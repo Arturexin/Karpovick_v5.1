@@ -1,0 +1,305 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="ventas-form baja_opacidad">
+    <div class="contenedor_botones_ventas botones-compras">
+        <button id="apertura-caja" class="myButtonAgregarDos btn_venta_uno">Apertura de Caja</button>
+        <button id="entradas-caja" class="myButtonAgregarDos marcaBoton btn_venta_uno">Entradas de Caja</button>
+        <button id="salidas-caja" class="myButtonAgregarDos btn_venta_uno">Salidas de Caja</button>
+    </div>
+    <div class="ventas_interior">
+        <div class="contenedor_botones_ventas uno_cliente">
+            <form id="formularioClientesVentas" class="contenedor_formulario_clientes">
+                <h2 class="uno_form">Datos del cliente</h2>
+                <div class="dos_form">
+
+                    <select name="opcion-buscar-cliente" id="opcion-buscar-cliente" class=" input-select-ventas">
+                        <option value="1">Nombres</option>
+                        <option value="2">DNI</option>
+                        <option value="3">Email</option>
+                        <option value="4">Teléfono</option>
+                    </select>
+                    <div class="tooltip_ayuda">
+                        <span class="material-symbols-outlined">help</span>
+                        <span class="tooltiptext_ayuda">Seleccione el tipo de dato de búsqueda.</span>
+                    </div>
+                </div>
+                <div class="tres_form">
+                    <input id="txtIdv" type="hidden" placeholder="ID"/>
+                    <div>
+                        <label class="label-general">Buscar
+                            <input class="input-general-importante fondo-importante" type="text" id="buscar-cliente-ventas" placeholder="Buscar">
+                            <div class="tooltip_ayuda">
+                                <span class="material-symbols-outlined">person_search</span>
+                                <span class="tooltiptext_ayuda">Digite palabras clave según el tipo de dato de búsqueda.</span>
+                            </div>
+                        </label>
+                        <label class="label-general">
+                            <div style="display: flex">Nombres*
+                                <div class="tooltip_ayuda">
+                                    <span class="material-symbols-outlined">help</span>
+                                    <span class="tooltiptext_ayuda">El nombre de la persona solo puede contener como caracteres letras.</span>
+                                </div>
+                            </div>
+                            <input class="input-general fondo" type="text" id="clientesv" name="clientesv"></label>
+                        <label class="label-general">
+                            <div style="display: flex">DNI/RUC
+                                <div class="tooltip_ayuda">
+                                    <span class="material-symbols-outlined">help</span>
+                                    <span class="tooltiptext_ayuda">El DNI/RUC solo puede contener caracteres numéricos.</span>
+                                </div>
+                            </div>
+                            <input class="input-general fondo" type="text" id="dniv" name="dniv"></label>
+                        <label class="label-general">
+                            <div style="display: flex">Email
+                                <div class="tooltip_ayuda">
+                                    <span class="material-symbols-outlined">help</span>
+                                    <span class="tooltiptext_ayuda">Ingresar datos en formato adecuado. Ej.: "email@karpovick.com".</span>
+                                </div>
+                            </div>
+                            <input class="input-general fondo" type="text" id="emailv" name="emailv"></label>
+                        <label class="label-general">
+                            <div style="display: flex">Teléfono*
+                                <div class="tooltip_ayuda">
+                                    <span class="material-symbols-outlined">help</span>
+                                    <span class="tooltiptext_ayuda">Ingresar datos en formato adecuado. EJ: "999 999 999".</span>
+                                </div>
+                            </div>
+                            <input class="input-general fondo" type="text" id="telefonov" name="telefonov"></label>
+                        <label class="label-general">
+                            <div style="display: flex">Dirección
+                                <div class="tooltip_ayuda">
+                                    <span class="material-symbols-outlined">help</span>
+                                    <span class="tooltiptext_ayuda">Ingresar la dirección de residencia.</span>
+                                </div>
+                            </div>
+                            <input class="input-general fondo" type="text" id="direccionv" name="direccionv"></label>
+                        <p id="concurrencia_cliente"></p>
+                    </div>
+                </div>
+                <div class="cuatro_form">
+                    <button id="boton-buscar-ventas-clientes" class="myButtonAgregar">Buscar Cliente</button>
+                    <button id="save-ventas-clientes" class="myButtonAgregar">Registrar Cliente</button>
+                    <input id="boton_restablecer_form_clientes_ventas" type="reset" class="myButtonEliminar">
+                </div>
+            </form>
+        </div>
+        <div class="contenedor_botones_ventas uno_form_venta">
+            <div class="contenedor_formulario_clientes">
+                <div class="uno_form">
+                    <h2 style="text-align: center;">Venta de Productos</h2>
+                </div>
+                
+                <div class="dos_form" style="display: flex;gap: 60px;">
+                    <div>
+
+                        <select class="dos_form input-select-ventas" id="input-tipo-comprobante">
+                            <option value="Nota de Venta">
+                                Nota de Venta
+                            </option>
+                            <option value="Boleta de Venta">
+                                Boleta de Venta
+                            </option>
+                            <option value="Factura">
+                                Factura
+                            </option>
+                            <option value="Proforma">
+                                Proforma
+                            </option>
+                        </select>
+                        <div class="tooltip_ayuda">
+                            <span class="material-symbols-outlined">help</span>
+                            <span class="tooltiptext_ayuda">Seleccione el tipo de comprobante de venta.</span>
+                        </div>
+                    </div>
+                    <div>
+                        <select name="fffff-sucursal" id="fffff-sucursal" class="input-select-ventas">
+                        </select>
+                        <div class="tooltip_ayuda">
+                            <span class="material-symbols-outlined">help</span>
+                            <span class="tooltiptext_ayuda">Seleccione una sucursal de venta.</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <form id="formulario-ventas" class="tres_form">
+                    <label class="label-general" style="font-size: 20px;">Buscar*
+                        <input class="input-general-importante fondo-importante buscarInput" id="buscador-productos-ventas" style="font-size: 18px;" type="text" placeholder="Buscar por código de producto">
+                        <div class="tooltip_ayuda">
+                            <button id="venta_detallada" class="material-symbols-outlined myButtonEditar" style="margin: 0px;padding: 0 5px;">find_in_page</button>
+                            <span class="tooltiptext_ayuda">Busca el código para editar la cantidad y precio de venta.</span>
+                        </div>
+                    </label>
+                    <label class="label-general">Sucursal<input class="input-general fondo" type="text" id="sucursal-ventas" style="color: #77E578;font-size: 18px;" name="sucursal-ventas" disabled></label>
+                    <label class="label-general">Categoría
+                        <select name="categoria-ventas" id="categoria-ventas" class="input-general fondo" disabled>
+                        </select>
+                    </label>
+                    <label class="label-general">Código<input class="input-general fondo" type="text" id="codigo-ventas" style="color: #77E578;font-size: 18px;" name="codigo-ventas" disabled></label>
+                    <label class="label-general">Descripción<input class="input-general fondo" type="text" id="descripcion-ventas" style="color: #77E578;font-size: 18px;" name="descripcion-ventas" disabled></label>
+                    <label class="label-general">Existencias<input class="input-general fondo" type="number" id="existencias-almacen-ventas" style="font-size: 18px; width: 70px;margin-right: 240px;text-align: right;" name="existencias-almacen-ventas" disabled></label>
+                    <label class="label-general">Medidas<input class="input-general fondo" type="text" id="talla-ventas" name="talla-ventas" style="font-size: 18px; width: 70px;margin-right: 240px;" disabled></label>
+                    <input class="input-general fondo" type="hidden" id="costo-unitario-ventas" name="costo-unitario-ventas" disabled>
+    
+                    <input class="input-general fondo" type="hidden" id="id-ventas" name="id-ventas" disabled>
+    
+                    <input class="input-general fondo" type="hidden" id="precio-ventas-formulario" name="precio-ventas-formulario" disabled>
+                </form>
+                
+                <div class="cuatro_form">
+                    <label class="label-ventas-ingresar">Cantidad* 
+                        <div style="width:110px; margin: 0 15px" class="contenedor_mas_menos">
+                        
+                            <p class="button_mas_menos" onclick="decrementarNumero(this, 0)">-</p>
+                            <input class="input_mas_menos input-ventas-ingresar" id="cantidad-vendida-ventas" type="text" value="0">
+                            <p class="button_mas_menos" onclick="incrementarNumero(this, 0)">+</p>
+                            
+                        </div>
+                    </label>
+                    <label class="label-ventas-ingresar">Saldo<input style="text-align: right;" class="input-ventas-ingresar" type="number" id="saldo-existencias-almacen-ventas" name="saldo-existencias-almacen-ventas" disabled></label>
+                    <label class="label-ventas-ingresar">Precio* 
+                        <div style="width:110px; margin: 0 15px" class="contenedor_mas_menos">
+                        
+                            <p class="button_mas_menos" onclick="decrementarNumero(this, 1)">-</p>
+                            <input class="input_mas_menos input-ventas-ingresar" id="precio-ventas" type="text" value="00.00">
+                            <p class="button_mas_menos" onclick="incrementarNumero(this, 1)">+</p>
+                            
+                        </div>
+                    </label>
+                    <label class="label-ventas-ingresar">Importe <span class="moneda_ventas"></span><input style="text-align: right;" class="input-ventas-ingresar" type="any" id="total-ventas" name="total-ventas" disabled></label>
+                    <button id="agregarATablaVentas" class="myButtonAgregar">Agregar a Lista</button>
+                    <input id="restablecerFormVentas" type="reset" class="myButtonEliminar">
+                </div>
+            </div>
+        </div>
+        <div class="contenedor_botones_ventas uno_tabla">
+            <div class="contenedor_formulario_clientes">
+                <table id="tabla-ventas" class="dos_form tabla-proforma">
+                    <thead>
+                        <tr>
+                            <th scope="row" colspan="7">
+                                <h2 class="uno_form">Lista de Productos</h2>
+                                <div class="tooltip_ayuda">
+                                    <button class="myButtonEditar" id="actualizar_saldos">Actualizar saldos</button>
+                                    <span class="tooltiptext_ayuda">Actualiza los saldos y existencias de los productos de la lista.</span>
+                                </div>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th style="width: 100px;">Código</th>
+                            <th style="width: 200px;">Descripción</th>
+                            <th>Medidas</th>
+                            <th>Cantidad</th>
+                            <th style="width: 100px;">Precio</th>
+                            <th style="width: 100px;">Importe</th>
+                            <th style="width: 100%;" id="remover-tabla-ventas" class="eliminarTablaFila ">
+                                <div class="tooltip">
+                                    <span class="material-symbols-outlined">delete</span>
+                                    <span class="tooltiptext">Descartar</span>
+                                </div>
+                                
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                    <tfoot>
+                        <th scope="row" colspan="3">Total</td>
+                        <th id="total-cantidad-tabla-ventas"></th>
+                        <th class="moneda_ventas"></th>
+                        <th id="total-importe-tabla-ventas"></th>
+                    </tfoot>
+                </table>
+                <form id="contenedor-metodo-pago" class="tres_form modo_credito">
+                    <div>
+                        <label class="label-metodo-pago">Efectivo 
+                            <div class="tooltip_ayuda">
+                                <input class="inputRadioVentas" id="radio-efectivo" type="radio" name="radioMetodoDePago" value="efectivo" checked>
+                                <span class="tooltiptext_ayuda">Pago en efectivo.</span>
+                            </div>
+                            <input class="input-metodo-pago fondo" type="text" id="efectivo-ventas" style="text-align: right;" disabled>
+                        </label>
+                        <label class="label-metodo-pago">Tarjeta 
+                            <div class="tooltip_ayuda">
+                                <input class="inputRadioVentas" id="radio-tarjeta" type="radio" name="radioMetodoDePago" value="tarjeta">
+                                <span class="tooltiptext_ayuda">Pago con medios digitales, tarjeta de débito o crédito.</span>
+                            </div>
+                            <input class="input-metodo-pago fondo" type="text" id="tarjeta-ventas" style="text-align: right;" disabled>
+                        </label>
+                        <label class="label-metodo-pago">Crédito 
+                            <div class="tooltip_ayuda">
+                                <input class="inputRadioVentas" id="radio-credito" type="radio" name="radioMetodoDePago" value="credito">
+                                <span class="tooltiptext_ayuda">Pago a crédito en tienda.</span>
+                            </div>
+                            <input class="input-metodo-pago fondo" type="text" id="credito-ventas" style="text-align: right;" disabled>
+                        </label>
+                        <label class="label-metodo-pago">Combinado 
+                            <div class="tooltip_ayuda">
+                                <input class="inputRadioVentas" id="radio-combinado" type="radio" name="radioMetodoDePago" value="combinado">
+                                <span class="tooltiptext_ayuda">Puede fraccionar el pago entre efectivo, tarjeta y crédito.</span>
+                            </div>
+                            <input class="input-metodo-pago fondo" type="text" id="total-metodo-pago-ventas" style="text-align: right;" disabled>
+                        </label>
+                        <label class="label-checkbox">Delivery 
+                            <input type="checkbox" id="modo_pago_ventas">
+                        </label>
+                    </div>
+                    <div class="cuadro_credito invisible" style="border: 1px solid var(--fondo-marca-uno); border-radius: 7px; height: 95px;">
+                        <label class="label-metodo-pago">Tasa
+                            <input style="margin: 0 5px; text-align: end; width: 35px;" class="input-metodo-pago fondo" type="text" id="credito-tasa">%
+                        </label>
+                        <label class="label-metodo-pago">Interés
+                            <span style="margin: 0 5px; text-align: end;" class="input-metodo-pago fondo" id="credito-interes"></span>
+                        </label>
+                        <label class="label-metodo-pago">Total
+                            <span style="margin: 0 5px; text-align: end;" class="input-metodo-pago fondo" id="credito-total"></span>
+                        </label>
+                    </div>
+                </form>
+                <div class="cuatro_form">
+                    <div style="display: grid;">
+                        <label class="label-checkbox">Imprimir comprobante 
+                            <input type="checkbox" id="check_comprobante">
+                        </label>
+                        <button id="procesar-venta" class="myButtonProcesar">Procesar Venta</button>
+                    </div>
+                    <button id="reporte_ventas_hoy" class="myButtonAgregar">Reporte de Ventas</button>
+                </div>
+                
+            </div>
+        </div>
+        <div class="contenedor_busqueda_detalle uno_detalle">
+            <div style="display: grid;">
+                <h2 style="text-align: center;">Buscador</h2>
+                <div style="display: grid;justify-items: center;gap: 10px;">
+                    <div style="display: flex;">
+                        <input type="text" id="buscador_descripcion" placeholder="Buscar por palabras clave..." class="input-general-importante" style="width: 230px;">
+                        <div class="tooltip_ayuda">
+                            <span class="material-symbols-outlined">find_in_page</span>
+                            <span class="tooltiptext_ayuda">Digite palabras clave para hacer la búsqueda del producto.</span>
+                        </div>
+                    </div>
+                    <div style="display: flex;">
+                        <select style="width: 240px;" id="categoria_buscador_detalle" class="input-general-importante">
+                        </select>
+                        <div class="tooltip_ayuda">
+                            <span class="material-symbols-outlined">help</span>
+                            <span class="tooltiptext_ayuda">Seleccione la categoría en la que se encuentra el producto a buscar.</span>
+                        </div>
+                    </div>
+                </div>
+                <button id="boton_buscar_codigo" class="myButtonEditar">Buscar por código</button>
+                <button id="boton_buscar_descripcion" class="myButtonEditar">Buscar por descripción</button>
+                <button id="boton_borrar_" class="eliminarTablaFila">Eliminar</button>
+            </div>
+            <div style="height: 30px;" class="contenedor_busqueda_cabecera">
+                <ul id="lista_cabecera"></ul>
+            </div>
+            <div class="contenedor_busqueda_detalle_interior">
+                <ul id="lista_detalle"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../static/ventas.js"></script>
+{% endblock %}

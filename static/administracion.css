@@ -1,0 +1,38 @@
+.clientes-form {
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 20px;
+}
+.boton-cli {
+    text-align: center;
+    width: 400px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+.contenedor_boton_sucursal{
+    display: flex;
+    width: 250px;
+    height: 58px;
+    background: var(--fondo-principal);
+    align-items: center;
+    border-radius: 30px;
+    justify-content: space-between;
+}
+.contenedor_form_sucursal{
+    display: flex;
+    justify-content: center;
+}
+.aumento_sucursal{
+    border-radius: 50%;
+    color: var(--color-principal);
+    background-color: var(--boton-uno);
+    border: 4px solid var(--fondo-terciario);
+    cursor: pointer;
+    margin: 0;
+}
+.aumento_sucursal:active{
+    position:relative;
+	top:1px;
+}

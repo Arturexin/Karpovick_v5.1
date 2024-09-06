@@ -1,0 +1,115 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="productos-form baja_opacidad">
+    <div class="contenedor_stock_productos">
+        <div id="circulo_stock_sucursal">
+            <div class="cirulo_interior">
+                <span class="nombre_circulo_sucursal"></span>
+                <span class="valor_circulo_sucursal"></span>
+                <span class="porcentaje_circulo_sucursal"></span>
+            </div>
+        </div>
+        <div>
+            <div class="contenedor-input-radio-inventario">
+                <h2>Impresión de etiquetas</h2>
+            </div>
+            <div class="contenedor-codigo-barras">
+                <table id="tabla-codigo-barras" class="tabla-proforma">
+                    <thead class="elemento_estatico_superior">
+                        <tr>
+                            <th scope="row" colspan="7">Tabla de Etiquetas</th>
+                        </tr>
+                        <tr>
+                            <th>Código</th>
+                            <th>Descripción</th>
+                            <th>Precio</th>
+                            <th>Cantidad</th>
+                            <th style="width: 200px;">Cod. Barras</th>
+                            <th style="width: 200px;">Cod. QR</th>
+                            <th>X</th>
+                        </tr>
+                    </thead>
+                    <tbody class="contenedor_body">
+                    </tbody>
+                    <tfoot class="elemento_estatico_inferior">
+                        <tr>
+                            <th scope="row" colspan="7">
+                                <button id="crear-codigo-barras" class="myButtonAgregar">Crear Código De Barras</button>
+                                <button id="crear-codigo-qr" class="myButtonAgregar">Crear Código QR</button>
+                            </th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        
+    </div>
+
+    <div id="acciones_rapidas" class="contenedor-pre-producto">
+    </div>
+    <div>
+        <table id="tabla-productos" class="tabla-proforma">
+            <thead>
+                <tr>
+                    <th scope="row" colspan="16"><h2>Inventario Productos</h2></th>
+                </tr>
+                <tr>
+                    <th scope="row" colspan="15">
+                        <button id="buscarFiltrosProductos">Buscar</button>
+                        <button id="restablecerProductos">Restablecer</button>
+                        <button id="extraccion_">CSV</button>
+                    </th>
+                </tr>
+                <tr>
+                    <th>Categoría<input id="filtro-tabla-productos-categoria" type="text" class="input-filtro" placeholder="Categoría"></th>
+                    <th>Código<input id="filtro-tabla-productos-codigo" type="text" class="input-filtro" placeholder="Código"></th>
+                    <th>Descripción<input id="filtro-tabla-productos-descripcion" type="text" class="input-filtro" placeholder="Descripción"></th>
+                    <th>Medidas</th>
+                    <th>Q AC</th>
+                    <th>Q S1</th>
+                    <th>Q S2</th>
+                    <th>Q S3</th>
+                    <th>Costo Unitario</th>
+                    <th>Costo Total</th>
+                    <th>Precio de Venta</th>
+                    <th>Lote</th>
+                    <th>Proveedor<input id="filtro-tabla-productos-proveedor" type="text" class="input-filtro" placeholder="Proveedor"></th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            
+            <tbody>                
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th scope="row" colspan="16">
+                        <button id="_inicio_"><<<</button>
+                        <button id="retroceder"><<  </button>  
+                        <select id="numeracionTabla" style="width: 50px; text-align: center;">
+                        </select>
+                        <button id="avanzar">  >></button>
+                        <button id="_final_">>>></button>
+                    </th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <details>
+        <summary>Acciones</summary>
+        <div>
+            <div style="display: flex;gap: 10px;justify-content: space-between;margin: 5px;"><div class="material-symbols-outlined myButtonEditar">print</div>
+                <span>Esta acción manda a cola de impresión de etiquetas de código de barras o qr.</span></div>
+            <div style="display: flex;gap: 10px;justify-content: space-between;margin: 5px;"><div class="material-symbols-outlined myButtonEditar">shopping_cart</div>
+                <span>Con esta acción se realiza la recompra de un producto existente.</span></div>
+            <div style="display: flex;gap: 10px;justify-content: space-between;margin: 5px;"><div class="material-symbols-outlined myButtonEditar">move_up</div>
+                <span>Con esta acción se puede transferir una determinada cantidad de cada producto entre las sucursales existentes.</span></div>
+            <div style="display: flex;gap: 10px;justify-content: space-between;margin: 5px;"><div class="material-symbols-outlined eliminarTablaFila">delete</div>
+                <span>Esta acción elimina un producto con todas sus operaciones y resportes de compra y venta.</span></div>
+        </div>
+    </details>
+    
+</div>
+<script src="../static/productos.js"></script>
+<script src="../static/tablas.js"></script>
+{% endblock %}

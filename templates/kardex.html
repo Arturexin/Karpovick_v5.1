@@ -1,0 +1,237 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="kardex-form baja_opacidad">
+    <div class="contenedor_kardex_analisis">
+        <form id="formularioDetalleMovimientos" class="contenedor_kardex" style="margin: 10px;">
+            <h2>Movimiento de Productos</h2>
+            <label>Sucursal 
+                <select name="fffff-sucursal" id="fffff-sucursal" class="input-select-ventas">
+                </select>
+                <div class="tooltip_ayuda">
+                    <span class="material-symbols-outlined">help</span>
+                    <span class="tooltiptext_ayuda">Seleccione la sucursal del producto a buscar.</span>
+                </div>
+            </label>
+            <div style="display: flex;">
+                <input id="buscador-productos-detalle-movimientos" type="text" class=" input-compras fondo-importante" placeholder="Buscar Código"> 
+                <div class="tooltip_ayuda">
+                    <span class="material-symbols-outlined">find_in_page</span>
+                    <span class="tooltiptext_ayuda">Digite caracteres clave del código a buscar.</span>
+                </div>
+            </div>
+            <div class="contenedor-label-input-compras">
+                <div class="label">
+                    <input type="hidden" id="id_producto">
+                    <label class="label-general">Categoría
+                        <select name="categoria-detalle-movimientos" id="categoria-detalle-movimientos" class="input-general fondo" disabled>
+                        </select>
+                    </label>
+                    <label class="label-general">Código<input class="input-general fondo" type="text" id="codigo-detalle-movimientos" name="codigo-detalle-movimientos" disabled/></label>
+                    <label class="label-general">Descripción<input class="input-general fondo" type="text" id="descripcion-detalle-movimientos" name="descripcion-detalle-movimientos" disabled/></label>
+                    <input class="input-general fondo" type="hidden" id="costo-unitario-detalle-movimientos" name="costo-unitario-detalle-movimientos" disabled/>
+                </div>
+            </div>     
+            <div class="boton-cli">
+                <button id="agregar-detalle-movimientos" href="#" class="myButtonAgregar">Consultar</button>
+                <input id="reset_form" type="reset" class="myButtonEliminar">
+            </div> 
+        </form>
+        <div class="grafico_interno">
+            <div class="titulo_graficos_dos">
+                <div><h3>Ventas Mensuales</h3></div>
+                <div>Mayor venta </p><span style="display: flex; gap: 5px;"><p id="mayor_venta" style="font-weight: bold;"></p><span class="material-symbols-outlined" style="color: var(--boton-tres);">expand_less</span></span><p class="mes_max" style="font-size: 10px;color: #9b9b9b;"></p></div>
+                <div>Menor venta </p><span style="display: flex; gap: 5px;"><p id="menor_venta" style="font-weight: bold;"></p><span class="material-symbols-outlined" style="color: var(--boton-dos);">expand_more</span></span><p class="mes_min" style="font-size: 10px;color: #9b9b9b;"></p></div>
+                <div>Venta promedio <span style="display: flex; gap: 5px;"><p id="promedio_venta" style="font-weight: bold;"></p><span class="material-symbols-outlined" style="color: var(--boton-uno);">vital_signs</span></span></div>
+            </div>  
+            <div class="etiquetas_graficos_colores">
+                <div>
+                    <div class="color_total_venta"></div>
+                    <span class="descripcion_item_grafico">Total Venta</span>
+                </div>
+                <div>
+                    <div class="color_total_costo"></div>
+                    <span class="descripcion_item_grafico">Costo de Venta</span>
+                </div>
+            </div>
+            <div class="grafico_compras">
+                <grafico-eje_y e_0="eje_y_numeracion"></grafico-eje_y>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
+            </div>
+            <br>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <div style="border: 1px solid var(--boton-dos);border-radius: 7px;">
+                    <label>Margen de beneficios real<h4 id="kardex_margen"></h4></label>
+                    <label>Margen de beneficios esperado <h4 id="kardex_margen_esperado"></h4></label>
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: center;border: 1px solid var(--boton-dos);border-radius: 7px;">
+
+                    <div>
+                        <label>Número de ventas <h4 id="kardex_num"></h4></label>
+                        <label>Total monto de venta <h4 id="kardex_venta"></label>
+                    </div>
+                    <div>
+                        <label>% Categoría <h4 id="kardex_num_categoria"></h4></label>
+                        <label>% Categoría <h4 id="kardex_venta_categoria"></label>
+                    </div>
+                    <div>
+                        <label>% Sucursal <h4 id="kardex_num_sucursal"></h4></label>
+                        <label>% Sucursal <h4 id="kardex_venta_sucursal"></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>        
+    
+    <div class="contenedor_kardex">
+        <table id="tabla-consolidado-kardex" class="tabla-proforma">
+            <thead>
+                <tr>
+                    <th scope="row" colspan="13">Kardex</th>
+                </tr>
+                <tr>
+                    <th scope="row" colspan="3">Producto</th>
+                    <th scope="row" colspan="2">Entradas</th>
+                    <th scope="row" colspan="2">Salidas</th>
+                    <th scope="row" colspan="2">Transferencias</th>
+                    <th scope="row" colspan="2">Despacho</th>
+                    <th scope="row" colspan="2">Saldos</th>
+                </tr>
+                <tr>
+                    <th style="width: 100px;">Código</th>
+                    <th style="width: 200px;">Detalle</th>
+                    <th style="width: 70px;">Costo Unitario</th>
+                    <th style="width: 70px;">Cantidad</th>
+                    <th style="width: 100px;">Costo Total</th>
+                    <th style="width: 70px;">Cantidad</th>
+                    <th style="width: 100px;">Costo Total</th>
+                    <th style="width: 70px;">Cantidad</th>
+                    <th style="width: 100px;">Costo Total</th>
+                    <th style="width: 70px;">Cantidad</th>
+                    <th style="width: 100px;">Costo Total</th>
+                    <th style="width: 70px;">Cantidad</th>
+                    <th style="width: 100px;">Costo Total</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th scope="row" colspan="13"><a id="reiniciar-tablas" class="myButtonEliminar">Reiniciar</a></th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div class="contenedor_compras">
+        <div>
+            <h2 style="text-align: center;">Lista de Entradas</h2>
+            <div class="contenedor-codigo-barras">
+                <table id="tabla-detalle-movimientos-entradas" class="tabla-proforma">
+                    <caption class="invisible">Lista de Entradas</caption>
+                    <thead class="elemento_estatico_superior">
+                        <tr>
+                            <th style="width: 120px;">Comprobante</th>
+                            <th style="width: 70px;">Cantidad Entrada</th>
+                            <th style="width: 100px;">Importe Entrada</th>
+                            <th style="width: 70px;">Fecha</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                    <tfoot class="elemento_estatico_inferior">
+                        <th>Total</th>
+                        <th id="total-existencias-detalle-entradas"></th>
+                        <th id="total-importe-detalle-entradas"></th>
+                        <th></th>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        <div>
+            <h2 style="text-align: center;">Lista de Salidas</h2>
+            <div class="contenedor-codigo-barras">
+                <table id="tabla-detalle-movimientos-salidas" class="tabla-proforma">
+                    <caption class="invisible">Lista de Salidas</caption>
+                    <thead class="elemento_estatico_superior">
+                        <tr>
+                            <th style="width: 120px;">Comprobante</th>
+                            <th style="width: 70px;">Cantidad Salidas</th>
+                            <th style="width: 100px;">Importe Salidas</th>
+                            <th style="width: 70px;">Fecha</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                    <tfoot class="elemento_estatico_inferior">
+                        <th>Total</th>
+                        <th id="total-existencias-detalle-salidas"></th>
+                        <th id="total-importe-detalle-salidas"></th>
+                        <th></th>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        <div>
+            <h2 style="text-align: center;">Lista de Transferencias</h2>
+            <div class="contenedor-codigo-barras">
+                <table id="tabla-detalle-movimientos-transferencias" class="tabla-proforma">
+                    <caption class="invisible">Lista de Transferencias</caption>
+                    <thead class="elemento_estatico_superior">
+                        <tr>
+                            <th style="width: 120px;">Comprobante</th>
+                            <th style="width: 70px;">Cantidad Transferencias</th>
+                            <th style="width: 100px;">Importe Transferencias</th>
+                            <th style="width: 70px;">Fecha</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                    <tfoot class="elemento_estatico_inferior">
+                        <th>Total</th>
+                        <th id="total-existencias-detalle-transferencias"></th>
+                        <th id="total-importe-detalle-transferencias"></th>
+                        <th></th>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        <div>
+            <h2 style="text-align: center;">Lista de Despacho</h2>
+            <div class="contenedor-codigo-barras">
+                <table id="tabla-detalle-movimientos-perdidas" class="tabla-proforma">
+                    <caption class="invisible">Lista de Despacho</caption>
+                    <thead class="elemento_estatico_superior">
+                        <tr>
+                            <th style="width: 120px;">Comprobante</th>
+                            <th style="width: 70px;">Cantidad Despacho</th>
+                            <th style="width: 100px;">Importe Despacho</th>
+                            <th style="width: 70px;">Fecha</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                    <tfoot class="elemento_estatico_inferior">
+                        <th>Total</th>
+                        <th id="total-existencias-detalle-perdidas"></th>
+                        <th id="total-importe-detalle-perdidas"></th>
+                        <th></th>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../static/kardex.js"></script>
+{% endblock %}

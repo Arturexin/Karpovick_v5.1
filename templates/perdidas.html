@@ -1,0 +1,92 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="perdidas-form baja_opacidad">
+    <div class="contenedor_compras">
+        <div class="contenedor_compras_dos">
+            <form id="formulario-perdidas">
+                <div class="into_form">
+                    <h2>Despacho sin venta
+                        <div class="tooltip_ayuda">
+                            <span class="material-symbols-outlined">help</span>
+                            <span class="tooltiptext_ayuda">Registra salidas de productos sin intercambio monetario.</span>
+                        </div>
+                    </h2>
+                    <label>Sucursal 
+                        <select name="fffff-sucursal" id="fffff-sucursal" class="input-select-ventas">
+                        </select>
+                        <div class="tooltip_ayuda">
+                            <span class="material-symbols-outlined">help</span>
+                            <span class="tooltiptext_ayuda">Seleccione la sucursal del producto a buscar.</span>
+                        </div>
+                    </label>
+                    <div>
+                        <input class="input-general-importante fondo-importante" type="text" id="buscador-perdidas" placeholder="Buscar por código">
+                        <div class="tooltip_ayuda">
+                            <span class="material-symbols-outlined">find_in_page</span>
+                            <span class="tooltiptext_ayuda">Digite caracteres clave del código a buscar.</span>
+                        </div>
+                    </div>
+                    <div class="contenedor-label-input-compras">
+                        <div class="label">
+                            <input class="input-general" type="hidden" id="id-perdidas" name="id-perdidas" disabled/>
+                            <label class="label-general">Categoria
+                                <select name="categoria-perdidas" id="categoria-perdidas" class="input-general fondo" disabled>
+                                </select>
+                            </label>
+                            <label class="label-general">Código<input class="input-general fondo" type="text" id="codigo-perdidas" name="codigo-perdidas" disabled/></label>
+                            <label class="label-general">Descripción<input class="input-general fondo" type="text" id="descripcion-perdidas" name="descripcion-perdidas" disabled/></label>
+                        </div>
+                    </div>
+                    <div>
+                        <input class="input-general-importante fondo-importante" type="text" id="cantidad-perdida" placeholder="Cantidad">
+                        <div class="tooltip_ayuda">
+                            <span class="material-symbols-outlined">help</span>
+                            <span class="tooltiptext_ayuda">Ingrese caracteres numéricos.</span>
+                        </div>
+                    </div>
+                    <label>Motivo de Salida
+                            <select id="motivo_salida">motivo
+                                <option value="Donación">Donación</option>
+                                <option value="Pérdida">Pérdida</option>
+                            </select>
+                    </label>
+                    <div>
+                        <button id="agregarATablaPrePerdidas" class="myButtonAgregar">Agregar a Tabla de Pérdidas</button>
+                        <input onclick="reseteoFormulario()" type="reset" class="myButtonEliminar">
+                    </div> 
+                </div>
+            </form>
+        </div>
+        <div>
+            <div class="titulo_graficos"><p>Salidas por Donaciones y Pérdidas</p></div>  
+            <div class="etiquetas_graficos_colores">
+                <div>
+                    <div class="color_item_grafico_compra"></div>
+                    <span class="descripcion_item_grafico">Donaciones</span>
+                </div>
+                <div>
+                    <div class="color_item_grafico_recompra"></div>
+                    <span class="descripcion_item_grafico">Pérdidas</span>
+                </div>
+            </div>
+            <div class="grafico_compras">
+                <grafico-eje_y e_0="eje_y_numeracion"></grafico-eje_y>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../static/perdidas.js"></script>
+{% endblock %}

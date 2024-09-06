@@ -1,0 +1,141 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="compras-form baja_opacidad">
+    <div class="contenedor_compras_uno botones-compras">
+        <button id="nuevo-producto" class="myButtonAgregarDos">Nuevo Producto</button>
+        <button id="recompra-producto-plus" class="myButtonAgregarDos">Recomprar Producto</button>
+    </div>
+    <div class="contenedor_compras_principal">
+        <div class="contenedor_formulario_compras">
+            <form id="formulario-compras-uno">
+            </form>
+        </div>
+        <div class="contenedor_busqueda_detalle_general">
+            <div style="display: grid;">
+                <h2 style="text-align: center;">Buscador</h2>
+                <div style="display: grid;grid-template-columns: 1fr 1fr 1fr 1fr 1fr;align-items: center;">
+
+                    <div style="display: grid;grid-template-columns: 1fr;align-items: center; justify-items: center; gap: 5px;">
+                        <input type="text" id="buscador_descripcion" placeholder="Buscar por palabras clave..." class="input-general-importante" style="width: 240px;">
+                        <div style="display: grid; grid-template-columns: 60% 40%;gap: 5px;">
+
+                            <select id="categoria_buscador_detalle" class="" style="width: 120px;">
+                            </select>
+                            <select id="periodo_tiempo" class="" style="width: 80px;">
+                                <option value="0" selected>Anual</option>
+                                <option value="1">1° trim</option>
+                                <option value="2">2° trim</option>
+                                <option value="3">3° trim</option>
+                                <option value="4">4° trim</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="tooltip">
+                        <button class="eliminarTablaFila stock_sucursal">Stock AC</button>
+                        <span class="tooltiptext">Número de operaciónes y stock en Almacén Central</span>
+                    </div>
+                    <div class="tooltip">
+                        <button class="eliminarTablaFila stock_sucursal">Stock S1</button>
+                        <span class="tooltiptext">Número de operaciónes y stock en Sucursal Uno</span>
+                    </div>
+                    <div class="tooltip">
+                        <button class="eliminarTablaFila stock_sucursal">Stock S2</button>
+                        <span class="tooltiptext">Número de operaciónes y stock en Sucursal Dos</span>
+                    </div>
+                    <div class="tooltip">
+                        <button class="eliminarTablaFila stock_sucursal">Stock S3</button>
+                        <span class="tooltiptext">Número de operaciónes y stock en Sucursal Tres</span>
+                    </div>
+                    
+                    
+                    
+                </div>
+                <div style="display: grid;grid-template-columns: 1.3fr 1.3fr 0.7fr 0.7fr;align-items: center;">
+
+                    <button id="boton_buscar_codigo" class="myButtonEditar">Buscar código</button>
+                    <button id="boton_buscar_descripcion" class="myButtonEditar">Buscar descirpción</button>
+                    <button id="boton_borrar_" class="eliminarTablaFila">Eliminar</button>
+                    <button onclick="imprimirContenido()">Imprimir</button>
+                </div>
+            </div>
+            <div style="width: 510px;" class="contenedor_busqueda_cabecera">
+                <ul id="lista_cabecera"></ul>
+            </div>
+            <div class="contenedor_busqueda_detalle_general_interior">
+                <ul id="lista_detalle"></ul>
+            </div>
+        </div>
+    </div>
+    <div class="contenedor-pre-recompra">
+        <table id="tabla_modal" class="tabla_modal contenido-tabla">
+            <thead>
+                <tr>
+                    <th scope="row" colspan="18"><h2>Proforma</h2></th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+                <th scope="row" colspan="18">
+                    <button id="procesar-pre-recompra" class="myButtonAgregar">Enviar Recompra</button>
+                    <button id="procesar-pre-compra" class="myButtonAgregar">Enviar Nueva Compra</button>
+                    <button id="remover-tabla-compras-uno" class="eliminarTablaFila">Cancelar</button>
+                </td>
+            </tfoot>
+        </table>
+    </div>
+    <div class="contenedor_tabla">
+        <table id="tabla_principal" class="tabla-proforma">
+            <thead>
+                <tr>
+                    <th scope="row" colspan="12"><h2>Lista de Compras</h2></th>
+                    
+                </tr>
+                <tr>
+                    <th>Sucursal</th>
+                    <th>Categoria</th>
+                    <th>Código</th>
+                    <th>Descripción</th>
+                    <th>Medidas</th>
+                    <th>Cantidad</th>
+                    <th>Costo Unitario</th>
+                    <th>Costo Total</th>
+                    <th>Precio de Venta</th>
+                    <th>Lote</th>
+                    <th>Proveedor</th>
+                    <th style="width: 100%;" id="remover-tabla-compras-dos" class="eliminarTablaFila">
+                        <div class="tooltip">
+                            <span style="font-size:18px;" class="material-symbols-outlined">delete</span>
+                            <span class="tooltiptext">Descartar</span>
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th scope="row" colspan="5">Total</th>
+                    <th id="total-cantidad-tabla-compras"></th>
+                    <th class="moneda_compras"></th>
+                    <th id="total-importe-tabla-compras"></th>
+                    <th scope="row" colspan="4">
+                        <label style="margin: 0 5px;" class="label-checkbox">Imprimir lista de compras 
+                            <input type="checkbox" id="check_comprobante">
+                        </label>
+                    </th>
+                </tr>
+                <tr>
+                    <th scope="row" colspan="12">
+                        <button id="procesar-compras" class="myButtonProcesar">Procesar</button>
+                        <button id="procesar-compras-plus" class="myButtonProcesar invisible">Procesar</button>
+                    </th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+<script src="../static/compras.js"></script>
+{% endblock %}

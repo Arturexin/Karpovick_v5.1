@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/general.css">
+    <link rel="stylesheet" href="../static/control.css">
+    <title>Document</title>
+</head>
+<body style="background: #867e7e;">
+    <nav class="nav_usuarios">
+        <div>
+            <h1>Control de Usuarios</h1>
+        </div>
+        <div>
+            <a href="">Control de Usuarios</a>
+        </div>
+        <div>
+            <a href="">Movimientos de Usuarios</a>
+        </div>
+        <div>
+            <a href="{{ url_for('logout')}}" id="cerrar-sesion-control" class="usuario-cabecera">Cerrar Sesión</a>
+        </div>
+    </nav>
+    
+    
+    <div id="formulario_control">
+        <div>
+            <div>
+                <h3>Leyenda Usuarios CARGO</h3>
+                <ul>
+                    <li>200: Super Administrador</li>
+                    <li>201: Administrador</li>
+                    <li>202: Supervisor</li>
+                    <li>0:Cajero Almacén Central</li>
+                    <li>1: Cajero Sucursal Uno</li>
+                    <li>2: Cajero Sucursal Dos</li>
+                    <li>3: Cajero Sucursal Tres</li>
+                </ul>
+            </div>
+            <div>
+                <h3>Leyenda Usuarios ESTADO</h3>
+                <ul>
+                    <li>0: Solicitud de activación</li>
+                    <li>1: Activado</li>
+                    <li>2: Solicitud de desactivación</li>
+                    <li>3: Desactivado</li>
+                    <li>4: Pausado</li>
+                    <li>5: Periodo de prueba</li>
+                    <li>6: Problemas de pago</li>
+                    <li>7: Bloqueado por impago</li>
+                </ul>
+            </div>
+            <div>
+                <h3>Leyenda Sucursales ESTADO</h3>
+                <ul>
+                    <li>0: Solicitud de activación</li>
+                    <li>1: Activado</li>
+                    <li>2: Solicitud de desactivación</li>
+                    <li>3: Desactivado</li>
+                </ul>
+            </div>
+        </div>
+        <form action="" class="formulario-general fondo">
+            <h3>Formulario de Usuarios</h3>
+            <div>
+                <label class="label-general">ID <input id="usuarios-id" class="input-general" type="text" disabled style="color: #eee;"></label>
+                <label class="label-general">Nombres <input id="usuarios-nombres" class="input-general" type="text"></label>
+                <label class="label-general">Apellidos <input id="usuarios-apellidos" class="input-general" type="text"></label>
+                <label class="label-general">DNI <input id="usuarios-dni" class="input-general" type="text"></label>
+                <label class="label-general">Email <input id="usuarios-email" class="input-general" type="text"></label>
+                <label class="label-general">Teléfono <input id="usuarios-telefono" class="input-general" type="text"></label>
+                <label class="label-general">Cargo 
+                    <select id="usuarios-cargo" class="input-general">
+                        <option value=200>Super Administrador</option>
+                        <option value=201>Administrador</option>
+                        <option value=202>Supervisor</option>
+                        <option value=0>Cajero Almacén Central</option>
+                        <option value=1>Cajero Sucursal Uno</option>
+                        <option value=2>Cajero Sucursal Dos</option>
+                        <option value=3>Cajero Sucursal Tres</option>
+                    </select>
+                </label>
+                <label class="label-general">Vinculación <input id="usuarios-vinculacion" class="input-general" type="text"></label>
+                <label class="label-general">Password <input id="usuarios-password" class="input-general" type="text"></label>
+                <label class="label-general">Estado
+                    <select id="usuarios-clave" class="input-general" disabled>
+                        <option value=0>Solicitud de activación</option>
+                        <option value=1>Activado</option>
+                        <option value=2>Solicitud de desactivación</option>
+                        <option value=3>Desactivado</option>
+                        <option value=4>Pago retrasado</option>
+                    </select>
+                </label>
+                <label class="label-general">Fecha <input id="usuarios-fecha" class="input-general" type="text" disabled style="color: #eee;"></label>
+            </div>
+            <div>
+                <button class="boton-accion" id="crear_usuario">Crear</button>
+                <button class="boton-accion" id="editar_usuario">Editar</button>
+                <button class="boton-accion" id="contrasena_usuario">Actualizar Password</button>
+                <button class="boton-restaurar" id="restablecerForm">Restablecer</button>
+            </div>
+        </form>
+    </div>
+    <div id="tabla_control">
+        <table id="tabla-usuarios" class="tabla-proformaC">
+            <thead>
+                <tr>
+                    <th scope="row" colspan="16"><h2>Lista de Usuarios</h2></th>
+                </tr>
+                <tr>
+                    <th scope="row" colspan="15">
+                        <div>
+                            <button class="boton-accion" id="buscarFiltrosUsuarios">Buscar</button>
+                            <button class="boton-restaurar" id="restablecerUsuarios">Restablecer</button>
+                        </div>
+                        <div>Fecha Inicio
+                            <input id="filtro-tabla-usuarios-fecha-inicio" type="date" class="input-filtro" placeholder="Fecha Inicio">
+                            Fecha Fin
+                            <input id="filtro-tabla-usuarios-fecha-fin" type="date" class="input-filtro" placeholder="Fecha Fin">
+                        </div>
+                    </th>
+                </tr>
+                <tr>
+                    <th style="width: 30px;">ID<input  style="width: 30px;" id="filtro-tabla-usuarios-id" type="text"></th>
+                    <th style="width: 95px;">Nombres<input  style="width: 95px;" id="filtro-tabla-usuarios-nombres" type="text"></th>
+                    <th style="width: 95px;">Apellidos<input  style="width: 95px;" id="filtro-tabla-usuarios-apellidos" type="text"></th>
+                    <th style="width: 95px;">DNI<input  style="width: 95px;" id="filtro-tabla-usuarios-dni" type="text"></th>
+                    <th style="width: 95px;">Email<input  style="width: 95px;" id="filtro-tabla-usuarios-email" type="text"></th>
+                    <th style="width: 95px;">Teléfono<input style="width: 95px;" id="filtro-tabla-usuarios-telefono" type="text"></th>
+                    <th style="width: 30px;">Cargo<input style="width: 30px;" id="filtro-tabla-usuarios-cargo" type="text"></th>
+                    <th style="width: 30px;">Vinculación<input style="width: 30px;" id="filtro-tabla-usuarios-vinculacion" type="text"></th>
+                    <th style="width: 30px;">Estado<input style="width: 30px;" id="filtro-tabla-usuarios-clave" type="text"></th>
+                    <th style="width: 95px;">Fecha</th>
+                    <th style="width: 95px;">Sucursales<input style="width: 30px;" id="filtro-tabla-usuarios-sucursales" type="text"></th>
+                    <th style="width: 95px;">Usuarios<input style="width: 30px;" id="filtro-tabla-usuarios-usuarios" type="text"></th>
+                    <th style="width: 95px;">Fecha Pago</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th scope="row" colspan="16">
+                        <button id="retrocederUsuarios"><<  </button>
+                        <select id="numeracionTablaUsuarios" style="width: 50px; text-align: center;">
+                        </select>  
+                        <button id="avanzarUsuarios">  >></button>
+                    </th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    
+    <div id="tabla_control_sucursal">
+        <table id="tabla-sucursales" class="tabla-proformaC">
+            <thead>
+                <tr>
+                    <th scope="row" colspan="16"><h2>Lista de Sucursales</h2></th>
+                </tr>
+                <tr>
+                    <th scope="row" colspan="15">
+                        <div>
+                            <button class="boton-accion" id="buscarFiltrosSucursal">Buscar</button>
+                            <button class="boton-restaurar" id="restablecerSucursal">Restablecer</button>
+                        </div>
+                        <div>Fecha Inicio
+                            <input id="filtro-tabla-sucursal-fecha-inicio" type="date" class="input-filtro" placeholder="Fecha Inicio">
+                            Fecha Fin
+                            <input id="filtro-tabla-sucursal-fecha-fin" type="date" class="input-filtro" placeholder="Fecha Fin">
+                        </div>
+                    </th>
+                </tr>
+                <tr>
+                    <th style="width: 30px;">ID</th>
+                    <th style="width: 95px;">Sucursal<input  style="width: 95px;" id="filtro-tabla-sucursal-sucursal" type="text"></th>
+                    <th style="width: 30px;">Estado<input  style="width: 30px;" id="filtro-tabla-sucursal-estado" type="text"></th>
+                    <th style="width: 30px;">Usuario<input  style="width: 30px;" id="filtro-tabla-sucursal-usuario" type="text"></th>
+                    <th style="width: 95px;">Fecha</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th scope="row" colspan="16">
+                        <button id="retrocederSucursal"><<  </button>
+                        <select id="numeracionTablaSucursal" style="width: 50px; text-align: center;">
+                        </select>  
+                        <button id="avanzarSucursal">  >></button>
+                    </th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <script src="../static/control.js"></script>
+</body>
+</html>

@@ -1,0 +1,192 @@
+.modificacion-form{
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 20px;
+}
+.color_item_grafico_modificacion{
+    width: 20px;
+    height: 10px;
+    background: #E6CA7B; 
+}
+.devolucionCompras-form{
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 20px;
+}
+.devolucionSalidas-form{
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 20px;
+}
+.perdidas-form{
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 20px;
+}
+
+
+
+
+
+
+
+.formulario-entradas{
+    background-color: #141E30;
+    margin: 20px;
+    padding: 20px;
+    min-width: 680px;
+    width: 680px;
+}
+.contenedor-entradas{
+    border: none;
+    border-radius: 7px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.label-registro {
+    list-style: none;
+    margin: 3.5px 20px;
+    padding: 4px;
+    width: 100%;
+}
+.input-registro {
+    
+    width: 90%;
+    margin: 4px 30px;
+    border-radius: 7px;
+    border: none;
+    padding: 3px;
+    color: var(--color-principal);
+}
+#comparte-datos-registro{
+    display: flex;
+    flex-direction: column;
+}
+.input-registro-number {
+    margin: 4px;
+    padding: 3px;
+    width: 35px;
+    background-color: #141E30;
+    border: 1px solid #276873;
+    border-radius: 7px;
+}
+.label-radio-registro{
+    margin: 30px;
+}
+.input-radio-registro{
+    margin: 5px;
+}
+#datos-producto-registro{
+    margin: 0px 20px;
+    border-radius: 7px;
+}
+.contenedor-entradas-dos{
+    width: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.label-talla-registro{
+    margin: 0px 19px;
+    text-align: right;
+}
+.label-registro-dos{
+    list-style: none;
+    margin: 5px 20px;
+    padding: 3px;
+    width: 100%;
+}
+.label-registro-item{
+    list-style: none;
+    margin: 0px 22px;
+}
+#radio-registro{
+    margin: 10px 150px;
+}
+/* MODAL */
+.contenedor-pre-modificacion{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #111111bd;
+    display: flex;
+    align-items: center;
+    opacity: 0;/* con esto ocultamos el modal */
+    pointer-events: none;
+    transition: opacity .5s;
+}
+.modal-show-modificacion{/* con esto mostramos el modal */
+    opacity: 1;
+    pointer-events: unset;
+    transition: opacity .5s;
+}
+.contenedor-devolucion-compras{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #111111bd;
+    display: flex;
+    align-items: center;
+    opacity: 0;/* con esto ocultamos el modal */
+    pointer-events: none;
+    transition: opacity .5s;
+}
+.modal-show-devolucion-compras{/* con esto mostramos el modal */
+    opacity: 1;
+    pointer-events: unset;
+    transition: opacity .5s;
+}
+.contenedor-devolucion-salidas{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #111111bd;
+    display: flex;
+    align-items: center;
+    opacity: 0;/* con esto ocultamos el modal */
+    pointer-events: none;
+    transition: opacity .5s;
+}
+.modal-show-devolucion-salidas{/* con esto mostramos el modal */
+    opacity: 1;
+    pointer-events: unset;
+    transition: opacity .5s;
+}
+.tablex{
+    display: flex;
+    align-items: flex-start;
+}
+.formulario-transicion-modificacion{
+    background-color: #111111bd;
+    opacity: 0;/* con esto ocultamos el modal */
+    pointer-events: none;
+    transition: opacity .5s;
+}
+.formulario-transicion-modificacion-show{/* con esto mostramos el modal */
+    opacity: 1;
+    pointer-events: unset;
+    transition: opacity .5s;
+}
+.tabla-transicion-modificacion{
+    background-color: #111111bd;
+    opacity: 0;/* con esto ocultamos el modal */
+    pointer-events: none;
+    transition: opacity .5s;
+}
+.tabla-transicion-modificacion-show{/* con esto mostramos el modal */
+    opacity: 1;
+    pointer-events: unset;
+    transition: opacity .5s;
+}

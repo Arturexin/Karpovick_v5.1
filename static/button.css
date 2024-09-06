@@ -1,0 +1,197 @@
+.myButtonAgregar {
+	box-shadow: 0px 10px 14px -7px var(--boton-uno);
+	background:linear-gradient(to bottom, var(--boton-uno) 5%, var(--boton-uno) 100%);
+	background-color:var(--boton-uno);
+	border-radius:8px;
+	display:inline-block;
+	cursor:pointer;
+	color:var(--color-secundario);
+	font-family:'Nunito', sans-serif;
+	font-size:17px;
+	font-weight:bold;
+	padding:7px 19px;
+	text-decoration:none;
+	/* text-shadow:0px 1px 0px #3d768a; */
+	border: none;
+	user-select: none;
+}
+/* .myButtonAgregar:hover {
+	background:linear-gradient(to bottom, #408c99 5%, #599bb3 100%);
+	background-color:#408c99;
+} */
+.myButtonAgregar:active {
+	position:relative;
+	top:1px;
+	color: var(--color-secundario);
+}
+
+
+.myButtonEditar {
+	box-shadow: 0px 10px 14px -7px var(--boton-uno);
+	background:linear-gradient(to bottom, var(--boton-uno) 5%, var(--boton-uno) 100%);
+	background-color:var(--boton-uno);
+	border-radius:8px;
+	border: none;
+	display:inline-block;
+	cursor:pointer;
+	color:var(--color-secundario);
+	font-family:'Nunito', sans-serif;
+	font-size:14px;
+	font-weight:bold;
+	padding:2px 10px;
+	text-decoration:none;
+	/* text-shadow:0px 1px 0px #3e5c8a; */
+	user-select: none;
+}
+/* .myButtonEditar:hover {
+	background:linear-gradient(to bottom, #405c99 5%, #5971b3 100%);
+	background-color:#405899;
+} */
+.myButtonEditar:active {
+	position:relative;
+	top:1px;
+	color: var(--color-secundario);
+}
+
+
+.myButtonEliminar {
+	box-shadow: 0px 10px 14px -7px var(--boton-dos);
+	background:linear-gradient(to bottom, var(--boton-dos) 5%, var(--boton-dos) 100%);
+	background-color:var(--boton-dos);
+	border-radius:8px;
+	display:inline-block;
+	cursor:pointer;
+	color:var(--color-secundario);
+	font-family:'Nunito', sans-serif;
+	font-size:17px;
+	font-weight:bold;
+	padding:7px 19px;
+	text-decoration:none;
+	/* text-shadow:0px 1px 0px var(--color-secundario); */
+	border: none;
+	user-select: none;
+}
+/* .myButtonEliminar:hover {
+	background:linear-gradient(to bottom, #995240 5%, #b36b59 100%);
+	background-color:#995240;
+} */
+.myButtonEliminar:active {
+	position:relative;
+	top:1px;
+	color: var(--color-secundario);
+}
+.eliminarTablaFila {
+	box-shadow: 0px 10px 14px -7px var(--boton-dos);
+	background:linear-gradient(to bottom, var(--boton-dos) 5%, var(--boton-dos) 100%);
+	background-color:var(--boton-dos);
+	border-radius:8px;
+	display:inline-block;
+	cursor:pointer;
+	color:var(--color-secundario);
+	font-family:'Nunito', sans-serif;
+	font-size:14px;
+	font-weight:bold;
+	padding:2px 5px;
+	text-decoration:none;
+	/* text-shadow:0px 1px 0px #8a4d3e; */
+	border: none;
+	user-select: none;
+}
+/* .eliminarTablaFila:hover {
+	background:linear-gradient(to bottom, #995240 5%, #b36b59 100%);
+	background-color:#995240;
+} */
+.eliminarTablaFila:active {
+	position:relative;
+	top:1px;
+	color: var(--color-secundario);
+}
+
+
+.myButtonProcesar {
+	box-shadow: 0px 10px 14px -7px var(--boton-tres);
+	background:linear-gradient(to bottom, var(--boton-tres) 5%, var(--boton-tres) 100%);
+	background-color:var(--boton-tres);
+	border-radius:8px;
+	display:inline-block;
+	cursor:pointer;
+	color:var(--color-secundario);
+	font-family:'Nunito', sans-serif;
+	font-size:20px;
+	font-weight:bold;
+	padding:13px 32px;
+	text-decoration:none;
+	/* text-shadow:0px 1px 0px #3e8a4b; */
+	user-select: none;
+	border: none;
+}
+/* .myButtonProcesar:hover {
+	background:linear-gradient(to bottom, #40994f 5%, #77E578 100%);
+	background-color:#40994c;
+} */
+.myButtonProcesar:active {
+	position:relative;
+	top:1px;
+	color: var(--color-secundario);
+}
+
+/* //////////////////////////////////////////////////////////////////////////////// */
+.myButtonAgregarDos {
+	width: 50%;
+	box-shadow: 0px 10px 14px -7px var(--boton-uno);
+	background:var(--boton-uno);
+	background-color:var(--boton-uno);
+	cursor:pointer;
+	color: var(--color-secundario);
+	font-family:'Nunito', sans-serif;
+	font-size:17px;
+	font-weight:bold;
+	padding:20px 20px;
+	text-decoration:none;
+	user-select: none;
+	border: none;
+	border-radius: 8px;
+}
+.myButtonAgregarDos:active {
+	position:relative;
+	top:1px;
+}
+.marcaBoton {
+	box-shadow: 0px 10px 14px -7px var(--fondo-marca-uno);
+	background-color:var(--fondo-marca-uno);
+	color: var(--color-secundario);
+	font-size: 20px;
+	transition: background-color .4s, box-shadow .4s, font-size .4s;
+}
+.marcaBotonDos {
+	box-shadow: 0px 10px 14px -7px var(--boton-tres);
+	background:var(--boton-tres);
+	background-color:var(--boton-tres);
+	color: var(--color-secundario);
+	transition: background-color .4s, box-shadow .4s, font-size .4s;
+}
+.botonBloqueoMenu {
+	display: flex;
+	border-radius: 8px;
+	display:inline-block;
+	cursor:pointer;
+	font-family:'Nunito', sans-serif;
+	font-size:17px;
+	font-weight:bold;
+	padding: 5px 5px;
+	text-decoration:none;
+	border: none;
+	user-select: none;
+	transition: background .4s, box-shadow .4s, transform .4s;
+}
+.botonBloqueoMenu:hover {
+    background: var(--fondo-secundario);
+    transform: translate(5px);
+    box-shadow: 0px 0px 5px var(--color-secundario);
+	color: var(--color-secundario);
+}
+.botonBloqueoMenu:active {
+	position:relative;
+	top:1px;
+	color: var(--color-secundario);
+}

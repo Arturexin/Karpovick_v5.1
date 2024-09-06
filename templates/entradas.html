@@ -1,0 +1,121 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="entradas-form baja_opacidad">
+    <div class="tabla-proforma">
+        <h2 style="text-align: center; margin: 10px;">Volcado de datos (.csv)
+            <div class="tooltip_ayuda">
+                <span class="material-symbols-outlined">help</span>
+                <span class="tooltiptext_ayuda">Este apartado está destinado a migrar datos de una lista de productos externa.</span>
+            </div>
+        </h2>
+        <hr><br>
+        <p style="text-align: center;">Por favor, asegúrate de que los archivos que utilices estén en formato CSV.</p>
+        <div style="display: grid;justify-content: center; margin: 10px;">
+            <div style="display: flex; justify-content: center;">
+                <button id="exportar_formato">Descargar formato CSV</button>
+                <div class="tooltip_ayuda">
+                    <span class="material-symbols-outlined">download</span>
+                    <span class="tooltiptext_ayuda">Despues de hacer la descarga debe acomodar sus datos de acuerdo a este formato.</span>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: center;">
+                <input type="file" id="carga_archivo" class="input_file_upload">
+                <div class="tooltip_ayuda">
+                    <span class="material-symbols-outlined">upload</span>
+                    <span class="tooltiptext_ayuda">Solo podrá volcar los datos si cumple con el formato previamente descargado.</span>
+                </div>
+            </div>
+            <button id="volcar_datos" class="myButtonEditar">Volcar</button>
+        </div>
+    </div>
+    <div id="acciones_rapidas_entradas" class="contenedor-pre-entrada">
+    </div>
+    <div class="contenedor_tabla_salidas">
+        <table id="tabla-entradas" class="tabla-proforma">
+            <thead>
+                <tr>
+                    <!-- <th scope="row" colspan="15"><h2>Lista de Entradas</h2></th> -->
+                    <th scope="row" colspan="10">
+                        <select id="filtro_tabla" class="input-select-ventas">
+                            <option value="0">Entradas</option>
+                            <option value="1">Transferencias</option>
+                            <option value="2">Despacho</option>
+                        </select>
+                    </th>
+                </tr>
+                <tr>
+                    <th scope="row" colspan="15">
+                        <div>
+                            <button id="buscarFiltrosEntradas">Buscar</button>
+                            <button id="restablecerEntradas">Restablecer</button>
+                            <button id="extraccion_">CSV</button>
+                        </div>
+                        <div>Fecha Inicio
+                            <input id="filtro-tabla-entradas-fecha-inicio" type="date" class="input-filtro" placeholder="Fecha Inicio">
+                            Fecha Fin
+                            <input id="filtro-tabla-entradas-fecha-fin" type="date" class="input-filtro" placeholder="Fecha Fin">
+                        </div>
+                    </th>
+                </tr>
+                <tr>
+                    <th>Sucursal
+                        <input list="sucursales_opciones" id="filtro-tabla-entradas-sucursal" class="input-filtro" placeholder="Sucursal" autocomplete="off">
+                        <datalist id="sucursales_opciones">
+                            <option value="Almacén Central"></option>
+                            <option value="Sucursal Uno"></option>
+                            <option value="Sucursal Dos"></option>
+                            <option value="Sucursal Tres"></option>
+                        </datalist> 
+                    </th>
+                    <th>Categoría<input id="filtro-tabla-entradas-categoria" type="text" class="input-filtro" placeholder="Categoría"></th>
+                    <th>Código<input id="filtro-tabla-entradas-codigo" type="text" class="input-filtro" placeholder="Código"></th>
+                    <th>Entradas de existencias</th>
+                    <th>Devolución de entradas</th>
+                    <th>Costo unitario</th>
+                    <th>Costo total</th>
+                    <th>Operación
+                        <input list="comprobante_opciones" id="filtro-tabla-entradas-operacion" type="text" class="input-filtro" placeholder="Operación" autocomplete="off">
+                        <datalist id="comprobante_opciones">
+                            <option value="Transferencia-"></option>
+                            <option value="Compra-"></option>
+                            <option value="Dev-Compra-"></option>
+                            <option value="Recompra-"></option>
+                            <option value="Dev-Recompra-"></option>
+                            <option value="Pérdida"></option>
+                            <option value="Donación"></option>
+                        </datalist> 
+                    </th>
+                    <th style="width: 90px;">Fecha</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody> 
+            <tfoot>
+                <tr>
+                    <th scope="row" colspan="16">
+                        <button id="_inicio_"><<<</button>
+                        <button id="retrocederEntradas"><<</button>
+                        <select id="numeracionTablaEntradas" style="width: 50px; text-align: center;">
+                        </select>  
+                        <button id="avanzarEntradas">>></button>
+                        <button id="_final_">>>></button>
+                    </th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <details>
+        <summary>Acciones</summary>
+        <div>
+            <div style="display: flex;gap: 10px;justify-content: space-between;margin: 5px;"><div class="material-symbols-outlined myButtonEditar">assignment_return</div>
+                <span>Esta acción realiza devoluciones (solo aplica a compras y recompras).</span></div>
+            <div style="display: flex;gap: 10px;justify-content: space-between;margin: 5px;"><div class="material-symbols-outlined eliminarTablaFila">delete</div>
+                <span>Esta acción elimina las operaciones realizadas de este producto.</span></div>
+        </div>
+    </details>
+</div>
+<script src="../static/entradas.js"></script>
+<script src="../static/tablas.js"></script>
+{% endblock %}

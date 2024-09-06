@@ -1,0 +1,180 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="transferencias-form baja_opacidad">
+    <div class="contenedor_compras">
+        <div class="contenedor_formulario_tr">
+            <h2>Transferencias
+                <div class="tooltip_ayuda">
+                    <span class="material-symbols-outlined">help</span>
+                    <span class="tooltiptext_ayuda">Se transfiere una determinada cantidad de unidades de un producto entre sucursales.</span>
+                </div>
+            </h2>
+            <label>Origen
+                <select name="fffff-sucursal" id="fffff-sucursal" class="input-select-ventas">
+                </select>
+                <div class="tooltip_ayuda">
+                    <span class="material-symbols-outlined">help</span>
+                    <span class="tooltiptext_ayuda">Sucursal donante.</span>
+                </div>
+            </label>
+            <label>Destino
+                <select name="sucursal-destino-transferencias" id="sucursal-destino-transferencias" class="input-select-ventas">
+                </select>
+                <div class="tooltip_ayuda">
+                    <span class="material-symbols-outlined">help</span>
+                    <span class="tooltiptext_ayuda">Sucursal donataria.</span>
+                </div>
+            </label>
+            
+            <div style="display: flex;">
+                <input id="buscador-productos-transferencias" type="text" class="input-compras fondo-importante" placeholder="Buscar Código"> 
+                <div class="tooltip_ayuda">
+                    <span class="material-symbols-outlined">find_in_page</span>
+                    <span class="tooltiptext_ayuda">Digite caracteres clave del código a buscar.</span>
+                </div>
+            </div>
+            <form id="formulario-transferencias" class="">
+                <div>
+                    <input class="input-compras fondo" type="hidden" id="id-transferencias" name="id-transferencias" disabled/>
+                    <label class="label-general">Categoría
+                        <select name="categoria-transferencias" id="categoria-transferencias" class="input-general fondo" disabled>
+                        </select>
+                    </label>
+                    <label class="label-general">Código<input class="input-general fondo" type="text" id="codigo-transferencias" name="codigo-transferencias" disabled/></label>
+                    <label class="label-general">Descripción<input class="input-general fondo" type="text" id="descripcion-transferencias" name="descripcion-transferencias" disabled/></label>
+                    
+                </div>
+                <div class="">
+                    <button id="agregarATablaPreTransferencias" class="myButtonAgregar">Agregar a Proforma</button>
+                    <input onclick="reseteoFormulario()" type="reset" class="myButtonEliminar">
+                </div> 
+            </form>
+        </div>
+        <div class="contenedor_busqueda_detalle_general">
+            <div style="display: grid;">
+                <h2 style="text-align: center;">Buscador</h2>
+                <div style="display: grid;grid-template-columns: 1fr 1fr 1fr 1fr 1fr;align-items: center;">
+
+                    <div style="display: grid;grid-template-columns: 1fr;align-items: center; justify-items: center; gap: 5px;">
+                        <input type="text" id="buscador_descripcion" placeholder="Buscar por palabras clave..." class="input-general-importante" style="width: 240px;">
+                        <div style="display: grid; grid-template-columns: 60% 40%;gap: 5px;">
+
+                            <select id="categoria_buscador_detalle" class="" style="width: 120px;">
+                            </select>
+                            <select id="periodo_tiempo" class="" style="width: 80px;">
+                                <option value="0" selected>Anual</option>
+                                <option value="1">1° trim</option>
+                                <option value="2">2° trim</option>
+                                <option value="3">3° trim</option>
+                                <option value="4">4° trim</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="tooltip">
+                        <button class="eliminarTablaFila stock_sucursal">Stock AC</button>
+                        <span class="tooltiptext">Número de operaciónes y stock en Almacén Central</span>
+                    </div>
+                    <div class="tooltip">
+                        <button class="eliminarTablaFila stock_sucursal">Stock S1</button>
+                        <span class="tooltiptext">Número de operaciónes y stock en Sucursal Uno</span>
+                    </div>
+                    <div class="tooltip">
+                        <button class="eliminarTablaFila stock_sucursal">Stock S2</button>
+                        <span class="tooltiptext">Número de operaciónes y stock en Sucursal Dos</span>
+                    </div>
+                    <div class="tooltip">
+                        <button class="eliminarTablaFila stock_sucursal">Stock S3</button>
+                        <span class="tooltiptext">Número de operaciónes y stock en Sucursal Tres</span>
+                    </div>
+                </div>
+                <div style="display: grid;grid-template-columns: 1.3fr 1.3fr 0.7fr 0.7fr;align-items: center;">
+
+                    <button id="boton_buscar_codigo" class="myButtonEditar">Buscar código</button>
+                    <button id="boton_buscar_descripcion" class="myButtonEditar">Buscar descirpción</button>
+                    <button id="boton_borrar_" class="eliminarTablaFila">Eliminar</button>
+                    <button onclick="imprimirContenido()">Imprimir</button>
+                </div>
+            </div>
+            <div style="width: 510px;" class="contenedor_busqueda_cabecera">
+                <ul id="lista_cabecera"></ul>
+            </div>
+            <div class="contenedor_busqueda_detalle_general_interior">
+                <ul id="lista_detalle"></ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="contenedor-pre-transferencia">
+        <table id="tabla-pre-transferencias" class="tabla_modal contenido-tabla">
+            <thead>
+                <tr>
+                    <th scope="row" colspan="11"><h2>Proforma</h2></th>
+                </tr>
+                <tr>
+                    <th style="width: 120px;">Sucursal / Origen</th>
+                    <th style="width: 120px;">Código Origen</th>
+                    <th style="width: 200px;">Descripción</th>
+                    <th style="width: 70px;">Existencias en Origen</th>
+                    <th style="width: 70px;">Unidades a transferir</th>
+                    <th style="width: 120px;">Sucursal / Destino</th>
+                    <th style="width: 70px;">Existencias en Destino</th>
+                    <th style="width: 70px;">Nuevas Existencias en Destino</th>
+                    <th style="width: 40px;">
+                        <span style="font-size:18px;" class="material-symbols-outlined">delete</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+                <th scope="row" colspan="11">
+                    <button id="procesar-pre-transferencias" class="myButtonAgregar">Enviar a Tabla Transferencias</button>
+                    <button id="remover-tabla-transferencias-uno" class="eliminarTablaFila">Cancelar</button>
+                </th>
+            </tfoot>
+        </table>
+    </div>
+    <div class="contenedor_tabla">
+        <table id="tabla-proforma-transferencias" class="tabla-proforma">
+            <thead>
+                <tr>
+                    <th scope="row" colspan="11"><h2>Lista de Transferencias</h2></th>
+                </tr>
+                <tr>
+                    <th>Sucursal / Origen</th>
+                    <th>Código Origen</th>
+                    <th>Descripción	</th>
+                    <th>Unidades a transferir</th>
+                    <th>Sucursal / Destino</th>
+                    <th style="width: 100%;" id="remover-tabla-transferencias-dos" class="eliminarTablaFila">
+                        <div class="tooltip">
+                            <span style="font-size:18px;" class="material-symbols-outlined">delete</span>
+                            <span class="tooltiptext">Descartar</span>
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th scope="row" colspan="3">Total Unidades Transferidas</th>
+                    <th id="total-cantidad-tabla-transferencias"></th>
+                    <th scope="row" colspan="4">
+                        <label style="margin: 0 5px;" class="label-checkbox">Imprimir lista de compras 
+                            <input type="checkbox" id="check_comprobante">
+                        </label>
+                    </th>
+                </tr>
+                <tr>
+                    <th scope="row" colspan="8">
+                        <button id="procesar-transferencias-plus" class="myButtonProcesar">Procesar</button>
+                    </th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+<script src="../static/transferencias.js"></script>
+{% endblock %}

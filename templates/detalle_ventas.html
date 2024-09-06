@@ -1,0 +1,277 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="detalleVentas-form baja_opacidad">
+    <div class="contenedor_compras">
+        <div>
+            <div class="titulo_graficos">
+                <h4 style="font-size: 20px;">Metodo de Pago</h4>
+                <div>N° de operaciones promedio 
+                    <h4 style="font-size: 12px;">Local / Delivery</h4>
+                    <span style="display: flex; gap: 5px;justify-content: center;">
+                        <div>
+                            <span id="promedio_venta_local" style="font-weight: bold;"></span>
+                            <span style="font-weight: bold;"> / </span>
+                            <span id="promedio_venta_delivery" style="font-weight: bold;"></span>
+                        </div>
+                    </span>
+                </div>
+            </div>  
+            <div class="etiquetas_graficos_colores">
+                <div>
+                    <div class="color_item_grafico_detVenta"></div>
+                    <span class="descripcion_item_grafico">Efectivo</span>
+                </div>
+                <div>
+                    <div class="color_item_grafico_detVenta"></div>
+                    <span class="descripcion_item_grafico">Tarjeta</span>
+                </div>
+                <div>
+                    <div class="color_item_grafico_detVenta"></div>
+                    <span class="descripcion_item_grafico">Crédito</span>
+                </div>
+                <div>
+                    <div class="color_item_grafico_detVenta"></div>
+                    <span class="descripcion_item_grafico">Devoluciones</span>
+                </div>
+            </div>
+            <div class="grafico_compras">
+                <grafico-eje_y e_0="eje_y_numeracion"></grafico-eje_y>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="cg_2_c" c_4="cg_3_c" c_5="cg_4_c" s_1="" s_2="sg_1_c" s_3="sg_2_c" s_4="sg_3_c" s_5="sg_4_c"></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="cg_2_c" c_4="cg_3_c" c_5="cg_4_c" s_1="" s_2="sg_1_c" s_3="sg_2_c" s_4="sg_3_c" s_5="sg_4_c"></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="cg_2_c" c_4="cg_3_c" c_5="cg_4_c" s_1="" s_2="sg_1_c" s_3="sg_2_c" s_4="sg_3_c" s_5="sg_4_c"></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="cg_2_c" c_4="cg_3_c" c_5="cg_4_c" s_1="" s_2="sg_1_c" s_3="sg_2_c" s_4="sg_3_c" s_5="sg_4_c"></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="cg_2_c" c_4="cg_3_c" c_5="cg_4_c" s_1="" s_2="sg_1_c" s_3="sg_2_c" s_4="sg_3_c" s_5="sg_4_c"></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="cg_2_c" c_4="cg_3_c" c_5="cg_4_c" s_1="" s_2="sg_1_c" s_3="sg_2_c" s_4="sg_3_c" s_5="sg_4_c"></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="cg_2_c" c_4="cg_3_c" c_5="cg_4_c" s_1="" s_2="sg_1_c" s_3="sg_2_c" s_4="sg_3_c" s_5="sg_4_c"></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="cg_2_c" c_4="cg_3_c" c_5="cg_4_c" s_1="" s_2="sg_1_c" s_3="sg_2_c" s_4="sg_3_c" s_5="sg_4_c"></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="cg_2_c" c_4="cg_3_c" c_5="cg_4_c" s_1="" s_2="sg_1_c" s_3="sg_2_c" s_4="sg_3_c" s_5="sg_4_c"></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="cg_2_c" c_4="cg_3_c" c_5="cg_4_c" s_1="" s_2="sg_1_c" s_3="sg_2_c" s_4="sg_3_c" s_5="sg_4_c"></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="cg_2_c" c_4="cg_3_c" c_5="cg_4_c" s_1="" s_2="sg_1_c" s_3="sg_2_c" s_4="sg_3_c" s_5="sg_4_c"></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="cg_2_c" c_4="cg_3_c" c_5="cg_4_c" s_1="" s_2="sg_1_c" s_3="sg_2_c" s_4="sg_3_c" s_5="sg_4_c"></barra-grafico_vertical>
+            </div>
+        </div>
+        <div class="contenedor_detalle_circulos">
+            <div>
+                <div style="font-size: 20px; text-align: center;">
+                    <div class="etiqueta_canal_venta">
+                        <div><h4 class="titulo_circulo_detalle_venta"></h4></div>
+                        <div>
+                            <div style="font-size: 12px;display: flex;justify-content: space-around;">
+                                <h4>Local </h4>
+                                <span>/ </span>
+                                <h4>Delivery</h4>
+                            </div>
+                            <div style="font-size: 18px;display: flex;justify-content: space-around;">
+                                <h4 class="porcentaje_local"> </h4>
+                                <span>/ </span>
+                                <h4 class="porcentaje_delivery"></h4>
+                            </div>
+                            <div style="font-size: 12px;display: flex;justify-content: space-around;">
+                                <span style="font-size: 12px;" class="absoluto_local"></span>
+                                <span style="font-size: 12px;">/ </span>
+                                <span style="font-size: 12px;" class="absoluto_delivery"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>  
+                
+                <div class="contenedor_circulo_det">
+                    <div id="circulo_stock_uno" class="adorno_circulo">
+                        <div class="cirulo_interior">
+                            <span class="nombre_circulo_sucursal_uno"></span>
+                            <h4 style="font-size: 18px;" class="valor_circulo_sucursal_uno"></h4>
+                            <h4 class="porcentaje_circulo_sucursal_uno"></h4>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            <div>
+                <div style="font-size: 20px; text-align: center;">
+                    <div class="etiqueta_canal_venta">
+                        <div><h4 class="titulo_circulo_detalle_venta"></h4></div>
+                        <div>
+                            <div style="font-size: 12px;display: flex;justify-content: space-around;">
+                                <h4>Local </h4>
+                                <span>/ </span>
+                                <h4>Delivery</h4>
+                            </div>
+                            <div style="font-size: 18px;display: flex;justify-content: space-around;">
+                                <h4 class="porcentaje_local"> </h4>
+                                <span>/ </span>
+                                <h4 class="porcentaje_delivery"></h4>
+                            </div>
+                            <div style="font-size: 12px;display: flex;justify-content: space-around;">
+                                <span style="font-size: 12px;" class="absoluto_local"></span>
+                                <span style="font-size: 12px;">/ </span>
+                                <span style="font-size: 12px;" class="absoluto_delivery"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>    
+                <div class="contenedor_circulo_det">
+                    <div id="circulo_stock_dos">
+                        <div class="cirulo_interior">
+                            <span class="nombre_circulo_sucursal_dos"></span>
+                            <h4 style="font-size: 18px;" class="valor_circulo_sucursal_dos"></h4>
+                            <h4 class="porcentaje_circulo_sucursal_dos"></h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div style="font-size: 20px; text-align: center;">
+                    <div class="etiqueta_canal_venta">
+                        <div><h4 class="titulo_circulo_detalle_venta"></h4></div>
+                        <div>
+                            <div style="font-size: 12px;display: flex;justify-content: space-around;">
+                                <h4>Local </h4>
+                                <span>/ </span>
+                                <h4>Delivery</h4>
+                            </div>
+                            <div style="font-size: 18px;display: flex;justify-content: space-around;">
+                                <h4 class="porcentaje_local"> </h4>
+                                <span>/ </span>
+                                <h4 class="porcentaje_delivery"></h4>
+                            </div>
+                            <div style="font-size: 12px;display: flex;justify-content: space-around;">
+                                <span style="font-size: 12px;" class="absoluto_local"></span>
+                                <span style="font-size: 12px;">/ </span>
+                                <span style="font-size: 12px;" class="absoluto_delivery"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>   
+                <div class="contenedor_circulo_det">
+                    <div id="circulo_stock_tres" class="adorno_circulo">
+                        <div class="cirulo_interior">
+                            <span class="nombre_circulo_sucursal_tres"></span>
+                            <h4 style="font-size: 18px;" class="valor_circulo_sucursal_tres"></h4>
+                            <h4 class="porcentaje_circulo_sucursal_tres"></h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div style="font-size: 20px; text-align: center;">
+                    <div class="etiqueta_canal_venta">
+                        <div><h4 class="titulo_circulo_detalle_venta"></h4></div>
+                        <div>
+                            <div style="font-size: 12px;display: flex;justify-content: space-around;">
+                                <h4>Local </h4>
+                                <span>/ </span>
+                                <h4>Delivery</h4>
+                            </div>
+                            <div style="font-size: 18px;display: flex;justify-content: space-around;">
+                                <h4 class="porcentaje_local"> </h4>
+                                <span>/ </span>
+                                <h4 class="porcentaje_delivery"></h4>
+                            </div>
+                            <div style="font-size: 12px;display: flex;justify-content: space-around;">
+                                <span style="font-size: 12px;" class="absoluto_local"></span>
+                                <span style="font-size: 12px;">/ </span>
+                                <span style="font-size: 12px;" class="absoluto_delivery"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>    
+                <div class="contenedor_circulo_det">
+                    <div id="circulo_stock_cuatro">
+                        <div class="cirulo_interior">
+                            <span class="nombre_circulo_sucursal_cuatro"></span>
+                            <h4 style="font-size: 18px;" class="valor_circulo_sucursal_cuatro"></h4>
+                            <h4 class="porcentaje_circulo_sucursal_cuatro"></h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    <div id="acciones_creditos" class="contenedor-pre-credito">
+    </div>
+    <div class="contenedor_tabla_salidas">
+        <table id="tabla-detalle-ventas"  class="tabla-proforma">
+            <thead>
+                <tr>
+                    <th scope="row" colspan="15"><h2>Detalle de Ventas</h2></th>
+                </tr>
+                <tr>
+                    <th scope="row" colspan="15">
+                        <div>
+                            <button id="buscarFiltrosVentas">Buscar</button>
+                            <button id="restablecerVentas">Restablecer</button>
+                            <button id="reportesCreditos">Créditos activos</button>
+                        </div>
+                        <div>Fecha Inicio
+                            <input id="filtro-tabla-detalleVentas-fecha-inicio" type="date" class="input-filtro" placeholder="Fecha Inicio">
+                            Fecha Fin
+                            <input id="filtro-tabla-detalleVentas-fecha-fin" type="date" class="input-filtro" placeholder="Fecha Fin">
+                        </div>
+                    </th>
+                </tr>
+                <tr>
+                    <th style="width: 120px;">Sucursal
+                        <input list="sucursales_opciones" id="filtro-tabla-detalleVentas-sucursal" class="input-filtro" placeholder="Sucursal" autocomplete="off">
+                        <datalist id="sucursales_opciones">
+                            <option value="Almacén Central"></option>
+                            <option value="Sucursal Uno"></option>
+                            <option value="Sucursal Dos"></option>
+                            <option value="Sucursal Tres"></option>
+                        </datalist> 
+                    </th>
+                    <th style="width: 120px;">Operación
+                        <input list="comprobante_opciones" id="filtro-tabla-detalleVentas-comprobante" type="text" class="input-filtro" placeholder="Operación" autocomplete="off">
+                        <datalist id="comprobante_opciones">
+                            <option value="Venta-"></option>
+                        </datalist>
+                    </th>
+                    <th style="width: 110px;">Comprobante
+                        <input list="tipo_opciones" id="filtro-tabla-detalleVentas-tipoComprobante" type="text" class="input-filtro" placeholder="Comprobante" autocomplete="off">
+                        <datalist id="tipo_opciones">
+                            <option value="N001-"></option>
+                            <option value="B001-"></option>
+                            <option value="F001-"></option>
+                        </datalist>
+                    </th>
+                    <th style="width: 120px;">Cliente<input id="filtro-tabla-detalleVentas-dni" type="text" class="input-filtro" placeholder="Cliente"></th>
+                    <th style="width: 70px;">Efectivo</th>
+                    <th style="width: 70px;">Tarjeta</th>
+                    <th style="width: 70px;">Crédito</th>
+                    <th style="width: 70px;">Devolu-ción</th>
+                    <th style="width: 70px;">Total venta</th>
+                    <th style="width: 60px;">Canal de venta</th>
+                    <th style="width: 90px;">Fecha</th>
+                    <th style="width: 50px;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th scope="row" colspan="16">
+                        <button id="_inicio_"><<<</button>
+                        <button id="retrocederVentas"><<  </button>
+                        <select id="numeracionTablaVentas" style="width: 50px; text-align: center;">
+                        </select>  
+                        <button id="avanzarVentas">  >></button>
+                        <button id="_final_">>>></button>
+                    </th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <details>
+        <summary>Acciones</summary>
+        <div>
+            <div style="display: flex;gap: 10px;justify-content: space-between;margin: 5px;"><div class="material-symbols-outlined myButtonEditar">print</div>
+                <span>Esta acción genera una copia del comprobante de pago.</span></div>
+            <div style="display: flex;gap: 10px;justify-content: space-between;margin: 5px;"><div class="material-symbols-outlined myButtonEditar">credit_card</div>
+                <span>Esta acción permite gestionar las ventas que fueron relizadas a crédito (Solo aplica si presenta un saldo en crédito).</span></div>
+        </div>
+    </details>
+</div>
+<script src="../static/detalle_ventas.js"></script>
+<script src="../static/tablas.js"></script>
+{% endblock %}

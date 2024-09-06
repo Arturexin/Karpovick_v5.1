@@ -1,0 +1,130 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="ventas-form baja_opacidad">
+    <div class="contenedor_botones_ventas botones-compras">
+        <button id="apertura-caja" class="myButtonAgregarDos marcaBoton">Apertura de Caja</button>
+        <button id="entradas-caja" class="myButtonAgregarDos">Entradas de Caja</button>
+        <button id="salidas-caja" class="myButtonAgregarDos">Salidas de Caja</button>
+    </div>
+    <div class="contenedor_apertura_caja">
+        <div class="contenedor_apertura_caja_interno">
+            <div class="contenedor_titulo_flecha">
+                <p class="titulo_apertura_caja"></p>
+                <div class="tooltip_ayuda">
+                    <span class="flecha_apertura_caja material-symbols-outlined">arrow_circle_right</span>
+                    <span class="tooltiptext_ayuda">Estado de la caja.</span>
+                </div>
+            </div>
+            <label>Saldo de apertura<input type="text" class="saldo_apertura_caja" value="0"></label>
+            <label>Ingresos<input type="text" class="ingresos_caja_ventas" disabled value="0"></label>
+            <label>Egresos<input type="text" class="egresos_caja_gastos" disabled value="0"></label>
+            <label>Saldo de cierre<input type="text" class="saldo_cierre_caja" disabled value="0"></label>
+            <button class="myButtonAgregar btn_apertura_caja">Aperturar Caja</button>
+            <button class="myButtonEliminar btn_cerrar_caja">Cerrar Caja</button>
+        </div>
+        <div class="contenedor_apertura_caja_interno">
+            <div class="contenedor_titulo_flecha">
+                <p class="titulo_apertura_caja"></p>
+                <div class="tooltip_ayuda">
+                    <span class="flecha_apertura_caja material-symbols-outlined">arrow_circle_right</span>
+                    <span class="tooltiptext_ayuda">Estado de la caja.</span>
+                </div>
+            </div>
+            <label>Saldo de apertura<input type="text" class="saldo_apertura_caja" value="0"></label>
+            <label>Ingresos<input type="text" class="ingresos_caja_ventas" disabled value="0"></label>
+            <label>Egresos<input type="text" class="egresos_caja_gastos" disabled value="0"></label>
+            <label>Saldo de cierre<input type="text" class="saldo_cierre_caja" disabled value="0"></label>
+            <button class="myButtonAgregar btn_apertura_caja">Aperturar Caja</button>
+            <button class="myButtonEliminar btn_cerrar_caja">Cerrar Caja</button>
+        </div>
+        <div class="contenedor_apertura_caja_interno">
+            <div class="contenedor_titulo_flecha">
+                <p class="titulo_apertura_caja"></p>
+                <div class="tooltip_ayuda">
+                    <span class="flecha_apertura_caja material-symbols-outlined">arrow_circle_right</span>
+                    <span class="tooltiptext_ayuda">Estado de la caja.</span>
+                </div>
+            </div>
+            <label>Saldo de apertura<input type="text" class="saldo_apertura_caja" value="0"></label>
+            <label>Ingresos<input type="text" class="ingresos_caja_ventas" disabled value="0"></label>
+            <label>Egresos<input type="text" class="egresos_caja_gastos" disabled value="0"></label>
+            <label>Saldo de cierre<input type="text" class="saldo_cierre_caja" disabled value="0"></label>
+            <button class="myButtonAgregar btn_apertura_caja">Aperturar Caja</button>
+            <button class="myButtonEliminar btn_cerrar_caja">Cerrar Caja</button>
+        </div>
+        <div class="contenedor_apertura_caja_interno">
+            <div class="contenedor_titulo_flecha">
+                <p class="titulo_apertura_caja"></p>
+                <div class="tooltip_ayuda">
+                    <span class="flecha_apertura_caja material-symbols-outlined">arrow_circle_right</span>
+                    <span class="tooltiptext_ayuda">Estado de la caja.</span>
+                </div>
+            </div>
+            <label>Saldo de apertura<input type="text" class="saldo_apertura_caja" value="0"></label>
+            <label>Ingresos<input type="text" class="ingresos_caja_ventas" disabled value="0"></label>
+            <label>Egresos<input type="text" class="egresos_caja_gastos" disabled value="0"></label>
+            <label>Saldo de cierre<input type="text" class="saldo_cierre_caja" disabled value="0"></label>
+            <button class="myButtonAgregar btn_apertura_caja">Aperturar Caja</button>
+            <button class="myButtonEliminar btn_cerrar_caja">Cerrar Caja</button>
+        </div>
+    </div>
+    <div class="contenedor_kardex">
+        <table id="tabla-caja" class="tabla-proforma">
+            <thead>
+                <tr>
+                    <th scope="row" colspan="10"><h2>Caja</h2></th>
+                </tr>
+                <tr>
+                    <th scope="row" colspan="15">
+                        <div>
+                            <button id="buscarFiltrosCaja">Buscar</button>
+                            <button id="restablecerCaja">Restablecer</button>
+                        </div>
+                        <div>Fecha Inicio
+                            <input id="filtro-tabla-caja-fecha-inicio" type="date" class="input-filtro">
+                            Fecha Fin
+                            <input id="filtro-tabla-caja-fecha-fin" type="date" class="input-filtro">
+                        </div>
+                    </th>
+                </tr>
+                <tr>
+                    <th>Sucursal
+                        <input list="sucursales_opciones" id="filtro-tabla-caja-sucursal" class="input-filtro" placeholder="Sucursal" autocomplete="off">
+                        <datalist id="sucursales_opciones">
+                            <option value="Almacén Central"></option>
+                            <option value="Sucursal Uno"></option>
+                            <option value="Sucursal Dos"></option>
+                            <option value="Sucursal Tres"></option>
+                        </datalist> 
+                    </th>
+                    <th>Saldo de Apertura</th>
+                    <th>Ingresos</th>
+                    <th>Egresos</th>
+                    <th>Saldo de Cierre</th>
+                    <th>Fecha</th>
+                    <th>Situación</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th scope="row" colspan="16">
+                        <button id="_inicio_"><<<</button>
+                        <button id="retrocederCaja"><<  </button>  
+                        <select id="numeracionTablaCaja" style="width: 50px; text-align: center;">
+                        </select>
+                        <button id="avanzarCaja">  >></button>
+                        <button id="_final_">>>></button>
+                    </th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<script src="../static/apertura_caja.js"></script>
+<script src="../static/tablas.js"></script>
+{% endblock %}

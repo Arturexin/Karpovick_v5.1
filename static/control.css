@@ -1,0 +1,126 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+body{
+    display: grid;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+}
+.nav_usuarios {
+    margin: 20px;
+    padding: 10px;
+    background-color: var(--fondo-secundario);
+    display: flex;
+    justify-content: space-between;
+    border: 3px solid var(--fondo-principal);
+    border-radius: 10px;
+}
+h1{
+    color: var(--color-principal);
+}
+.nav_usuarios a {
+    text-decoration: none;
+    color: var(--color-principal);
+    font-size: 18px;
+}
+.tabla-proformaC {
+    margin: 0px auto;
+    background-color: var(--color-principal);
+    border: 3px solid var(--fondo-principal);
+    border-radius: 14px;
+    font-size: 15px;
+}
+.tabla-proformaC th, .tabla-proformaC td {
+    padding: 2px;
+}
+.tabla-proformaC tr:nth-child(even){
+    background-color: #8b8585;}
+    .tabla-proformaC tr:hover {
+    background-color: #ce9b9b;
+}
+.tabla-proformaC th {
+	background:var(--fondo-secundario);
+    border-radius: 10px;
+	color:var(--color-principal);
+	font-family:Arial;
+	font-size:16px;
+	padding:7px 5px;
+}
+.boton_editar{
+    background: rgb(30, 81, 189);
+    padding: 0px 10px;
+    margin: 0px 2px;
+    border-radius: 5px;
+    color: var(--color-principal);
+    text-decoration: none;
+    cursor: pointer;
+}
+.boton_editar:hover {
+	background:linear-gradient(to bottom, #405f99 5%, #5969b3 100%);
+	background-color:rgb(30, 81, 189);
+}
+.boton_editar:active {
+	position:relative;
+	top:1px;
+}
+.boton_eliminar{
+    background: rgb(168, 57, 57);
+    padding: 0px 10px;
+    margin: 0px 2px;
+    border-radius: 5px;
+    color: var(--color-principal);
+    text-decoration: none;
+    cursor: pointer;
+}
+.boton_eliminar:hover {
+	background:linear-gradient(to bottom, #995940 5%, #b37559 100%);
+	background-color:rgb(168, 57, 57);
+}
+.boton_eliminar:active {
+	position:relative;
+	top:1px;
+}
+.boton-accion{
+    width: 100px;
+    background: rgb(30, 139, 189);
+    padding: 5px 10px;
+    margin: 10px;
+    border-radius: 5px;
+    border: none;
+    color: var(--color-principal);
+    text-decoration: none;
+    cursor: pointer;
+}
+.boton-accion:hover {
+	background:linear-gradient(to bottom, #408c99 5%, #599bb3 100%);
+	background-color:rgb(30, 139, 189);
+}
+.boton-accion:active {
+	position:relative;
+	top:1px;
+}
+.boton-restaurar{
+    width: 100px;
+    background: rgb(168, 57, 57);
+    padding: 5px 10px;
+    margin: 10px;
+    border-radius: 5px;
+    border: none;
+    color: var(--color-principal);
+    text-decoration: none;
+    cursor: pointer;
+}
+.boton-restaurar:hover {
+	background:linear-gradient(to bottom, #995940 5%, #b37559 100%);
+	background-color:rgb(168, 57, 57);
+}
+.boton-restaurar:active {
+	position:relative;
+	top:1px;
+}
+#formulario_control{
+    display: flex;
+    gap: 20px;
+}

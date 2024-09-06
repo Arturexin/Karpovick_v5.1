@@ -1,0 +1,102 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="salidas-form baja_opacidad">
+    <div class="contenedor_ranking_graficos">
+        <div class="contenedor_compras_uno botones-compras">
+            <button class="b_g_s_r myButtonAgregarDos">Almacén Central</button>
+            <button class="b_g_s_r myButtonAgregarDos">Sucursal Uno</button>
+            <button class="b_g_s_r myButtonAgregarDos">Sucursal Dos</button>
+            <button class="b_g_s_r myButtonAgregarDos">Sucursal Tres</button>
+        </div>
+        <div class="contenedor_graficos_sucursales">
+        </div>
+    </div>
+    <div id="acciones_rapidas_salidas" class="contenedor-pre-salida">
+    </div>
+    <div class="contenedor_tabla_salidas">
+        <table id="tabla-salidas" class="tabla-proforma"">
+            <thead>
+                <tr>
+                    <th scope="row" colspan="10">
+                        <select id="filtro_tabla" class="input-select-ventas">
+                            <option value="0">Salidas</option>
+                            <option value="1">Transferencias</option>
+                        </select>
+                    </th>
+                </tr>
+                <tr>
+                    <th scope="row" colspan="15">
+                        <div>
+                            <button id="buscarFiltrosSalidas">Buscar</button>
+                            <button id="restablecerSalidas">Restablecer</button>
+                            <button id="extraccion_">CSV</button>
+                        </div>
+                        <div>Fecha Inicio
+                            <input id="filtro-tabla-salidas-fecha-inicio" type="date" class="input-filtro" placeholder="Fecha Inicio">
+                            Fecha Fin
+                            <input id="filtro-tabla-salidas-fecha-fin" type="date" class="input-filtro" placeholder="Fecha Fin">
+                        </div>
+                        <div>
+                            <button id="reporte_ventas">Reporte de Ventas</button>
+                            
+                        </div>
+                    </th>
+                </tr>
+                <tr>
+                    <th>Sucursal
+                        <input list="sucursales_opciones" id="filtro-tabla-salidas-sucursal" class="input-filtro" placeholder="Sucursal" autocomplete="off">
+                        <datalist id="sucursales_opciones">
+                            <option value="Almacén Central"></option>
+                            <option value="Sucursal Uno"></option>
+                            <option value="Sucursal Dos"></option>
+                            <option value="Sucursal Tres"></option>
+                        </datalist>    
+                    </th>
+                    <th>Categoría<input id="filtro-tabla-salidas-categoria" type="text" class="input-filtro" placeholder="Categoría"></th>
+                    <th>Código<input id="filtro-tabla-salidas-codigo" type="text" class="input-filtro" placeholder="Código"></th>
+                    <th>Salidas de existencias</th>
+                    <th>Devolución de salidas</th>
+                    <th>Precio de venta</th>
+                    <th>Total venta</th>
+                    <th>Operación
+                        <input list="comprobante_opciones" id="filtro-tabla-salidas-operacion" type="text" class="input-filtro" placeholder="Operación" autocomplete="off">
+                        <datalist id="comprobante_opciones">
+                            <option value="Transferencia-"></option>
+                            <option value="Venta-"></option>
+                            <option value="Dev-Venta-"></option>
+                        </datalist>  
+                    </th>
+                    <th style="width: 90px;">Fecha</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th scope="row" colspan="16">
+                        <button id="_inicio_"><<<</button>
+                        <button id="retrocederSalidas"><<  </button>
+                        <select id="numeracionTablaSalidas" style="width: 50px; text-align: center;">
+                        </select>  
+                        <button id="avanzarSalidas">  >></button>
+                        <button id="_final_">>>></button>
+                    </th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <details>
+        <summary>Acciones</summary>
+        <div>
+            <div style="display: flex;gap: 10px;justify-content: space-between;margin: 5px;"><div class="material-symbols-outlined myButtonEditar">assignment_return</div>
+                <span>Esta acción realiza devoluciones (solo aplica a ventas).</span></div>
+            <div style="display: flex;gap: 10px;justify-content: space-between;margin: 5px;"><div class="material-symbols-outlined eliminarTablaFila">delete</div>
+                <span>Esta acción elimina las operaciones realizadas de este producto.</span></div>
+        </div>
+    </details>
+</div>
+<script src="../static/salidas.js"></script>
+<script src="../static/tablas.js"></script>
+{% endblock %}

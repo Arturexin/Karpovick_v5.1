@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/index.css">
+    <link rel="stylesheet" href="../static/button.css">
+    <link rel="stylesheet" href="../static/ventas.css">
+    <link rel="stylesheet" href="../static/inventario.css">
+    <link rel="stylesheet" href="../static/administracion.css">
+    <link rel="stylesheet" href="../static/movimientos.css">
+    <link rel="stylesheet" href="../static/mantenimiento.css">
+    <link rel="stylesheet" href="../static/general.css">
+    <link rel="stylesheet" href="../static/filtros.css">
+    <link rel="stylesheet" href="../static/home.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" 
+            integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA==" 
+            crossorigin="anonymous" 
+            referrerpolicy="no-referrer">
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fasthand&family=Montserrat:wght@500&family=Nunito&family=Roboto&family=Ubuntu&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+    <link rel="icon" href="../static/images/Karpovick_logo_uno.png" type="image/x-icon">
+    <title>Karpovick</title>
+    
+</head>
+<body class="body_web">
+    
+    <div id="sidebar" class="barra-lateral">
+        <ul class="menu-vertical">
+            <li>
+                <a id="button-home" class="sub-lista" href="{{ url_for('home')}}">
+                    <div class="tooltip_index">
+                        <span class="material-symbols-outlined" style="color: rgb(81, 197, 81);">home</span>
+                        <span class="tooltiptext_index">Home</span>
+                    </div>
+                    <p>Home</p>
+                </a>
+            </li>
+            <li>
+                <a id="button-ventas" class="sub-lista" href="{{ url_for('ventas')}}">
+                    <div class="tooltip_index">
+                        <span class="material-symbols-outlined" style="color: rgb(81, 197, 81);">sell</span>
+                        <span class="tooltiptext_index">Ventas</span>
+                    </div>
+                    <p>Ventas</p>
+                </a>
+            </li>
+            <!-- <hr style="border: 1px solid var(--fondo-marca-uno);"> -->
+            <li>
+                <a id="button-compras" class="sub-lista" href="{{ url_for('compras')}}">
+                    <div class="tooltip_index">
+                        <span class="material-symbols-outlined" style="color: rgb(189, 137, 78);">shopping_cart</span>
+                        <span class="tooltiptext_index">Compras</span>
+                    </div>
+                    <p>Compras</p>
+                </a>
+            </li>
+            <li>
+                <a id="button-transferencias" class="sub-lista" href="{{ url_for('transferencias')}}">
+                    <div class="tooltip_index">
+                        <span class="material-symbols-outlined" style="color: rgb(189, 137, 78);">move_up</span>
+                        <span class="tooltiptext_index">Transferencias</span>
+                    </div>
+                    <p>Transferencias</p>
+                </a>
+            </li>
+            <li>
+                <a id="button-kardex" class="sub-lista" href="{{ url_for('kardex')}}">
+                    <div class="tooltip_index">
+                        <span class="material-symbols-outlined" style="color: rgb(189, 137, 78);">sync_alt</span>
+                        <span class="tooltiptext_index">Kardex</span>
+                    </div>
+                    <p>Kardex</p>
+                </a>
+            </li>
+            <li>
+                <a id="button-detalle-ventas" class="sub-lista" href="{{ url_for('detalle_ventas')}}">
+                    <div class="tooltip_index">
+                        <span class="material-symbols-outlined" style="color: rgb(189, 137, 78);">storefront</span>
+                        <span class="tooltiptext_index">Detalle de ventas</span>
+                    </div>
+                    <p>Detalle de ventas</p>
+                </a>
+            </li>
+            <!-- <hr style="border: 1px solid var(--fondo-marca-uno);"> -->
+            <li>
+                <a id="button-modificacion" class="sub-lista" href="{{ url_for('modificacion')}}">
+                    <div class="tooltip_index">
+                        <span class="material-symbols-outlined" style="color: rgb(55, 115, 204);">contract_edit</span>
+                        <span class="tooltiptext_index">Modificación</span>
+                    </div>
+                    <p>Modificación</p>
+                </a>
+            </li>
+            <li>
+                <a id="button-devolucion-compras" class="sub-lista" href="{{ url_for('devolucion_compras')}}">
+                    <div class="tooltip_index">
+                        <span class="material-symbols-outlined" style="color: rgb(55, 115, 204);">switch_right</span>
+                        <span class="tooltiptext_index">Devolución de compras</span>
+                    </div>
+                    <p>Devolución de compras</p>
+                </a>
+            </li>
+            <li>
+                <a id="button-devolucion-salidas" class="sub-lista" href="{{ url_for('devolucion_salidas')}}">
+                    <div class="tooltip_index">
+                        <span class="material-symbols-outlined" style="color: rgb(55, 115, 204);">switch_left</span>
+                        <span class="tooltiptext_index">Devolución de ventas</span>
+                    </div>
+                    <p>Devolución de ventas</p>
+                </a>
+            </li>
+            <li>
+                <a id="button-perdidas" class="sub-lista" href="{{ url_for('perdidas')}}">
+                    <div class="tooltip_index">
+                        <span class="material-symbols-outlined" style="color: rgb(55, 115, 204);">money_off</span>
+                        <span class="tooltiptext_index">Despacho</span>
+                    </div>
+                    <p>Despacho</p>
+                </a>
+            </li>
+            <!-- <hr style="border: 1px solid var(--fondo-marca-uno);"> -->
+            <li>
+                <a id="button-productos" class="sub-lista" href="{{ url_for('productos')}}">
+                    <div class="tooltip_index">
+                        <span class="material-symbols-outlined" style="color: rgb(165, 97, 230);">storage</span>
+                        <span class="tooltiptext_index">Productos</span>
+                    </div>
+                    <p>Productos</p>
+                </a>
+            </li>
+            <li>
+                <a id="button-entradas" class="sub-lista" href="{{ url_for('entradas')}}">
+                    <div class="tooltip_index">
+                        <span class="material-symbols-outlined" style="color: rgb(165, 97, 230);">left_panel_close</span>
+                        <span class="tooltiptext_index">Entradas</span>
+                    </div>
+                    <p>Entradas</p>
+                </a>
+            </li>
+            <li>
+                <a id="button-salidas" class="sub-lista" href="{{ url_for('salidas')}}">
+                    <div class="tooltip_index">
+                        <span class="material-symbols-outlined" style="color: rgb(165, 97, 230);">left_panel_open</span>
+                        <span class="tooltiptext_index">Salidas</span>
+                    </div>
+                    <p>Salidas</p>
+                </a>
+            </li>
+            <li>
+                <a id="button-clientes" class="sub-lista" href="{{ url_for('clientes')}}">
+                    <div class="tooltip_index">
+                        <span class="material-symbols-outlined" style="color: rgb(165, 97, 230);">groups</span>
+                        <span class="tooltiptext_index">Clientes</span>
+                    </div>
+                    <p>Clientes</p>
+                </a>
+            </li>
+            <!-- <hr style="border: 1px solid var(--fondo-marca-uno);"> -->
+            <li>
+                <a id="button-configuracion" class="sub-lista" href="{{ url_for('configuracion')}}">
+                    <div class="tooltip_index">
+                        <span class="material-symbols-outlined">settings</span>
+                        <span class="tooltiptext_index">Configuración</span>
+                    </div>
+                    <p>Configuración</p>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <main class="principal">
+        
+        {% block content %}
+        {% endblock %}
+        <div class="usuario_opciones">
+            <ul>
+                <li><p id="puesto_usuario">{{ puesto }}</p></li>
+                <li><p id="identificacion_usuario_id">{{ identificacion_usuario }}</p></li>
+                <li><a href="{{ url_for('logout')}}" id="cerrar-sesion">Salir</a></li>
+            </ul>
+        </div>
+    </main>
+
+    <div class="contenedor_cabecera_principal">
+        <div class="cabeza-web">
+            <div class="nav_bar_">
+                <p style="margin: 0 10px;">Karpovick</p>
+                <div id="boton_despliegue" class="botonBloqueoMenu" style="display: flex;">
+                    <span class="material-symbols-outlined">menu</span>
+                </div>
+            </div>
+            <div class="nav_bar_">
+                <button id="actualizar_bases" class="eliminarTablaFila">Actualizar</button>
+            </div>
+            <div class="nav_bar_">
+                <h4 style="border: 2px solid var(--boton-tres); border-radius: 50%;padding: 5px 10px; margin-right: 6px;">
+                    <span class="moneda_cabecera"></span>
+                </h4>
+                <div style="display: flex;">
+                    <button id="resta_anio"><<</button>
+                    <input id="anio_referencia" class="input-select-ventas" type="text" style="width: 60px;height: 20px;font-size: 16px;text-align: center;" disabled>
+                    <button id="suma_anio">>></button>
+                </div>
+                <button id="cargar_datos_anio" class="myButtonEditar">Cargar Datos</button>
+            </div>
+            
+            <div class="contenedor_estilo_colores_fondo">
+                <div class="color_fondo" id="color_negro"></div>
+                <div class="color_fondo" id="color_violeta"></div>
+                <div class="color_fondo" id="color_cafe"></div>
+                <div class="color_fondo" id="color_blanco"></div>
+            </div>
+            <div class="usuario_cliente">
+                <span class="material-symbols-outlined">
+                    person
+                </span>
+                <p id="usuario-cliente" class="usuario-cabecera">{{ usuario_nombre }}</p>
+            </div>
+            
+        </div>
+    </div>
+
+    <div id="myModal" class="modal">
+    </div>
+
+    <script src="../static/index.js"></script>
+    <script src="../static/componentes_creados.js"></script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="modificacion-form baja_opacidad">
+    <div class="contenedor_compras_uno botones-compras">
+        <button id="registra-modificacion" class="myButtonAgregarDos">Registrar Nuevo producto</button>
+        <button id="editar-modificacion" class="myButtonAgregarDos">Modificar Producto</button>
+    </div>
+    <div class="contenedor_compras">
+        <div class="contenedor_compras_dos">
+            <form id="formulario-modificacion">
+            </form>
+        </div>
+        <div class="contenedor_busqueda_detalle_general">
+            <div style="display: grid;">
+                <h2 style="text-align: center;">Buscador</h2>
+                <div style="display: grid;grid-template-columns: 1fr 1fr;align-items: center;">
+
+                        <input type="text" id="buscador_descripcion" placeholder="Buscar por palabras clave..." class="input-general-importante" style="width: 240px;">
+                        <select id="categoria_buscador_detalle" class="">
+                        </select>
+                </div>
+                <div style="display: grid;grid-template-columns: 1fr 1fr 1fr;align-items: center;">
+
+                    <button id="boton_buscar_codigo" class="myButtonEditar">Buscar código</button>
+                    <button id="boton_buscar_descripcion" class="myButtonEditar">Buscar descirpción</button>
+                    <button id="boton_borrar_" class="eliminarTablaFila">Eliminar</button>
+                </div>
+            </div>
+            <div style="width: 510px;" class="contenedor_busqueda_cabecera">
+                <ul id="lista_cabecera"></ul>
+            </div>
+            <div class="contenedor_busqueda_detalle_general_interior">
+                <ul id="lista_detalle"></ul>
+            </div>
+        </div>
+    </div>
+    <div class="contenedor-pre-modificacion">
+        <table id="tabla-pre-modificacion" class="tabla_modal contenido-tabla">
+            <thead>
+                <tr>
+                    <th scope="row" colspan="12"><h2>Proforma</h2></th>
+                </tr>
+                <tr>
+                    <th style="width: 120px;">Sucursal</th>
+                    <th style="width: 120px;">Categoría</th>
+                    <th style="width: 100px;">Código</th>
+                    <th>Descripción</th>
+                    <th style="width: 70px;">Medidas</th>
+                    <th>Cantidad</th>
+                    <th style="width: 70px;">Costo de Unitario</th>
+                    <th style="width: 70px;">Costo Total</th>
+                    <th style="width: 70px;">Precio de Venta</th>
+                    <th>Lote</th>
+                    <th>Proveedor</th>
+                    <th>
+                        <span style="font-size:18px;" class="material-symbols-outlined">delete</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+                <th scope="row" colspan="12">
+                    <button id="procesar-modificacion-uno" class="myButtonAgregar">Enviar a Lista Productos</button>
+                    <button id="procesar-modificacion-dos" class="myButtonAgregar invisible">Enviar a Lista Productos</button>
+                    <button id="remover-tabla-modificacion-uno" class="eliminarTablaFila">Cancelar</button>
+                </th>
+            </tfoot>
+        </table>
+    </div>
+    <div class="contenedor_tabla">
+        <table id="tabla-proforma-modificacion" class="tabla-proforma">
+            <thead>
+                <tr>
+                    <th scope="row" colspan="12"><h2>Lista de Productos</h2></th>
+                </tr>
+                <tr>
+                    <th>Sucursal</th>
+                    <th>Categoría</th>
+                    <th>Código</th>
+                    <th>Descripción</th>
+                    <th>Medidas</th>
+                    <th>Existencias</th>
+                    <th>Costo Unitario</th>
+                    <th>Costo Total</th>
+                    <th>Precio de Venta</th>
+                    <th>Lote</th>
+                    <th>Proveedor</th>
+                    <th style="width: 100%;" id="remover-tabla-modificacion-dos" class="eliminarTablaFila">
+                        <div class="tooltip">
+                            <span style="font-size:18px;" class="material-symbols-outlined">delete</span>
+                            <span class="tooltiptext">Descartar</span>
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+                <th scope="row" colspan="12">
+                    <button id="procesar-modificacion-principal" class="myButtonProcesar invisible">Procesar</button>
+                    <button id="procesar-registro" class="myButtonProcesar">Procesar</button>
+                </th>
+            </tfoot>
+        </table>
+    </div>
+</div>
+<script src="../static/modificacion.js"></script>
+{% endblock %}

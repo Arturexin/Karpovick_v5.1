@@ -1,0 +1,259 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="ventas-form baja_opacidad">
+    <div class="contenedor_botones_ventas botones-compras">
+        <button id="apertura-caja" class="myButtonAgregarDos">Apertura de Caja</button>
+        <button id="entradas-caja" class="myButtonAgregarDos">Entradas de Caja</button>
+        <button id="salidas-caja" class="myButtonAgregarDos marcaBoton">Salidas de Caja</button>
+    </div>
+    <div style="display: flex; width: 1100px; justify-content: space-around;">
+        <div id="circulo_total_deposito" class="modelo_circulo_sucursal">
+            <div class="cirulo_interior_margen">
+                <span>Depósitos</span>
+                <h4 class="valor_circulo_deposito"></h4>
+                <h4 class="porcentaje_circulo_deposito"></h4>
+            </div>
+        </div>
+        <div id="circulo_total_personal" class="modelo_circulo_sucursal">
+            <div class="cirulo_interior_margen">
+                <span>Personal</span>
+                <h4 class="valor_circulo_personal"></h4>
+                <h4 class="porcentaje_circulo_personal"></h4>
+            </div>
+        </div>
+        <div id="circulo_total_alquiler" class="modelo_circulo_sucursal">
+            <div class="cirulo_interior_margen">
+                <span>Alquiler</span>
+                <h4 class="valor_circulo_alquiler"></h4>
+                <h4 class="porcentaje_circulo_alquiler"></h4>
+            </div>
+        </div>
+        <div id="circulo_total_servicios" class="modelo_circulo_sucursal">
+            <div class="cirulo_interior_margen">
+                <span>Servicios</span>
+                <h4 class="valor_circulo_servicios"></h4>
+                <h4 class="porcentaje_circulo_servicios"></h4>
+            </div>
+        </div>
+        <div id="circulo_total_insumos" class="modelo_circulo_sucursal">
+            <div class="cirulo_interior_margen">
+                <span>Insumos</span>
+                <h4 class="valor_circulo_insumos"></h4>
+                <h4 class="porcentaje_circulo_insumos"></h4>
+            </div>
+        </div>
+        <div id="circulo_total_devoluciones" class="modelo_circulo_sucursal">
+            <div class="cirulo_interior_margen">
+                <span>Devoluciones</span>
+                <h4 class="valor_circulo_devoluciones"></h4>
+                <h4 class="porcentaje_circulo_devoluciones"></h4>
+            </div>
+        </div>
+        <div id="circulo_total_mercancias" class="modelo_circulo_sucursal">
+            <div class="cirulo_interior_margen">
+                <span>Mercancias</span>
+                <h4 class="valor_circulo_mercancias"></h4>
+                <h4 class="porcentaje_circulo_mercancias"></h4>
+            </div>
+        </div>
+        <div id="circulo_total_seguridad_social" class="modelo_circulo_sucursal">
+            <div class="cirulo_interior_margen">
+                <span>Seg soc</span>
+                <h4 class="valor_circulo_seguridad_social"></h4>
+                <h4 class="porcentaje_circulo_seguridad_social"></h4>
+            </div>
+        </div>
+        <div id="circulo_total_impuestos" class="modelo_circulo_sucursal">
+            <div class="cirulo_interior_margen">
+                <span>Impuestos</span>
+                <h4 class="valor_circulo_impuestos"></h4>
+                <h4 class="porcentaje_circulo_impuestos"></h4>
+            </div>
+        </div>
+        <div id="circulo_total_mantenimiento" class="modelo_circulo_sucursal">
+            <div class="cirulo_interior_margen">
+                <span>Mantenimiento</span>
+                <h4 class="valor_circulo_mantenimiento"></h4>
+                <h4 class="porcentaje_circulo_mantenimiento"></h4>
+            </div>
+        </div>
+        <div id="circulo_total_publicidad" class="modelo_circulo_sucursal">
+            <div class="cirulo_interior_margen">
+                <span>Publicidad</span>
+                <h4 class="valor_circulo_publicidad"></h4>
+                <h4 class="porcentaje_circulo_publicidad"></h4>
+            </div>
+        </div>
+        <div id="circulo_total_prestamos" class="modelo_circulo_sucursal">
+            <div class="cirulo_interior_margen">
+                <span>Prestamoss</span>
+                <h4 class="valor_circulo_prestamos"></h4>
+                <h4 class="porcentaje_circulo_prestamos"></h4>
+            </div>
+        </div>
+        <div id="circulo_total_otros" class="modelo_circulo_sucursal">
+            <div class="cirulo_interior_margen">
+                <span>Otros Gastos</span>
+                <h4 class="valor_circulo_otros"></h4>
+                <h4 class="porcentaje_circulo_otros"></h4>
+            </div>
+        </div>
+    </div>
+    <div class="contenedor_kardex_analisis">
+        <form id="formulario-gastos-varios" class="contenedor_kardex" style="margin: 10px;">
+            <h2>Salidas de efectivo</h2>
+            <label>Sucursal 
+                <select name="fffff-sucursal" id="fffff-sucursal" class="input-select-ventas">
+                </select>
+                <div class="tooltip_ayuda">
+                    <span class="material-symbols-outlined">help</span>
+                    <span class="tooltiptext_ayuda">Seleccione una sucursal.</span>
+                </div>
+            </label>
+            <div>
+                <label class="label-general"> Concepto
+                    <select name="concepto-gastos" id="concepto-gastos" class="input-general fondo" style="cursor: pointer;">
+                        <option value="" selected disabled>Selecciona un concepto</option>
+                        <option value="2_nomina">Pago nómina</option>
+                        <option value="3_seguridad_social">Pago seguridad social</option>
+                        <option value="4_proveedores">Pago proveedores</option>
+                        <option value="5_impuestos">Pago impuestos</option>
+                        <option value="6_servicios">Pago servicios</option>
+                        <option value="7_alquiler">Pago alquiler</option>
+                        <option value="8_mantenimientos">Pago mantenimientos</option>
+                        <option value="9_publicidad">Pago publicidad</option>
+                        <option value="10_activo">Compra activo</option>
+                        <option value="13_depositos">Depósito Bancario</option>
+                        <option value="14_otros">Otros Gastos</option>
+                    </select>
+                </label>
+                <label class="label-general">Descripción<input id="comprobante-gastos" class="input-general fondo" type="text"></label>
+                <label class="label-general">Método de pago
+                    <select id="metodo_pago" class="input-general fondo" style="cursor: pointer;">
+                        <option value="0" selected disabled>Selecciona un método de pago</option>
+                        <option value="1">Caja chica</option>
+                        <option value="2">Caja bancos</option>
+                        <option value="3">Crédito</option>
+                    </select>
+                </label>
+
+                <label class="label-general">Monto<input id="monto-gastos" class="input-general fondo" type="text"></label>
+            </div>
+            
+            <div class="boton-cli">
+                <button id="procesar-gastos" class="myButtonAgregar">Procesar Gastos</button>
+                <button id="resgistrarPrestamo" class="myButtonAgregar">Registrar Préstamo</button>
+                <input type="reset" class="myButtonEliminar">
+            </div>
+        </form>
+        <div class="grafico_interno">
+            <div class="titulo_graficos"><h2>Gráfico de salidas de efectivo por sucursal</h2></div>  
+            <div class="etiquetas_graficos_colores">
+                <div>
+                    <div class="color_item_grafico_sucursal"></div>
+                    <span class="descripcion_item_grafico_s"></span>
+                </div>
+                <div>
+                    <div class="color_item_grafico_sucursal"></div>
+                    <span class="descripcion_item_grafico_s"></span>
+                </div>
+                <div>
+                    <div class="color_item_grafico_sucursal"></div>
+                    <span class="descripcion_item_grafico_s"></span>
+                </div>
+                <div>
+                    <div class="color_item_grafico_sucursal"></div>
+                    <span class="descripcion_item_grafico_s"></span>
+                </div>
+                <div>
+                    <div class="color_item_grafico_sucursal"></div>
+                    <span class="descripcion_item_grafico_s"></span>
+                </div>
+            </div>
+            <div class="grafico_compras">
+                <grafico-eje_y e_0="eje_y_numeracion_s"></grafico-eje_y>
+                <barra-grafico_vertical l_0="f_l_g_s" c_1="cg_1_c_s" c_2="cg_2_c_s" c_3="cg_3_c_s" c_4="cg_4_c_s" c_5="" s_1="sg_1_c_s" s_2="sg_2_c_s" s_3="sg_3_c_s" s_4="sg_4_c_s" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g_s" c_1="cg_1_c_s" c_2="cg_2_c_s" c_3="cg_3_c_s" c_4="cg_4_c_s" c_5="" s_1="sg_1_c_s" s_2="sg_2_c_s" s_3="sg_3_c_s" s_4="sg_4_c_s" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g_s" c_1="cg_1_c_s" c_2="cg_2_c_s" c_3="cg_3_c_s" c_4="cg_4_c_s" c_5="" s_1="sg_1_c_s" s_2="sg_2_c_s" s_3="sg_3_c_s" s_4="sg_4_c_s" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g_s" c_1="cg_1_c_s" c_2="cg_2_c_s" c_3="cg_3_c_s" c_4="cg_4_c_s" c_5="" s_1="sg_1_c_s" s_2="sg_2_c_s" s_3="sg_3_c_s" s_4="sg_4_c_s" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g_s" c_1="cg_1_c_s" c_2="cg_2_c_s" c_3="cg_3_c_s" c_4="cg_4_c_s" c_5="" s_1="sg_1_c_s" s_2="sg_2_c_s" s_3="sg_3_c_s" s_4="sg_4_c_s" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g_s" c_1="cg_1_c_s" c_2="cg_2_c_s" c_3="cg_3_c_s" c_4="cg_4_c_s" c_5="" s_1="sg_1_c_s" s_2="sg_2_c_s" s_3="sg_3_c_s" s_4="sg_4_c_s" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g_s" c_1="cg_1_c_s" c_2="cg_2_c_s" c_3="cg_3_c_s" c_4="cg_4_c_s" c_5="" s_1="sg_1_c_s" s_2="sg_2_c_s" s_3="sg_3_c_s" s_4="sg_4_c_s" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g_s" c_1="cg_1_c_s" c_2="cg_2_c_s" c_3="cg_3_c_s" c_4="cg_4_c_s" c_5="" s_1="sg_1_c_s" s_2="sg_2_c_s" s_3="sg_3_c_s" s_4="sg_4_c_s" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g_s" c_1="cg_1_c_s" c_2="cg_2_c_s" c_3="cg_3_c_s" c_4="cg_4_c_s" c_5="" s_1="sg_1_c_s" s_2="sg_2_c_s" s_3="sg_3_c_s" s_4="sg_4_c_s" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g_s" c_1="cg_1_c_s" c_2="cg_2_c_s" c_3="cg_3_c_s" c_4="cg_4_c_s" c_5="" s_1="sg_1_c_s" s_2="sg_2_c_s" s_3="sg_3_c_s" s_4="sg_4_c_s" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g_s" c_1="cg_1_c_s" c_2="cg_2_c_s" c_3="cg_3_c_s" c_4="cg_4_c_s" c_5="" s_1="sg_1_c_s" s_2="sg_2_c_s" s_3="sg_3_c_s" s_4="sg_4_c_s" s_5=""></barra-grafico_vertical>
+                <barra-grafico_vertical l_0="f_l_g_s" c_1="cg_1_c_s" c_2="cg_2_c_s" c_3="cg_3_c_s" c_4="cg_4_c_s" c_5="" s_1="sg_1_c_s" s_2="sg_2_c_s" s_3="sg_3_c_s" s_4="sg_4_c_s" s_5=""></barra-grafico_vertical>
+            </div>
+        </div>
+    </div>
+    
+    <div id="acciones_gastos" class="contenedor-pre-credito">
+    </div>
+    <div id="acciones_prestamo" class="contenedor-pre-credito">
+    </div>
+
+    <div class="contenedor_kardex">
+        <table id="tabla-gastos-varios" class="tabla-proforma">
+            <thead>
+                <tr>
+                    <th scope="row" colspan="10"><h2>Salidas de efectivo</h2></th>
+                </tr>
+                <tr>
+                    <th scope="row" colspan="15">
+                        <div>
+                            <button id="buscarFiltrosGastosVarios">Buscar</button>
+                            
+                            <button id="restablecerGastosVarios">Restablecer</button>
+                        </div>
+                        <div>Fecha Inicio
+                            <input id="filtro-tabla-gastosVarios-fecha-inicio" type="date" class="input-filtro">
+                            Fecha Fin
+                            <input id="filtro-tabla-gastosVarios-fecha-fin" type="date" class="input-filtro">
+                        </div>
+                    </th>
+                </tr>
+                <tr>
+                    <th style="width: 120px;">Sucursal
+                        <input list="sucursales_opciones" id="filtro-tabla-gastosVarios-sucursal" class="input-filtro" placeholder="Sucursal" autocomplete="off">
+                        <datalist id="sucursales_opciones">
+                            <option value="Almacén Central"></option>
+                            <option value="Sucursal Uno"></option>
+                            <option value="Sucursal Dos"></option>
+                            <option value="Sucursal Tres"></option>
+                        </datalist> 
+                    </th>
+                    <th style="width: 120px;">Concepto<input id="filtro-tabla-gastosVarios-concepto" type="text" class="input-filtro" placeholder="Concepto"></th>
+                    <th style="width: 120px;">Descripción<input id="filtro-tabla-gastosVarios-comprobante" type="text" class="input-filtro" placeholder="Descripción"></th>
+                    <th style="width: 60px;">Caja chica</th>
+                    <th style="width: 60px;">Caja bancos</th>
+                    <th style="width: 60px;">Crédito</th>
+                    <th style="width: 60px;">Total</th>
+                    <th style="width: 90px;">Usuario<input id="filtro-tabla-gastosVarios-usuario" type="text" class="input-filtro" placeholder="Usuario"></th>
+                    <th style="width: 90px;">Fecha</th>
+                    <th style="width: 60px;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th scope="row" colspan="16">
+                        <button id="_inicio_"><<<</button>
+                        <button id="retrocederGastosVarios"><<  </button>
+                        <select id="numeracionTablaGastosVarios" style="width: 50px; text-align: center;">
+                        </select>
+                        <button id="avanzarGastosVarios">  >></button>
+                        <button id="_final_">>>></button>
+                    </th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    
+</div>
+
+<script src="../static/salidas_caja.js"></script>
+<script src="../static/tablas.js"></script>
+{% endblock %}

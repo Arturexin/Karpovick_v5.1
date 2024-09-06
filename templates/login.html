@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../static/images/Karpovick_logo_uno.png" type="image/x-icon">
+    <title>Document</title>
+    <link rel="stylesheet" href="../static/button.css">
+    <link rel="stylesheet" href="../static/login.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+        emailjs.init('wJouUVW2DVI8Yf43I')
+    </script>
+</head>
+<body>
+    <nav class="nav-portada">
+        <div class="logo_login">
+            <h1>Karpovick</h1><img width="50px" src="../static/images/Karpovick_logo_uno.png" alt="">
+        </div>
+        <div>
+            <a href="#" id="boton-iniciar-sesion-formulario">Iniciar Sesión</a>
+        </div>
+    </nav>
+    <div class="contenedor-login">
+        <div class="contenedor_prueba">
+            <p>Bienvenido a <span><h1>Karpovick</h1></span></p>
+            <p style="width: 400px;">Te regalamos un mes de prueba para que conoscas las bondades de Karpovick, tarifa normal <span><u>USD 3.99</u></span>/mes.</p>
+            <button id="boton_prueba" class="boton_prueba">Pruébalo</button>
+        </div>
+        <div class="contenedor_form">
+            <form id="formulario-loggin" action="/login" method="POST">
+                
+                <div class="contenedor-formulario-uno">
+                    <div class="centrado_form">
+                        <h2>Iniciar Sesión</h2>
+                    </div>
+                    
+                    <label >Usuario
+                        <input id="username" type="text" name="username">
+                    </label>
+                    <label>Constraseña
+                        <input id="password" type="password" name="password">
+                    </label>
+                    
+                    {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                    <br />
+                    {% for message in messages %}
+                    <div class="alerta" role="alert">
+                        <strong>{{ message }}</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+                    <dir class="centrado_form">
+                        <button type="submit" class="boton-iniciar-sesion">Iniciar Sesión</button>
+                        <button class="crear-cuenta boton-iniciar-sesion-tres">Crear cuenta</button>
+                    </dir>
+                    
+                </div>
+            </form>
+            <form id="formulario-create">
+                <div class="contenedor-formulario-dos">
+                    <div class="centrado_form">
+                        <h2>Crear Cuenta</h2>
+                    </div>
+                    <label>Nombres<input id="nombres-create" name="nombres-create" type="text"></label>
+                    <label>Apellidos<input id="apellidos-create" name="apellidos-create" type="text"></label>
+                    <label>DNI<input id="dni-create" name="dni-create" type="text"></label>
+                    <label>Email<input id="email-create" name="email-create" type="text"></label>
+                    <label>Teléfono<input id="telefono-create" name="telefono-create" type="text"></label>
+                    <label>Password<input id="password-create" name="password-create" type="password"></label>
+                    <label>Confirmar Password<input id="password-confirmar-create" name="password-confirmar-create" type="password"></label>
+                    <div class="centrado_form">
+                        <button type="submit" id="button" class="boton-iniciar-sesion">Registrar Cuenta</button>
+                        <button class="boton-iniciar-sesion-dos boton-iniciar-sesion-tres">Iniciar Sesión</button>
+                    </div>
+                </div>
+            </form>
+            </div>
+        <div>
+                <img style="width: 600px; height: 440px;" src="../static/images/Grafico_angulo_dos.png" alt="">
+        </div>
+    </div>
+    <div class="presentacion_login">
+        <div class="componente_presentacion">
+            <img src="../static/images/Ventas.png" alt="">
+            <h1>Punto de Venta</h1>
+            <p>Simplifica tu negocio y mejora la experiencia de tus 
+            clientes con nuestra aplicación de punto de venta.
+            Mayor eficiencia, más ventas y clientes satisfechos.
+            ¡Únete a la revolución del punto de venta digital!.</p>
+            
+                
+        </div>
+        <div class="componente_presentacion">
+            <img src="../static/images/Inventarios.png" alt="">
+            <h1>Gestor de Inventarios</h1>
+            <p>Controla tu inventario con precisión milimétrica y lleva tu negocio al siguiente nivel con nuestra aplicación de gestión de inventarios en línea.</p>
+        </div>
+        <div class="componente_presentacion">
+            <img src="../static/images/Graficos.png" alt="">
+            <h1>Gráficos Estadísticos</h1>
+            <p>Visualiza el rendimiento de tu negocio en tiempo real con gráficos estadísticos poderosos. Toma decisiones informadas y aumenta tus ganancias.</p>
+        </div>
+    </div>
+    <footer class="footer-login">
+        
+            <div class="container">
+              <div class="row">
+                <img width="100px" src="../static/images/Karpovick_logo_uno.png" alt="">
+                <div class="col-md-6">
+                  <p>&copy; 2023 Karpovick Group. Todos los derechos reservados.</p>
+                </div>
+                <div class="col-md-6">
+                  <p class="text-md-right">Contáctanos:
+                    <a href="mailto:karpovick-group@outlook.com">karpovick-group@outlook.com</a></p>
+                </div><i class="fas fa-map-marker-alt"></i> Arequipa, Perú<br>
+              </div>
+            </div>
+    </footer>
+    <script src="../static/login.js"></script>
+</body>
+</html>
