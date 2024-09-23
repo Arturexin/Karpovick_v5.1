@@ -24,6 +24,7 @@ def getCreditoComprobante(id_detalle):
                         "JOIN sucursales ON creditos.sucursal_cre = sucursales.id_sucursales "
                         "WHERE `identificador_cre` = %s "
                         "AND id_detalle LIKE %s "
+                        "AND creditos.estado > 0 "
                         "ORDER BY id_creditos ASC")
             data_params = (usuarioLlave, id_detalle)
             cur.execute(query, data_params)
@@ -65,6 +66,7 @@ def getCreditoReporteDos():
                         "JOIN sucursales ON creditos.sucursal_cre = sucursales.id_sucursales "
                         "WHERE identificador_cre = %s "
                         "AND saldo_total > 0 "
+                        "AND creditos.estado > 0 "
                         "GROUP BY tipo_comprobante")
             data_params = (usuarioLlave,)
             cur.execute(query, data_params)
@@ -102,21 +104,23 @@ def createCreditos():
         usuarioLlave = session.get('usernameDos')
         usuarioId = session.get('identificacion_usuario')
         dato_cero = 0
+        dato_uno = 1
         with mysql.connection.cursor() as cur:
             query_venta = ( "SELECT id_det_ventas, tipo_comprobante "
                             "FROM ventas "
                             "WHERE identificador_ventas = %s "
                             "AND tipo_comprobante LIKE %s "
+                            "AND ventas.estado > 0 "
                             "ORDER BY id_det_ventas DESC")
             data_params_venta = (usuarioLlave, request.json['tipo_comprobante'])
             cur.execute(query_venta, data_params_venta)
             id_detalle_ventas = cur.fetchall()[0][0]
 
             query = ("INSERT INTO `creditos` (`id_creditos`, `sucursal_cre`, `id_detalle`, `efectivo`, `tarjeta`, `tasa`, `a_monto`, `a_interes`, "
-                     "`saldo_monto`, `saldo_interes`, `saldo_total`, `saldo_perdida`, `fecha_cre`, `id_usuario`, `identificador_cre`) "
-                     "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+                     "`saldo_monto`, `saldo_interes`, `saldo_total`, `saldo_perdida`, `fecha_cre`, `id_usuario`, `identificador_cre`, `estado`) "
+                     "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
             data = (request.json['sucursal_cre'], id_detalle_ventas, dato_cero, dato_cero, request.json['tasa'], dato_cero, dato_cero, request.json['saldo_monto'], 
-                    request.json['saldo_interes'], request.json['saldo_total'], dato_cero, request.json['fecha_cre'], usuarioId, usuarioLlave)
+                    request.json['saldo_interes'], request.json['saldo_total'], dato_cero, request.json['fecha_cre'], usuarioId, usuarioLlave, dato_uno)
             cur.execute(query, data)
             mysql.connection.commit()
 
@@ -146,16 +150,17 @@ def editCreditos():
 @login_required
 def operarCreditos():
     try:
+        dato_uno = 1
         usuarioLlave = session.get('usernameDos')
         usuarioId = session.get('identificacion_usuario')
 
         with mysql.connection.cursor() as cur:
             query = ("INSERT INTO `creditos` (`id_creditos`, `sucursal_cre`, `id_detalle`, `efectivo`, `tarjeta`, `tasa`, `a_monto`, `a_interes`, "
-                     "`saldo_monto`, `saldo_interes`, `saldo_total`, `saldo_perdida`, `fecha_cre`, `id_usuario`, `identificador_cre`) "
-                     "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+                     "`saldo_monto`, `saldo_interes`, `saldo_total`, `saldo_perdida`, `fecha_cre`, `id_usuario`, `identificador_cre`, `estado`) "
+                     "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
             data = (request.json['sucursal_cre'], request.json['id_detalle'], request.json['efectivo'], request.json['tarjeta'], request.json['tasa'], 
                     request.json['a_monto'], request.json['a_interes'], request.json['saldo_monto'], request.json['saldo_interes'], 
-                    request.json['saldo_total'], request.json['saldo_perdida'], request.json['fecha_cre'], usuarioId, usuarioLlave)
+                    request.json['saldo_total'], request.json['saldo_perdida'], request.json['fecha_cre'], usuarioId, usuarioLlave, dato_uno)
             cur.execute(query, data)
             mysql.connection.commit()
         return jsonify({"status": "success", "message": "Crédito operado correctamente."})

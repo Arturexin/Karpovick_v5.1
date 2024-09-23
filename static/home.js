@@ -24,14 +24,9 @@ let sumaTotalPerdidasAnioPasado = [];
 let transferencias_monto = [];
 let transferencias_monto_anio_pasado = [];
 async function cargarSaldosTransferencias(url, anio){// rotacion de inventarios
-    let variable= [];
-    for(let i = 0; i < sucursales_comparacion.length; i++){
-        let respuesta = await cargarDatos(`${url}?`+
-                                            `id_sucursal=${sucursales_comparacion[i].id_sucursales}&`+                                              
-                                            `year_actual=${anio}`)  
-    variable.push(respuesta)
-    }
-    return variable;
+    let respuesta = await cargarDatos(  `${url}?`+                                              
+                                        `year_actual=${anio}`) 
+    return respuesta;
 };
 async function cargarFuncionesGraficos(){
     ventasMensualesSucursales = await cargarDatos(  `salidas_suma_ventas_por_mes_por_sucursal?`+// rotacion de inventarios
@@ -87,29 +82,7 @@ function cargarDatosAnio(){
             event.textContent = ""
         })
 
-        ventasMensualesSucursales = await cargarDatos(  `salidas_suma_ventas_por_mes_por_sucursal?`+// rotacion de inventarios
-                                                        `year_actual=${anio_principal}`)
-        sumaTotalEntradas = await cargarDatos(  `entradas_suma_total_mes?`+// rotacion de inventarios
-                                                `year_actual=${anio_principal}`)
-        sumaTotalSalidas = await cargarDatos(   `salidas_suma_total_por_mes?`+// rotacion de inventarios
-                                                `year_actual=${anio_principal}`)
-        gastos_grafico_detallado = await cargarDatos(   `gastos_suma_mes?`+
-                                                        `year_actual=${anio_principal}`)
-        sumaTotalEntradasAnioPasado = await cargarDatos(`entradas_suma_total_pasado?`+// rotacion de inventarios
-                                                        `year_actual=${anio_principal}`)
-        sumaTotalSalidasAnioPasado = await cargarDatos(`salidas_suma_total_pasado?`+// rotacion de inventarios
-                                                        `year_actual=${anio_principal}`)
-        sumaTotalPerdidas = await cargarDatos(  `perdidas_suma_total?`+// rotacion de inventarios
-                                                `year_actual=${anio_principal}`);
-        sumaTotalPerdidasAnioPasado = await cargarDatos(`perdidas_suma_total_anio_pasado?`+// rotacion de inventarios
-                                                        `year_actual=${anio_principal}`);
-        transferencias_monto = await cargarSaldosTransferencias(`transferencias_suma_total`, anio_principal)
-        transferencias_monto_anio_pasado = await cargarSaldosTransferencias(`transferencias_suma_total_anio_pasado`, anio_principal)
-        
-        graficoDonaEfectivo()
-        totalVentasPorMes()
-        totalVentasPorMesSucursal()
-        rotacionSucursal()
+        cargarFuncionesGraficos()
 
         quitarMarcaBoton()
         modal_proceso_abrir(`Datos del año ${anio_principal} cargados.`, "")
@@ -238,16 +211,16 @@ async function rotacionSucursal(){
     });
 
     rotacionMes.push(inventarios[0].length / (costos_venta[0] / (((stock_anio_pasado[0] * 2) + inventarios[0][0] + inventario_final[0] + 
-                    (transferencias_monto[0].sumar_monto - transferencias_monto[0].restar_monto)) / 2)) -
+                    (transferencias_monto.suma_total_ac)) / 2)) -
                     discriminarNullArray(sumaTotalPerdidas, sucursales_comparacion.length, "sumar_perdidas")[0])
     rotacionMes.push(inventarios[1].length / (costos_venta[1] / (((stock_anio_pasado[1] * 2) + inventarios[1][0] + inventario_final[1] + 
-                    (transferencias_monto[1].sumar_monto - transferencias_monto[1].restar_monto)) / 2)) -
+                    (transferencias_monto.suma_total_su)) / 2)) -
                     discriminarNullArray(sumaTotalPerdidas, sucursales_comparacion.length, "sumar_perdidas")[1])
     rotacionMes.push(inventarios[2].length / (costos_venta[2] / (((stock_anio_pasado[2] * 2) + inventarios[2][0] + inventario_final[2] + 
-                    (transferencias_monto[2].sumar_monto - transferencias_monto[2].restar_monto)) / 2)) -
+                    (transferencias_monto.suma_total_sd)) / 2)) -
                     discriminarNullArray(sumaTotalPerdidas, sucursales_comparacion.length, "sumar_perdidas")[2])
     rotacionMes.push(inventarios[3].length / (costos_venta[3] / (((stock_anio_pasado[3] * 2) + inventarios[3][0] + inventario_final[3] + 
-                    (transferencias_monto[3].sumar_monto - transferencias_monto[3].restar_monto)) / 2)) -
+                    (transferencias_monto.suma_total_st)) / 2)) -
                     discriminarNullArray(sumaTotalPerdidas, sucursales_comparacion.length, "sumar_perdidas")[3])
 
     for(let i = 0; i < rotacionMes.length; i++){

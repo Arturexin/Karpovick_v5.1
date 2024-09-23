@@ -33,11 +33,12 @@ let datos = [];
 let sucursales = [];
 let array_sucursales = [];
 let colorFondoBarra = ["#E6CA7B","#91E69C","#6380E6","#E66E8D"];
-let sucursales_activas = ['existencias_ac', 'existencias_su', 'existencias_sd', 'existencias_st'];
+let sucursales_activas = ['existencias_ac', 'existencias_su', 'existencias_sd', 'existencias_st', 'existencias_sc'];
+let suc_add = ["Almacén Central", "Sucursal Uno", "Sucursal Dos", "Sucursal Tres", "Sucursal Cuatro"]
 let mapa_calor = ["#91ff85","#C6F556","#F5CF6F","#DE8B59","#FF666D"];
-let obttenerAnio = new Date().getFullYear() % 100
-const arregloMeses = [`01-${obttenerAnio}`, `02-${obttenerAnio}` ,`03-${obttenerAnio}` ,`04-${obttenerAnio}` ,`05-${obttenerAnio}` ,`06-${obttenerAnio}`, 
-                    `07-${obttenerAnio}`, `08-${obttenerAnio}`, `09-${obttenerAnio}`, `10-${obttenerAnio}`, `11-${obttenerAnio}` ,`12-${obttenerAnio}`];
+let obtenerAnio = new Date().getFullYear() % 100
+const arregloMeses = [`01-${obtenerAnio}`, `02-${obtenerAnio}` ,`03-${obtenerAnio}` ,`04-${obtenerAnio}` ,`05-${obtenerAnio}` ,`06-${obtenerAnio}`, 
+                    `07-${obtenerAnio}`, `08-${obtenerAnio}`, `09-${obtenerAnio}`, `10-${obtenerAnio}`, `11-${obtenerAnio}` ,`12-${obtenerAnio}`];
 const meses_letras = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Set","Oct","Nov","Dic",]
 const monedas = { 
                     "Balboa": "B/.",
@@ -58,10 +59,7 @@ const monedas = {
                     "Sol_peruano": "S/",
                     "Nada": "",
                 }; 
-let indice_base = [];
-let suc_enc = [];
-let cat_con = [];
-let indice_cli = [];
+
 function moneda(){
     return monedas[JSON.parse(localStorage.getItem("datos_usuario"))[0].moneda]
 };
@@ -125,13 +123,17 @@ async function cargarIndices(){
         console.error('Error al cargar índices:', error.message);
     };
 };
+let indice_base = [];
+let suc_enc = JSON.parse(localStorage.getItem("sucursal_encabezado"))
+let cat_con = JSON.parse(localStorage.getItem("categoria_consulta"))
+let indice_cli = [];
 async function cargarDatos(ruta){
     let url = URL_API_almacen_central + ruta
     try{
         let respuesta  = await fetch(url, {
             "method": 'GET',
             "headers": {
-                "Content-Type": 'application/json'
+                "Content-Type": 'application/json'  
             }
         });
         if (!respuesta.ok) {
@@ -184,9 +186,41 @@ async function funcionFetch(url, fila){
         throw error;
     };
 };
+async function funcionFetchDos(url, fila){
+    try {
+        let response = await fetch(url, {
+            method: 'POST',
+            body: JSON.stringify(fila),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
 
+        if (!response.ok) {
+            throw new Error("Error en la respuesta de la API: " + response.statusText);
+        }
+
+        // Convertir la respuesta a JSON
+        let data = await response.json();
+        return data;  // Retorna el JSON con la respuesta de la API
+
+    } catch (error) {
+        console.error("Error durante la solicitud:", error);
+        throw error;  // Propaga el error si lo hay
+    }
+};
+function obtenerIndiceSucursal(){
+    let indice = ""
+    let nom_ = suc_enc.find(x => x.id_sucursales === Number(document.getElementById("fffff-sucursal").value))
+    suc_add.forEach((e, i)=>{
+        if(e === nom_.sucursal_nombre){
+            indice = i
+        }
+    })
+    return indice
+}
 function cargarSucursalesEjecucion(elemento_id){// SE LLAMA AL CARGAR LA PAGINA INDEX
-    suc_enc = JSON.parse(localStorage.getItem("sucursal_encabezado"))
+    
     let html_sucursal = ''
     for(let i = 0; i < suc_enc.length; i++){
         let fila = ""
@@ -207,7 +241,7 @@ function cargarSucursalesEjecucion(elemento_id){// SE LLAMA AL CARGAR LA PAGINA 
     elemento_id.innerHTML = html_sucursal
 };
 function llenarCategoriaProductosEjecucion(cate){
-    cat_con = JSON.parse(localStorage.getItem("categoria_consulta"))
+    
     let html_cat = `<option value="0" selected>-- Categorías --</option>`;
     for(categoria of cat_con) {
         let fila = `<option value="${categoria.id}">${categoria.categoria_nombre}</option>`
@@ -225,25 +259,15 @@ function baseProv(cate){
     };
     document.querySelector(cate).innerHTML = html 
 }
-function categoriaProductosCreacion(categoria, array){
+function categoriaProductosCreacion(categoria){
+    let array = [];
     const event = categoria;
-    if(event){
-        cat_con.forEach((elemento) => {
-            if(elemento.id === Number(event)){
-                if(elemento.uno !== ""){array.push(elemento.uno)};
-                if(elemento.dos !== ""){array.push(elemento.dos)};
-                if(elemento.tres !== ""){array.push(elemento.tres)};
-                if(elemento.cuatro !== ""){array.push(elemento.cuatro)};
-                if(elemento.cinco !== ""){array.push(elemento.cinco)};
-                if(elemento.seis !== ""){array.push(elemento.seis)};
-                if(elemento.siete !== ""){array.push(elemento.siete)};
-                if(elemento.ocho !== ""){array.push(elemento.ocho)};
-                if(elemento.nueve !== ""){array.push(elemento.nueve)};
-                if(elemento.diez !== ""){array.push(elemento.diez)};
-                if(elemento.once !== ""){array.push(elemento.once)};
-                if(elemento.doce !== ""){array.push(elemento.doce)};
-            };
-        });
+    let cat = ['uno', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve', 'diez', 'once', 'doce']
+    let cat_id = cat_con.find(x=> x.id === Number(event.value))
+    if(cat_id){
+        cat.forEach((e)=>{
+            cat_id[e] !== "" ? array.push(cat_id[e]): "";
+        })
     };
     return array;
 };
@@ -334,7 +358,7 @@ function sidebarMarcadito(){
     }else if(btnDevolucionCompras == 1){
         document.getElementById("button-devolucion-compras").classList.add("marcadito")
         document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
-        document.getElementById("buscador-comporbante-compras").focus();
+        document.getElementById("buscador_operacion").focus();
     }else if(btnDevolucionSalidas == 1){
         document.getElementById("button-devolucion-salidas").classList.add("marcadito")
         document.querySelector(".baja_opacidad").classList.add("alta_opacidad")

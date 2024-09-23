@@ -46,6 +46,7 @@ def getAllClientesConteo():
                      "AND telefono_cli LIKE %s "
                      "AND nombres LIKE %s "
                      "AND clase_cli = %s "
+                     "AND clientes.estado > 0 "
                      "AND fecha_cli >= %s AND fecha_cli < %s")
             
             data_params = (usuarioLlave, f"%{nombre_persona}%", f"%{dni_persona}%", f"%{email_persona}%", f"%{telefono_persona}%", 
@@ -87,6 +88,7 @@ def getAllClientes(numero):
                      "AND telefono_cli LIKE %s "
                      "AND nombres LIKE %s "
                      "AND clase_cli = %s "
+                     "AND clientes.estado > 0 "
                      "AND fecha_cli >= %s AND fecha_cli < %s "
                      "ORDER BY id_cli ASC "
                      "LIMIT 20 OFFSET %s")
@@ -125,7 +127,9 @@ def getAllClientesVentas():
         with mysql.connection.cursor() as cur:
             query = ("SELECT id_cli, nombre_cli, dni_cli, email_cli, telefono_cli, direccion_cli "
                      "FROM clientes "
-                     "WHERE `identificador_cli` = %s AND clase_cli LIKE %s")
+                     "WHERE `identificador_cli` = %s "
+                     "AND clientes.estado > 0 "
+                     "AND clase_cli LIKE %s")
             cur.execute(query, (usuarioLlave, '0'))
             data = cur.fetchall()
 
@@ -154,7 +158,9 @@ def getAllProveedores():
         with mysql.connection.cursor() as cur:
             query = ("SELECT id_cli, nombre_cli "
                      "FROM clientes "
-                     "WHERE `identificador_cli` = %s AND clase_cli LIKE %s")
+                     "WHERE `identificador_cli` = %s "
+                     "AND clientes.estado > 0 "
+                     "AND clase_cli LIKE %s")
             cur.execute(query, (usuarioLlave, '1'))
             data = cur.fetchall()
             
@@ -183,8 +189,9 @@ def getAllClientesMes():
                      "SUM(CASE WHEN clase_cli = 1 THEN 1 ELSE 0 END) AS suma_proveedores "
                      "FROM clientes "
                      "WHERE `identificador_cli` = %s "
-                     " AND YEAR(fecha_cli) = %s "
-                     " GROUP BY mes")
+                     "AND clientes.estado > 0 "
+                     "AND YEAR(fecha_cli) = %s "
+                     "GROUP BY mes")
             cur.execute(query,(usuarioLlave, year_actual))
             data = cur.fetchall()
 
@@ -208,7 +215,8 @@ def getClientes(id_cli):
         with mysql.connection.cursor() as cur:
             query = ("SELECT id_cli, nombre_cli, dni_cli, email_cli, telefono_cli, direccion_cli, usuario_cli, clase_cli, fecha_cli "
                      "FROM clientes "
-                     "WHERE id_cli = %s ")
+                     "WHERE id_cli = %s "
+                     "AND clientes.estado > 0 ")
             cur.execute(query, (id_cli,))
             data = cur.fetchall()
 
@@ -239,14 +247,16 @@ def createClientes():
     return 'ok'
 
 def createCliente():
+    dato_uno = 1
     usuarioLlave = session.get('usernameDos')
     usuarioId = session.get('identificacion_usuario')
     try:
         with mysql.connection.cursor() as cur:
-            query = ("INSERT INTO `clientes` (`id_cli`, `nombre_cli`, `dni_cli`, `email_cli`, `telefono_cli`, `direccion_cli`, `usuario_cli`, `clase_cli`, `fecha_cli`, `identificador_cli`) "
-                     "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+            query = ("INSERT INTO `clientes` (`id_cli`, `nombre_cli`, `dni_cli`, `email_cli`, `telefono_cli`, `direccion_cli`, "
+                     "`usuario_cli`, `clase_cli`, `fecha_cli`, `identificador_cli`, `estado`) "
+                     "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
             data = (request.json['nombre_cli'], request.json['dni_cli'], request.json['email_cli'], request.json['telefono_cli'], 
-                    request.json['direccion_cli'], usuarioId, request.json['clase_cli'], request.json['fecha_cli'], usuarioLlave)
+                    request.json['direccion_cli'], usuarioId, request.json['clase_cli'], request.json['fecha_cli'], usuarioLlave, dato_uno)
             cur.execute(query, data)
             mysql.connection.commit()
         return jsonify({"status": "success", "message": "Persona creada correctamente."})
@@ -274,12 +284,14 @@ def updateCliente():
 @cross_origin()
 def crearClienteControl():
     current_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    dato_uno = 1
     try:
         with mysql.connection.cursor() as cur:
-            query = ("INSERT INTO `clientes` (`id_cli`, `nombre_cli`, `dni_cli`, `email_cli`, `telefono_cli`, `direccion_cli`, `usuario_cli`, `clase_cli`, `fecha_cli`, `identificador_cli`) "
-                     "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+            query = ("INSERT INTO `clientes` (`id_cli`, `nombre_cli`, `dni_cli`, `email_cli`, `telefono_cli`, `direccion_cli`, "
+                     "`usuario_cli`, `clase_cli`, `fecha_cli`, `identificador_cli`, `estado`) "
+                     "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
             data = (request.json['nombre_cli'], request.json['dni_cli'], request.json['email_cli'], request.json['telefono_cli'], 
-                    request.json['direccion_cli'], request.json['usuario_cli'], request.json['clase_cli'], current_date, request.json['usuario_cli'])
+                    request.json['direccion_cli'], request.json['usuario_cli'], request.json['clase_cli'], current_date, request.json['usuario_cli'], dato_uno)
             cur.execute(query, data)
             mysql.connection.commit()
         return jsonify({"status": "success", "message": "Persona creada correctamente."})

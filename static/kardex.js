@@ -89,13 +89,15 @@ function llenadoTablaDetalle(array, id_tabla, nombre_propiedad_objeto_valor){
     array.forEach((event) => {
         let dato = 0;
         if(document.querySelector(`#${id_tabla} > caption`).textContent === "Lista de Transferencias"){
-            if(event.id_suc_origen === Number(document.getElementById("fffff-sucursal").value)){
+            /* if(event.id_suc_origen === Number(document.getElementById("fffff-sucursal").value)){
                 dato = -event.existencias;
                 comprobante(event, dato);
             }else{
                 dato = event.existencias;
                 comprobante(event, dato);
-            }
+            } */
+            dato = event.existencias;
+                comprobante(event, dato);
         }else if(event.comprobante.startsWith("Dev")){
             dato = -event.existencias_devueltas;
             comprobante(event, dato);
@@ -162,7 +164,7 @@ async function procesarKardex(){
                                             `perdidas_sucursal=${document.getElementById("fffff-sucursal").value}&`+
                                             `year_actual=${anio_principal}`)
         kardex_transferencias = await cargarDatos(`transfrencias_codigo_kardex/${document.getElementById("id_producto").value}?`+
-                                            `transferencias_sucursal=${document.getElementById("fffff-sucursal").value}&`+
+                                            `transferencias_sucursal=${indice_sucursal_kardex}&`+
                                             `year_actual=${anio_principal}`)
         cargarGraficos()
         

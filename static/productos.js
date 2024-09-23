@@ -13,6 +13,8 @@ function inicioProductos(){
         sucu_[i] = event.sucursal_nombre
     })
 };
+let datos_usuario = JSON.parse(localStorage.getItem("datos_usuario"))
+
 let filas_total_bd = {value: 0};
 let indice_tabla = {value : 1};
 let num_filas_tabla = {value: 0};
@@ -75,10 +77,11 @@ function cuerpoFilaTabla(e){
                 <td style="text-align: end;">${e.existencias_su}</td>
                 <td style="text-align: end;">${e.existencias_sd}</td>
                 <td style="text-align: end;">${e.existencias_st}</td>
+                <td style="text-align: end;">${e.existencias_sc}</td>
                 <td style="text-align: end;">${e.costo_unitario.toFixed(2)}</td>
                 <td style="text-align: end;">${((e.existencias_ac + 
                                                 e.existencias_su + e.existencias_sd + 
-                                                e.existencias_st)*e.costo_unitario).toFixed(2)}</td>
+                                                e.existencias_st + e.existencias_sc)*e.costo_unitario).toFixed(2)}</td>
                 <td style="text-align: end;">${e.precio_venta.toFixed(2)}</td>
                 <td style="text-align: end;">${e.lote}</td>
                 <td style="width: 100px;">${e.nombre_cli}</td>
@@ -96,7 +99,7 @@ function cuerpoFilaTabla(e){
                         <span class="tooltiptext">Transferencia</span>
                     </div>
                     <div class="tooltip">
-                        <span onclick="removeAlmacenCentral(${e.idProd})" style="font-size:18px;" class="material-symbols-outlined eliminarTablaFila">delete</span>
+                        <span onclick="accionRemove(${e.idProd})" style="font-size:18px;" class="material-symbols-outlined eliminarTablaFila">delete</span>
                         <span class="tooltiptext">Eliminar producto</span>
                     </div>
                 </td>
@@ -116,366 +119,306 @@ function manejoDeFechas(){
 ////////////////////BOTON ACCIONES/////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //ELIMINAR PRODUCTO
-async function removeAlmacenCentral(idProd) {
-    respuestaAlmacen = confirm('¿Estás seguro de eliminarlo?')
-    if (respuestaAlmacen) {
-        let url = URL_API_almacen_central + 'almacen_central/' + idProd
-            await fetch(url, {
-            "method": 'DELETE',
-            "headers": {
-                "Content-Type": 'application/json'
-                }
-            })
+
+async function accionRemove(id) {
+    let prod_ = base_datos.array.find(y => y.idProd == id)// obtenemos los datos de la fila
+    tabla_proforma_productos(prod_, "Eliminar producto");
+
+    let contenedor_tab = document.querySelector("#contenedor_tabla_producto");
+    contenedor_tab.children[0].remove();
+    
+    contenedorBotonesProducto(`procesarRemove(${prod_.idProd})`, "Eliminar producto")
+    document.getElementById("acciones_rapidas").classList.add("modal-show-producto")
+};
+
+async function procesarRemove(idProd){
+    let url = URL_API_almacen_central + 'almacen_central_remove'
+    let data = {
+        'idProd': idProd
+    };
+    let response = await funcionFetchDos(url, data);
+    if(response.status === "success"){
         await conteoFilas(subRutaA(), filas_total_bd, indice_tabla, 
                         document.getElementById("numeracionTabla"), 20)
         await searchDatos(subRutaB(num_filas_tabla.value), base_datos,"#tabla-productos")
         localStorage.setItem("base_datos_consulta", JSON.stringify(await cargarDatos('almacen_central_ccd')))
+        modal_proceso_abrir(`${response.message}.`)
+        modal_proceso_salir_botones()
+        removerContenido()
     };
 };
-//RECOMPRAS
-
-
-function formulario_recompras_productos(){
-    let formularioRecomprasInventario = `
-                                        <div id="form_accion_rapida" class="nuevo-contenedor-box">
-                                            <form action="" class="formulario-general fondo">
-                                                <h2 id="accion_codigo"></h2>
-                                                <input id="accion_id" class="input-general fondo invisible" type="text" disabled>
-                                                <label class="label-general">Sucursal origen
-                                                    <select name="fffff-sucursal" id="fffff-sucursal" class="input-select-ventas">
-                                                    </select>
-                                                </label>
-                                                <label class="label-general">Existencias<input id="accion_existencias" class="input-general fondo" type="text" disabled></label>
-                                                <label class="label-general">Unidades a Recomprar<input id="accion_editar" class="input-general-importante fondo-importante" type="text"></label>
-                                                <label class="label-general">Saldo en Origen<input id="accion_saldo" class="input-general fondo" type="text" disabled></label>
-                                                <input id="accion_existencias_ac" class="input-general fondo invisible" type="text" disabled>
-                                                <input id="accion_existencias_su" class="input-general fondo invisible" type="text" disabled>
-                                                <input id="accion_existencias_sd" class="input-general fondo invisible" type="text" disabled>
-                                                <input id="accion_existencias_st" class="input-general fondo invisible" type="text" disabled>
-                                                <button id="accion_procesar_recompra" class="myButtonAgregar">Procesar Recompra</button>
-                                                <button id="remover_accion_rapida" class="myButtonEliminar">Cancelar</button>
-                                                <span class="invisible">Holas</span>
-                                            </form>
-                                        </div>
-                                        `;
-    document.getElementById("acciones_rapidas").innerHTML = formularioRecomprasInventario;
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function tabla_head_productos(suc, q, op, saldo, origen){
+    let tabla_= document.querySelector("#tabla_proforma_producto > thead");
+    let nuevaFilaTabla_ = tabla_.insertRow(-1);
+    let fila =  `
+                <th>${suc}</th>
+                <th>${q}</th>
+                <th>${op}</th>
+                <th>${saldo}</th>
+                <th>${origen}</th>
+                `;
+    nuevaFilaTabla_.innerHTML = fila;
 }
+function contenedorBotonesProducto(funcion, titulo){
+    let contenedor_bot = document.querySelector("#contenedor_botones_producto");
+    let html =  `
+                <button class="myButtonAgregar" onCLick="${funcion}">${titulo}</button>
+                <button class="myButtonEliminar" onClick="removerContenido()">Cancelar</button>
+                `;
+    contenedor_bot.innerHTML = html;
+}
+//RECOMPRAS
+function tabla_proforma_productos(prod_, titulo){
+    let html = `<div id="form_accion_rapida" class="nuevo-contenedor-box">
+                    <h2 style="text-align: center;">${titulo}</h2>
+                    <table class="tabla_modal contenido-tabla">
+                        <thead>
+                            <tr>
+                                <th style="width: 120px;">Categoría</th>
+                                <th style="width: 120px;">Código</th>
+                                <th style="width: 200px;">Descripción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td id="id_prod" class="invisible">${prod_.idProd}</td>
+                                <td style="width: 120px; text-align: center;">${prod_.categoria_nombre}</td>
+                                <td style="width: 120px; text-align: center;">${prod_.codigo}</td>
+                                <td style="width: 200px; text-align: center;">${prod_.descripcion}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <div id="contenedor_tabla_producto">`;
+                html += `<table class="tabla-proforma" id="tabla_proforma_producto">
+                            <thead></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <br>
+                    <div id="contenedor_botones_producto" style="display: flex;justify-content: center;">
+                    </div>
+                </div>`;
+    document.getElementById("acciones_rapidas").innerHTML = html;
+}
+function tabla_body_productos(e, i, id_suc){
+    let tabla_= document.querySelector("#tabla_proforma_producto > tbody");
+    let nuevaFilaTabla_ = tabla_.insertRow(-1);
+    let fila =  `<tr>` +
+                    `<td class="nom_suc" style="text-align: center; width: 180px">${suc_add[i]}</td>` + //nombre de sucursal
+                    `<td style="text-align: center; width: 90px">${e[sucursales_activas[i]]}</td>` + // existencias del producto
+                    `<td>
+                        <input class="input-tablas-dos-largo q_recompra" onKeyup = "op_recompras(this)">
+                    </td>` +
+                    `<td style="text-align: center; width: 90px" class="s_recompra">${e[sucursales_activas[i]]}</td>` +
+                    `<td class="invisible">${id_suc}</td>` + // id de la cucursal
+                    `<td class="invisible">${i}</td>` + // indice de la sucursal
+                `</tr>`;
+    nuevaFilaTabla_.innerHTML = fila;
+    document.querySelector("#tabla_proforma_producto > tbody > tr:nth-child(1) > td:nth-child(3) > input").focus();
+};
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function accion_recompras(id){
-    accionCantidadARecomprar()
-    let sucursales_comparacion = JSON.parse(localStorage.getItem("sucursal_encabezado"))// Obtenemos el id, índice y nombre de las sucursales
-    let almacenCentral = base_datos.array.find(y => y.idProd == id)// obtenemos los datos de la fila
-    let array_sucursales_existencias = [almacenCentral.existencias_ac, almacenCentral.existencias_su, almacenCentral.existencias_sd, almacenCentral.existencias_st]
-    document.getElementById('accion_id').value = almacenCentral.idProd;
-    document.getElementById('accion_codigo').textContent = "Recompra: " + almacenCentral.codigo;
-
-    document.getElementById('accion_existencias').value = almacenCentral.existencias_ac;//inicia con datos de la primera sucursal
-    sucursal_indice_productos = document.getElementById("fffff-sucursal").selectedIndex;//inicia con datos de la primera sucursal
-
-    document.getElementById("fffff-sucursal").addEventListener("change", ()=>{
-        sucursal_indice_productos = document.getElementById("fffff-sucursal").selectedIndex
-        array_sucursales_existencias.forEach((event, i)=>{
-            if(sucursales_comparacion[i] && 
-            document.getElementById("fffff-sucursal")[sucursal_indice_productos].textContent === sucursales_comparacion[i].sucursal_nombre){
-                document.getElementById('accion_existencias').value = event;
-            }
-        })
-        document.getElementById('accion_editar').focus();
-    })
-    document.getElementById('accion_existencias_ac').value = almacenCentral.existencias_ac;
-    document.getElementById('accion_existencias_su').value = almacenCentral.existencias_su;
-    document.getElementById('accion_existencias_sd').value = almacenCentral.existencias_sd;
-    document.getElementById('accion_existencias_st').value = almacenCentral.existencias_st;
-
-    document.getElementById("accion_editar").focus()
+    let prod_ = base_datos.array.find(y => y.idProd == id)// obtenemos los datos de la fila
+    tabla_proforma_productos(prod_, "Recompra");
+    tabla_head_productos("Sucursal", "Existencias", "Recompra", "Saldo", "");
+    suc_add.forEach((e, i)=>{
+        let coincidencia = suc_enc.find(x=> x.sucursal_nombre === e)
+        coincidencia ? tabla_body_productos(prod_, i, coincidencia.id_sucursales) : ";"
+    });
+    contenedorBotonesProducto(`procesarRecompra()`, "Procesar recompra")
     document.getElementById("acciones_rapidas").classList.add("modal-show-producto")
 };
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-function accionCantidadARecomprar(){
-    formulario_recompras_productos()
-    cargarSucursalesEjecucion(document.getElementById("fffff-sucursal"))
-    removerAccionRapida();
-    let editar = document.getElementById("accion_editar");
-    editar.addEventListener("keyup", (event)=>{
-        document.getElementById("accion_saldo").value = Number(event.target.value) +
-                                                        Number(document.getElementById("accion_existencias").value)
-    });
-    const accionProcesarRecompra = document.getElementById("accion_procesar_recompra");
-    accionProcesarRecompra.addEventListener("click", procesamientoInventarioRecompras)
+function op_recompras(e){
+    let row_ = e.closest("tr");
+    row_.children[3].textContent = Number(row_.children[1].textContent) + Number(row_.children[2].children[0].value )
+    Number(row_.children[3].textContent) < 0 || 
+    isNaN(Number(row_.children[3].textContent)) ?   row_.children[3].style.background = "var(--boton-dos)": 
+                                                    row_.children[3].style.background = "";
 };
-async function procesamientoInventarioRecompras(e){
-    e.preventDefault();
-    if(Number(document.getElementById("accion_editar").value) > 0){
-        modal_proceso_abrir("Procesando la recompra!!!.", "")
+function removerContenido(){
+    let contenido = document.getElementById("form_accion_rapida")
+    contenido.remove();
+    document.getElementById("acciones_rapidas").classList.remove("modal-show-producto")
+};
+
+
+async function procesarRecompra(){
+    modal_proceso_abrir("Procesando la recompra!!!.", "")
+    let inputs = document.querySelectorAll(".q_recompra");
+    let valores = Array.from(inputs).map(input => Number(input.value));
+
+    if (valores.every(valor => valor >= 0 && Number.isFinite(valor)) && valores.some(valor => valor > 0)){
         try{
-            let respuesta_numeracion = await cargarNumeracionComprobante();
-            if(respuesta_numeracion.ok){
-                await realizarRecompraProductos()
-                await conteoFilas(subRutaA(), filas_total_bd, indice_tabla, 
-                                document.getElementById("numeracionTabla"), 20)
-                await searchDatos(subRutaB((document.getElementById("numeracionTabla").value - 1) * 20), 
-                                base_datos,"#tabla-productos")
-            }else{
-                modal_proceso_abrir("La conexión con el servidor no es buena.", "")
-                modal_proceso_salir_botones()
-            };
-        }catch(error){
+            await realizarRecompra()
+            await conteoFilas(subRutaA(), filas_total_bd, indice_tabla, 
+                            document.getElementById("numeracionTabla"), 20)
+            await searchDatos(subRutaB((document.getElementById("numeracionTabla").value - 1) * 20), 
+                            base_datos,"#tabla-productos")
+        }catch (error){
             modal_proceso_abrir("Ocurrió un error. " + error, "")
             console.error("Ocurrió un error. ", error)
             modal_proceso_salir_botones()
         };
     }else{
-        modal_proceso_abrir("Unidades a recomprar insuficientes.", "")
+        modal_proceso_abrir(`Uno o varios de los valores son incorrectos.`, ``)
         modal_proceso_salir_botones()
-    }
+    };
 };
-async function realizarRecompraProductos(){
-    function DatosDeRecompraProductos(){
-        this.idProd = document.getElementById("accion_id").value;
-        this.sucursal_post = sucursales_activas[sucursal_indice_productos];
-        this.existencias_post = document.getElementById("accion_saldo").value;
+async function realizarRecompra(){
+    let nom_suc = Array.from(document.querySelectorAll(".nom_suc"));
+    let array_entradas = [];
+    const numFilas = document.querySelector("#tabla_proforma_producto > tbody").children
 
-        this.comprobante = "Recompra-" + (Number(numeracion[0].recompras) + 1);
-        this.existencias_entradas = document.getElementById("accion_editar").value;
-        this.sucursal = document.getElementById("fffff-sucursal").value;
+    function DatosEntradas(a){
+        this.idProd = Number(document.getElementById("id_prod").textContent);
+        this.sucursal = Number(a.children[4].textContent);
+        this.existencias_entradas = Number(a.children[2].children[0].value);
+    }
+    for(let i = 0; i < numFilas.length; i++){
+        numFilas[i].children[2].children[0].value > 0 ? array_entradas.push(new DatosEntradas(numFilas[i])): "";
+    }
+
+    function DataRecompras(){
+        this.idProd = Number(document.getElementById("id_prod").textContent);
+        this.id_num = datos_usuario[0].id;
+        suc_add.forEach((e, i)=>{
+            let coincidencia = nom_suc.find(x => x.textContent === e)
+            coincidencia ?  this[sucursales_activas[i]] = Number(coincidencia.parentNode.children[2].children[0].value):
+                            this[sucursales_activas[i]] = 0;
+        });
+        this.array_entradas = array_entradas;
         this.fecha = generarFecha();
     };
-    let filaProductos = new DatosDeRecompraProductos();
+    let fila_recompra = new DataRecompras();
     let url = URL_API_almacen_central + 'procesar_recompra';
-    let response = await funcionFetch(url, filaProductos)
-    console.log("Respuesta Productos "+response.status)
-    if(response.status === 200){
-        modal_proceso_abrir("Procesando la recompra!!!.", `Recompra ejecutada.`)
-        console.log(`Recompra ejecutada.`)
-        await funcionAccionRecompraNumeracion()
-    }else{
-        modal_proceso_abrir(`Ocurrió un problema`, "")
+    let response = await funcionFetchDos(url, fila_recompra)
+    if(response.status === "success"){
+        modal_proceso_abrir(`La ${response.message} se ejecutó satisfactoriamente.`)
         modal_proceso_salir_botones()
-    };
-};
-async function funcionAccionRecompraNumeracion(){
-    let dataComprobante = {
-        "id": numeracion[0].id,
-        "compras": numeracion[0].compras,
-        "recompras": Number(numeracion[0].recompras) + 1,
-        "transferencias": numeracion[0].transferencias,
-        "ventas": numeracion[0].ventas,
-        "nota_venta": numeracion[0].nota_venta,   
-        "boleta_venta": numeracion[0].boleta_venta,   
-        "factura": numeracion[0].factura
-    };  
-    let urlNumeracion = URL_API_almacen_central + 'numeracion_comprobante'
-    let response = await funcionFetch(urlNumeracion, dataComprobante)
-    console.log("Respuesta Entradas "+response.status)
-    if(response.status === 200){
-        document.getElementById("form_accion_rapida").remove()
-        modal_proceso_abrir("Operación completada exitosamente.", "")
-        modal_proceso_salir_botones()
-        document.getElementById("acciones_rapidas").classList.remove("modal-show-producto")
-    }else{
-        modal_proceso_abrir(`Ocurrió un problema Numeración`, "")
-        modal_proceso_salir_botones()
+        removerContenido()
     };
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////TRANSFERENCIAS////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-let sucursal_indice_productos_origen = 0;
-let sucursal_indice_productos_destino = 0;
-function accion_transferencias(id) {
-    accionCantidadATransferir()
-    let sucursales_comparacion = JSON.parse(localStorage.getItem("sucursal_encabezado"))// Obtenemos el id, índice y nombre de las sucursales
-    let almacenCentral = base_datos.array.find(y => y.idProd == id)
-    let array_sucursales_existencias = [almacenCentral.existencias_ac, almacenCentral.existencias_su, almacenCentral.existencias_sd, almacenCentral.existencias_st]
-    document.getElementById('accion_id').value = almacenCentral.idProd;
-    document.getElementById('accion_codigo').textContent = "Transferencia: " + almacenCentral.codigo;
-    document.getElementById('accion_existencias').value = almacenCentral.existencias_ac;//inicia con datos de la primera sucursal
-    sucursal_indice_productos_origen = document.getElementById("fffff-sucursal").selectedIndex;//inicia con datos de la primera sucursal
+function tabla_transferencias_body(e, i, id_suc){
+    let tabla_= document.querySelector("#tabla_proforma_producto > tbody");
+    let nuevaFilaTabla_ = tabla_.insertRow(-1);
+    let fila = `<tr>` +
+                    `<td class="nom_suc" style="text-align: center; width: 180px">${suc_add[i]}</td>` + //nombre de sucursal
+                    `<td style="text-align: center; width: 90px">${e[sucursales_activas[i]]}</td>` + // existencias del producto
+                    `<td>
+                        <input class="input-tablas-dos-largo q_tran" onKeyup = "op_transferencias(this)">
+                    </td>` +
+                    `<td style="text-align: center; width: 90px">${e[sucursales_activas[i]]}</td>` +
+                    `<td class="invisible">${id_suc}</td>` + // id de la cucursal
+                    `<td><input class="suc_tran" type="radio" name="radioMetodoDePago" onClick="sucursalOrigen()"></td>` + // 
+                    `<td class="invisible">${i}</td>` + // indice de la sucursal
+                `</tr>`;
+    nuevaFilaTabla_.innerHTML = fila;
+    document.querySelector("#tabla_proforma_producto > tbody > tr:nth-child(1) > td:nth-child(3) > input").focus();
+};
 
-    document.getElementById("fffff-sucursal").addEventListener("change", ()=>{
-        sucursal_indice_productos_origen = document.getElementById("fffff-sucursal").selectedIndex
-        array_sucursales_existencias.forEach((event, i)=>{
-            if(sucursales_comparacion[i] && 
-            document.getElementById("fffff-sucursal")[sucursal_indice_productos_origen].textContent === sucursales_comparacion[i].sucursal_nombre){
-                document.getElementById('accion_existencias').value = event;
-            }
-        })
-        document.getElementById('accion_editar').focus();
+function accion_transferencias(id){
+    let prod_ = base_datos.array.find(y => y.idProd == id)// obtenemos los datos de la fila
+    tabla_proforma_productos(prod_, "Transferencia");
+    tabla_head_productos("Sucursal", "Existencias", "Transferencia", "Saldo", "Orígen");
+    suc_add.forEach((e, i)=>{
+        let coincidencia = suc_enc.find(x=> x.sucursal_nombre === e)
+        coincidencia ? tabla_transferencias_body(prod_, i, coincidencia.id_sucursales) : "";
+    });
+    contenedorBotonesProducto("procesarTransferencia()", "Procesar transferencia")
+    document.querySelector(".suc_tran").checked = true;
+    sucursalOrigen();
+    document.getElementById("acciones_rapidas").classList.add("modal-show-producto");
+};
+
+function op_transferencias(e){// Opera las cantidades a transferir con respecto a las existencias
+    let row_ = e.closest("tr");
+    row_.children[3].textContent = Number(row_.children[1].textContent) + Number(row_.children[2].children[0].value )
+    Number(row_.children[3].textContent) < 0 || 
+    isNaN(Number(row_.children[3].textContent)) ?   row_.children[3].style.background = "var(--boton-dos)": 
+                                                    row_.children[3].style.background = "";
+    sumaTranSucursales();                                         
+};
+function sumaTranSucursales(){//Suma las cantidades de los inputs a transferir
+    let elementos = document.querySelectorAll(".q_tran");
+    let valores = Array.from(elementos).map(elemento => Number(elemento.value));
+    let suma = valores.reduce((acumulador, valor) => acumulador + valor, 0);
+
+    elementos.forEach((e)=>{
+        let row_ = e.closest("tr")
+        if(row_.children[5].children[0].checked){
+            row_.children[3].textContent = Number(row_.children[1].textContent) - suma
+            row_.children[3].textContent < 0 ?  row_.children[3].style.background = "var(--boton-dos)": 
+                                                row_.children[3].style.background = "var(--boton-tres)";
+        }
     })
-    document.getElementById("accion_existencias_destino").value = almacenCentral.existencias_ac;
-    document.getElementById('accion_existencias_ac').value = almacenCentral.existencias_ac;
-    document.getElementById('accion_existencias_su').value = almacenCentral.existencias_su;
-    document.getElementById('accion_existencias_sd').value = almacenCentral.existencias_sd;
-    document.getElementById('accion_existencias_st').value = almacenCentral.existencias_st;
-
-    document.getElementById("accion_editar").focus()
-    document.getElementById("acciones_rapidas").classList.add("modal-show-producto")
-    accionCambioSucursal(id)
-};
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function formulario_transferencias_productos(){
-    let formularioRecomprasInventario = `
-                                        <div id="form_accion_rapida" class="nuevo-contenedor-box">
-                                            <form action="" class="formulario-general fondo">
-                                                <h2 id="accion_codigo"></h2>
-                                                <input id="accion_id" class="input-general fondo invisible" type="text" disabled>
-                                                <label class="label-general">Sucursal origen
-                                                    <select name="fffff-sucursal" id="fffff-sucursal" class="input-select-ventas">
-                                                    </select>
-                                                </label>
-                                                <label class="label-general">Sucursal Destino
-                                                    <select id="accion_sucursal_destino" class="input-select-ventas">
-                                                    </select>
-                                                </label>
-                                                <label class="label-general">Existencias<input id="accion_existencias" class="input-general fondo" type="text" disabled></label>
-                                                <label class="label-general">Unidades a Transferir<input id="accion_editar" class="input-general-importante fondo-importante" type="text"></label>
-                                                <label class="label-general">Saldo en Origen<input id="accion_saldo" class="input-general fondo" type="text" disabled></label>
-                                                <label class="label-general">Existencias Destino<input id="accion_existencias_destino" class="input-general fondo" type="text" disabled></label>
-                                                <label class="label-general">Saldo en Destino<input id="accion_saldo_dos" class="input-general fondo" type="text" disabled></label>
-                                                <input id="accion_existencias_ac" class="input-general fondo invisible" type="text" disabled>
-                                                <input id="accion_existencias_su" class="input-general fondo invisible" type="text" disabled>
-                                                <input id="accion_existencias_sd" class="input-general fondo invisible" type="text" disabled>
-                                                <input id="accion_existencias_st" class="input-general fondo invisible" type="text" disabled>
-                                                <button id="accion_procesar_transferencia" class="myButtonAgregar">Procesar Transferencia</button>
-                                                <button id="remover_accion_rapida" class="myButtonEliminar">Cancelar</button>
-                                            </form>
-                                        </div>
-                                        `;
-    document.getElementById("acciones_rapidas").innerHTML = formularioRecomprasInventario;
-};
-function accionCantidadATransferir(){
-    formulario_transferencias_productos()
-    cargarSucursalesEjecucion(document.getElementById("fffff-sucursal"))//Sucursal origen
-    cargarSucursalesEjecucion(document.getElementById("accion_sucursal_destino"))//Sucursal destino
-    removerAccionRapida();
-    let editar = document.getElementById("accion_editar");
-    editar.addEventListener("keyup", (event)=>{
-        document.getElementById("accion_saldo").value = Number(document.getElementById("accion_existencias").value) - 
-                                                        Number(event.target.value)
-        document.getElementById("accion_saldo_dos").value = Number(event.target.value) +
-                                                            Number(document.getElementById("accion_existencias_destino").value)                                                
-    });
-    const agregarAtablaProductoTres = document.getElementById("accion_procesar_transferencia");
-    agregarAtablaProductoTres.addEventListener("click", procesamientoInventarioTransferencias)
+    return Number(suma);
+}
+function sucursalOrigen(){// Inhabilita el input de la sucursal de orígen de la transferencia
+    let radios = document.querySelectorAll(".suc_tran")
+    radios.forEach((e)=>{
+        let row_ = e.closest("tr")
+        row_.children[3].style.background = "";
+        row_.children[2].children[0].value = "";
+        row_.children[3].textContent = row_.children[1].textContent;
+        row_.children[5].children[0].checked ?  row_.children[2].children[0].setAttribute("disabled", "true") :
+                                                row_.children[2].children[0].removeAttribute("disabled");
+    })
 };
 
-function accionCambioSucursal(id){
-    let sucursales_comparacion = JSON.parse(localStorage.getItem("sucursal_encabezado"))// Obtenemos el id, índice y nombre de las sucursales
-    let almacenCentral = base_datos.array.find(y => y.idProd == id)
-    let array_sucursales_existencias_destino = [almacenCentral.existencias_ac, almacenCentral.existencias_su, almacenCentral.existencias_sd, almacenCentral.existencias_st]
 
-    document.getElementById("accion_existencias_destino").value = almacenCentral.existencias_ac;
-    sucursal_indice_productos_destino = document.getElementById("accion_sucursal_destino").selectedIndex;
+async function procesarTransferencia(){
+    modal_proceso_abrir("Procesando la transferencia!!!.", "")
+    let inputs = document.querySelectorAll(".q_tran");
+    let valores = Array.from(inputs).map(input => Number(input.value));
 
-    document.getElementById("accion_sucursal_destino").addEventListener("change", (event)=>{
-        sucursal_indice_productos_destino = event.target.selectedIndex;
-        array_sucursales_existencias_destino.forEach((event, i)=>{
-            if(sucursales_comparacion[i] && 
-            document.getElementById("accion_sucursal_destino")[sucursal_indice_productos_destino].textContent === sucursales_comparacion[i].sucursal_nombre){
-                document.getElementById('accion_existencias_destino').value = event;
-            }
-        })
-        document.getElementById("accion_saldo").value = Number(document.getElementById("accion_existencias").value) - 
-                                                        Number(document.getElementById("accion_editar").value)
-        document.getElementById("accion_saldo_dos").value = Number(document.getElementById("accion_editar").value) +
-                                                            Number(document.getElementById("accion_existencias_destino").value)
-        document.getElementById("accion_editar").focus()
-    });
-};
-
-async function procesamientoInventarioTransferencias(e){
-    e.preventDefault();
-    if(Number(document.getElementById("accion_editar").value) > 0 && 
-    document.getElementById("fffff-sucursal").value !== document.getElementById("accion_sucursal_destino").value &&
-    document.getElementById("accion_existencias").value >= 0){
-        modal_proceso_abrir("Procesando la transferencia!!!.", "")
+    if (valores.every(valor => valor >= 0 && Number.isFinite(valor)) && valores.some(valor => valor > 0)){
         try{
-            let respuesta_numeracion = await cargarNumeracionComprobante();
-            if(respuesta_numeracion.ok){
-                await realizarTransferenciaProductos()
-                await conteoFilas(subRutaA(), filas_total_bd, indice_tabla, 
-                                document.getElementById("numeracionTabla"), 20)
-                await searchDatos(subRutaB((document.getElementById("numeracionTabla").value - 1) * 20), 
-                                base_datos,"#tabla-productos")
-            };
-        }catch(error){
-            modal_proceso_abrir("Ocurrió un error. ", error, "")
+            await realizarTransferencia()
+            await conteoFilas(subRutaA(), filas_total_bd, indice_tabla, 
+                            document.getElementById("numeracionTabla"), 20)
+            await searchDatos(subRutaB((document.getElementById("numeracionTabla").value - 1) * 20), 
+                            base_datos,"#tabla-productos")
+        }catch (error){
+            modal_proceso_abrir("Ocurrió un error. " + error, "")
             console.error("Ocurrió un error. ", error)
             modal_proceso_salir_botones()
         };
-    }else if(document.getElementById("fffff-sucursal").value === document.getElementById("accion_sucursal_destino").value){
-        modal_proceso_abrir("Seleccione una sucursal de destino diferente a la de origen.", "")
-        modal_proceso_salir_botones()
-    }else if(Number(document.getElementById("accion_editar").value) <= 0){
-        modal_proceso_abrir("Unidades a transferir insuficientes.", "")
-        modal_proceso_salir_botones()
-    }else if(Number(document.getElementById("accion_existencias").value) < 0){
-        modal_proceso_abrir("No hay suficientes existencias en sucursal de origen.", "")
-        modal_proceso_salir_botones()
-    };
-};
-async function realizarTransferenciaProductos(){
-    function DatosDeTransferenciaProductos(){
-        this.idProd = document.getElementById("accion_id").value;
-        this.sucursal_post = sucursales_activas[sucursal_indice_productos_origen]
-        this.existencias_post = document.getElementById("accion_saldo").value;
-        this.sucursal_post_dos = sucursales_activas[sucursal_indice_productos_destino]
-        this.existencias_post_dos = document.getElementById("accion_saldo_dos").value;
-
-        this.comprobante = "Transferencia-" + (Number(numeracion[0].transferencias) + 1);
-        this.cantidad = document.getElementById("accion_editar").value;
-        this.id_suc_destino = document.getElementById("accion_sucursal_destino").value;
-        this.id_suc_origen = document.getElementById("fffff-sucursal").value;
-        this.fecha_tran = generarFecha();
-    };
-    let filaProductos = new DatosDeTransferenciaProductos();
-    let url = URL_API_almacen_central + 'procesar_transferencia'
-    let response = await funcionFetch(url, filaProductos)
-    console.log("Respuesta Productos "+response.status)
-    if(response.status === 200){
-        modal_proceso_abrir("Procesando la transferencia!!!.", `Transferencia ejecutada`)
-        console.log(`Transferencia ejecutada`)
-        await funcionAccionTransferenciaNumeracion()
     }else{
-        modal_proceso_abrir(`Ocurrió un problema.`, "")
+        modal_proceso_abrir(`Uno o varios de los valores son incorrectos.`, ``)
         modal_proceso_salir_botones()
     };
 };
-async function funcionAccionTransferenciaNumeracion(){
-    let dataComprobante = {
-        "id": numeracion[0].id,
-        "compras": numeracion[0].compras,
-        "recompras": numeracion[0].recompras,
-        "transferencias": Number(numeracion[0].transferencias) + 1,
-        "ventas": numeracion[0].ventas,
-        "nota_venta": numeracion[0].nota_venta,   
-        "boleta_venta": numeracion[0].boleta_venta,   
-        "factura": numeracion[0].factura
-    };    
-    let urlNumeracion = URL_API_almacen_central + 'numeracion_comprobante'
-    let response = await funcionFetch(urlNumeracion, dataComprobante)
-    console.log("Respuesta Numeración "+response.status)
-    if(response.status === 200){
-        modal_proceso_abrir("Operación completada exitosamente.", "")
-        modal_proceso_salir_botones()
-        document.getElementById("acciones_rapidas").classList.remove("modal-show-producto")
-        document.getElementById("form_accion_rapida").remove()
-    }else{
-        modal_proceso_abrir(`Ocurrió un problema  Numeración.`, "")
-        modal_proceso_salir_botones()
+async function realizarTransferencia(){
+    let nom_suc = Array.from(document.querySelectorAll(".nom_suc"));
+    function DatosTransferencia(){
+        this.idProd = Number(document.getElementById("id_prod").textContent);
+        suc_add.forEach((e, i)=>{
+            let coincidencia = nom_suc.find(x => x.textContent === e)
+            coincidencia ?  coincidencia.parentNode.children[5].children[0].checked ?   this[sucursales_activas[i]] = -sumaTranSucursales(): 
+                                                                                        this[sucursales_activas[i]] = Number(coincidencia.parentNode.children[2].children[0].value):
+                            this[sucursales_activas[i]] = 0;
+        });
+        this.id_num = datos_usuario[0].id;
+        this.fecha = generarFecha();
     };
-};
-/////////////////////////////////////////////////////////////////////////////////////////////
+    let fila = new DatosTransferencia();
 
-function removerAccionRapida(){
-    let remover = document.getElementById("remover_accion_rapida");
-    remover.addEventListener("click", (e)=>{
-        e.preventDefault();
-        document.getElementById("form_accion_rapida").remove()
-        document.getElementById("acciones_rapidas").classList.remove("modal-show-producto")
-    });
+    let url = URL_API_almacen_central + 'procesar_transferencia_p'
+    let response = await funcionFetchDos(url, fila)
+    if(response.status === "success"){
+        modal_proceso_abrir(`La trnasferencia "${response.message}" fue procesada satisfactoriamente!!!.`, ``)
+        modal_proceso_salir_botones()
+        removerContenido()
+    };
 };
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 function editAlmacenCentral(id) {
     let almacenCentral = base_datos.array.find(y => y.idProd == id);
@@ -487,10 +430,13 @@ function editAlmacenCentral(id) {
                                 <td class="codigo-codigo-barras">${almacenCentral.codigo}</td>
                                 <td>${almacenCentral.descripcion}</td>
                                 <td>${almacenCentral.precio_venta}</td>
-                                <td><input class="input-cantidad-codigo-barras" value="${almacenCentral.existencias_ac + 
+                                <td><input class="input-cantidad-codigo-barras" value="${
+                                                                                        almacenCentral.existencias_ac + 
                                                                                         almacenCentral.existencias_su + 
                                                                                         almacenCentral.existencias_sd + 
-                                                                                        almacenCentral.existencias_st}">
+                                                                                        almacenCentral.existencias_st +
+                                                                                        almacenCentral.existencias_sc
+                                                                                        }">
                                 </td>
                                 <td style="width: 200px;"><img class="inputCodigoBarras"></td>
                                 <td style="display: flex;justify-content: center;" class="inputCodigoQr"></td>

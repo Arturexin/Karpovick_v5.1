@@ -601,7 +601,7 @@ document.getElementById("agregar_sucursal").addEventListener("click", async (e)=
         modal_proceso_abrir(`Creando sucursal.`, "")
         let num_filas = document.querySelector('#tabla_sucursales > tbody').children
         if(num_filas.length < 4){
-            let suc_add = ["Almacén Central", "Sucursal Uno", "Sucursal Dos", "Sucursal Tres"]
+            
             let sucursal_opcion = "";
             for(let i = 0; i <= num_filas.length; i++){
                 if(num_filas.length == i){

@@ -72,7 +72,6 @@ app.register_blueprint(productos_.productos_individual_stock_suc_cod)
 app.register_blueprint(productos_.productos_crud)
 app.register_blueprint(productos_.productos_modificacion)
 app.register_blueprint(productos_.productos_remove)
-app.register_blueprint(productos_.productos_transferencias)
 ##########################################################################################################################################################################
 # Datos de la tabla ENTRADAS y base de datos entradas
 ##########################################################################################################################################################################
@@ -80,10 +79,7 @@ app.register_blueprint(entradas_.entradas_conteo)
 app.register_blueprint(entradas_.entradas_tabla)
 app.register_blueprint(entradas_.entradas_suma_total_mes)
 app.register_blueprint(entradas_.entradas_suma_total_pasado)
-app.register_blueprint(entradas_.entradas_suma_transferencias_mes)
-app.register_blueprint(entradas_.entradas_suma_traspaso_mes)
 app.register_blueprint(entradas_.entradas_suma_devoluciones_mes)
-app.register_blueprint(entradas_.entradas_suma_perdidas_donaciones_mes)
 app.register_blueprint(entradas_.entradas_individual_id)
 app.register_blueprint(entradas_.entradas_extraccion_csv)
 app.register_blueprint(entradas_.entradas_id_kardex)
@@ -93,7 +89,6 @@ app.register_blueprint(entradas_.entradas_delete)
 app.register_blueprint(entradas_.entradas_devolucion_post)
 app.register_blueprint(entradas_.entradas_recompra_individual_post)
 app.register_blueprint(entradas_.entradas_recompra_grupal_post)
-app.register_blueprint(entradas_.entradas_perdida_post)
 app.register_blueprint(entradas_.entradas_traspasos_get_post)
 app.register_blueprint(entradas_.entradas_compras_grupal_get_post)
 ##########################################################################################################################################################################
@@ -108,7 +103,6 @@ app.register_blueprint(salidas_.salidas_suma_total_pasado)
 app.register_blueprint(salidas_.salidas_suma_total_sucursal_mes)
 app.register_blueprint(salidas_.salidas_suma_devoluciones_mes_suc)
 app.register_blueprint(salidas_.salidas_suma_ventas_dia_sucursal)
-app.register_blueprint(salidas_.salidas_suma_transferencias_mes)
 app.register_blueprint(salidas_.salidas_suma_devoluciones_mes)
 app.register_blueprint(salidas_.salidas_top_cinco_categorias_suc)
 app.register_blueprint(salidas_.salidas_top_cinco_cod_suc)
@@ -125,7 +119,6 @@ app.register_blueprint(salidas_.salidas_comprobante)
 app.register_blueprint(salidas_.salidas_post)
 app.register_blueprint(salidas_.salidas_delete)
 app.register_blueprint(salidas_.procesar_devolucion_salidas_post)
-app.register_blueprint(salidas_.procesar_venta_post)
 app.register_blueprint(salidas_.salidas_gestion_ventas_post)
 ##########################################################################################################################################################################
 # Datos de la tabla TRANSFERENCIAS
@@ -137,6 +130,8 @@ app.register_blueprint(transferencias_.transferencias_tabla_s)
 app.register_blueprint(transferencias_.transfrencias_kardex_id)
 app.register_blueprint(transferencias_.transferencias_suma_total)
 app.register_blueprint(transferencias_.transferencias_suma_total_pasado)
+app.register_blueprint(transferencias_.productos_transferencias)
+app.register_blueprint(transferencias_.productos_transferencias_p)
 ##########################################################################################################################################################################
 # Datos de la tabla PERDIDAS
 ##########################################################################################################################################################################
@@ -145,6 +140,7 @@ app.register_blueprint(perdidas_.perdidas_tabla)
 app.register_blueprint(perdidas_.perdidas_kardex_id)
 app.register_blueprint(perdidas_.perdidas_suma_total)
 app.register_blueprint(perdidas_.perdidas_suma_total_pasado)
+app.register_blueprint(perdidas_.perdidas_perdida_post)
 ##########################################################################################################################################################################
 # Datos de la tabla CREDITOS
 ##########################################################################################################################################################################

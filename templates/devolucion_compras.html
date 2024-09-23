@@ -13,7 +13,7 @@
                         </div>
                     </h2>
                     <div>
-                        <input id="buscador-comporbante-compras" class="input-general-importante fondo-importante" type="text" placeholder="Ingresar operación de Compra o Recompra">
+                        <input id="buscador_operacion" class="input-general-importante fondo-importante" type="text" placeholder="Ingresar operación de Compra o Recompra">
                         <div class="tooltip_ayuda">
                             <span class="material-symbols-outlined">find_in_page</span>
                             <span class="tooltiptext_ayuda">Digite caracteres clave de la operación a buscar.</span>
@@ -76,6 +76,7 @@
                 <tr>
                     <th scope="row" colspan="8">
                         <select id="causaDevolucionCompras" class="fondo-importante input-compras">
+                            <option value="0" selected="">-- Causa de devolución --</option>
                             <option value = "1">Producto defectuoso</option>
                             <option value = "2">Producto dañado durante el envío</option>
                             <option value = "3">Producto incorrecto o equivocado</option>
@@ -109,7 +110,6 @@
                     <th>Cantidad a Devolver</th>
                     <th>Comprobante</th>
                     <th>Causa de Devolución</th>
-                    <th>Total Cantidad Devuelta</th>
                     <th style="width: 100%;" id="remover-tabla-devoluciones-compras-dos" class="eliminarTablaFila">
                         <div class="tooltip">
                             <span style="font-size:18px;" class="material-symbols-outlined">delete</span>

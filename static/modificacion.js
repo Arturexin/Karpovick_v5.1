@@ -162,7 +162,7 @@ function crearBodyRegistro(tallaRegistro, loteRegistro){
     let tablaRegistro = document.querySelector("#tabla-pre-modificacion > tbody");
     let nuevaFilaTablaRegistro = tablaRegistro.insertRow(-1);
     let fila = `<tr>`+
-                    `<td>${document.getElementById("fffff-sucursal").children[document.getElementById("fffff-sucursal").selectedIndex].textContent}</td>`+// Columna 0 > sucursal
+                    `<td>${suc_add[obtenerIndiceSucursal()]}</td>`+// Columna 0 > sucursal
                     `<td>${document.getElementById("categoria-modificacion").children[document.getElementById("categoria-modificacion").selectedIndex].textContent}</td>`+// Columna 1 > categoría
                     `<td class="codigo_modal" style="background: rgb(105, 211, 35)">${document.getElementById("codigo-modificacion").value}-${tallaRegistro}-${loteRegistro}</td>`+// Columna 2 > código
                     `<td><input class="input-tablas-texto-largo" value="${document.getElementById("descripcion-modificacion").value}" placeholder="Rellene esta celda"></td>`+// Columna 3 > descripción
@@ -176,21 +176,19 @@ function crearBodyRegistro(tallaRegistro, loteRegistro){
                     `<td class="invisible">${document.getElementById("proveedor-modificacion").value}</td>`+// Columna 11 > id proveedor
                     `<td class="invisible">${document.getElementById("fffff-sucursal").value}</td>`+// Columna 12 > id sucursal
                     `<td class="invisible">${document.getElementById("categoria-modificacion").value}</td>`+// Columna 13 > id categoría
-                    `<td class="invisible">${document.getElementById("fffff-sucursal").selectedIndex}</td>`+// Columna 14 > índice sucursal
+                    `<td class="invisible">${obtenerIndiceSucursal()}</td>`+// Columna 14 > índice sucursal
                     `<td style="text-align: center">
                         <div class="tooltip">
-                            <span style="font-size:18px;" class="material-symbols-outlined eliminarTablaFila eliminar_fila_compras">delete</span>
+                            <span style="font-size:18px;" class="material-symbols-outlined eliminarTablaFila" onCLick = "clicKEliminarFila(this)">delete</span>
                             <span class="tooltiptext">Eliminar producto</span>
                         </div>
                     </td>`+// Columna 15 > botón eliminar fila
                 `</tr>`
     nuevaFilaTablaRegistro.innerHTML = fila;
-    codigoComprobacionRegistro = document.getElementById("codigo-modificacion").value + "-" + tallaRegistro + "-" + loteRegistro
-    eliminarFilaCompras()
+    codigoComprobacionRegistro = document.getElementById("codigo-modificacion").value + "-" + tallaRegistro + "-" + loteRegistro;
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////PASAR DATOS DE FORMULARIO A TABLA DE MODIFICACIÓN///////////////////////////////////////////////
-let arrayCreacionCategoriaTallasModificacion = [];
 
 function agregarNuevoProductoATablaModificacion(e){
     e.preventDefault();
@@ -201,10 +199,10 @@ function agregarNuevoProductoATablaModificacion(e){
     expregul.precios.test(document.getElementById("pventa-modificacion").value)){
         ///////////////////////////////////////////////////////////////////////////////
         document.querySelector(".contenedor-pre-modificacion").classList.add("modal-show-modificacion");//Mostrmos el modal
-        categoriaProductosCreacion(document.getElementById("categoria-modificacion").value, arrayCreacionCategoriaTallasModificacion);//Evaluamos la categoría
+        let arrayCreacionCategoriaTallas = categoriaProductosCreacion(document.getElementById("categoria-modificacion"));//Evaluamos la categoría
         compararCodigosNuevos(".codigo_modal", codigoComprobacionRegistro, ".label-modificacion");
         ///////////////////////////////////////////////////////////////////////////////
-        arrayCreacionCategoriaTallasModificacion.forEach((event) =>{
+        arrayCreacionCategoriaTallas.forEach((event) =>{
             crearBodyRegistro(event, document.getElementById("lote-modificacion").value)
         });
         document.getElementById("categoria-modificacion").style.background = ""
@@ -219,7 +217,7 @@ function agregarNuevoProductoATablaModificacion(e){
         comprobarCodigoProductos(".codigo_modal");
         marcarCodigoRepetido(".codigo_modal", ".codigo_proforma", 
                             document.querySelector("#tabla-proforma-modificacion > thead > tr:nth-child(1) > th > h2").textContent)
-        arrayCreacionCategoriaTallasModificacion = [];
+        arrayCreacionCategoriaTallas = [];
         document.querySelector("#tabla-pre-modificacion > tbody > tr:nth-child(1) > td:nth-child(6) > input").focus()
 
     }else if(expregul.codigo.test(document.getElementById("codigo-modificacion").value) == false){
@@ -286,7 +284,7 @@ function filaBodyProformaPincipal(){
                             `<td class="invisible">${event.parentNode.children[14].textContent}</td>`+// Columna 14 > índice sucursal
                             `<td style="text-align: center">
                                 <div class="tooltip">
-                                    <span style="font-size:18px;" class="material-symbols-outlined eliminarTablaFila eliminar_fila_compras">delete</span>
+                                    <span style="font-size:18px;" class="material-symbols-outlined eliminarTablaFila" onCLick = "clicKEliminarFila(this)">delete</span>
                                     <span class="tooltiptext">Eliminar producto</span>
                                 </div>
                             </td>`+// Columna 15 > botón eliminar fila
@@ -305,7 +303,6 @@ function filaBodyProformaPincipal(){
             event.parentNode.children[8].children[0].style.background = "#b36659"
         };
     });
-    eliminarFilaCompras()
 };
 const procesarIngresarNuevo = document.getElementById("procesar-modificacion-uno");
 procesarIngresarNuevo.addEventListener("click", (e) => {
@@ -352,8 +349,6 @@ async function funcionGeneralTraspaso(){
     let array_productos = [];
     let array_entradas = [];
     function DatosProductos(a){
-        let array = [0,0,0,0]
-
         this.categoria= a.children[13].textContent;
         this.codigo= a.children[2].textContent;
         this.costo_unitario= a.children[6].textContent;
@@ -363,15 +358,9 @@ async function funcionGeneralTraspaso(){
         this.proveedor= a.children[11].textContent;
         this.talla= a.children[4].textContent;
 
-        for(let i = 0; i < array.length; i++){
-            if(a.children[14].textContent == i){
-                array[i] = a.children[5].textContent
-            }
+        for(let i = 0; i < sucursales_activas.length; i++){//agregamos la cantidad a comprar de acuerdo al índice de la sucursal
+            this[sucursales_activas[i]] = Number(a.children[14].textContent) === i ? Number(a.children[5].textContent) : 0;
         };
-        this.existencias_ac = array[0];
-        this.existencias_su = array[1];
-        this.existencias_sd = array[2];
-        this.existencias_st = array[3];
     }
     function DatosEntradas(a){
         this.sucursal = a.children[12].textContent;
@@ -497,7 +486,7 @@ document.addEventListener("keyup", () =>{
         
         let almacenCentral = indice_base.find(y => y.codigo.toLowerCase().startsWith(document.getElementById('buscador-productos-modificacion').value.toLocaleLowerCase()))
         if(almacenCentral){
-            indice_sucursal_modificacion = document.getElementById("fffff-sucursal").selectedIndex;
+            indice_sucursal_modificacion = obtenerIndiceSucursal();
             document.getElementById('id-modificacion').value = almacenCentral.idProd
             document.getElementById('categoria-modificacion').value = almacenCentral.categoria
             document.getElementById('codigo-modificacion').value = almacenCentral.codigo
@@ -523,13 +512,6 @@ function removerModificacionRepetido(){//verificamos que el nuevo producto no te
                 elemento.parentNode.remove()
             }
         });
-    });
-};
-function eliminarFilaCompras(){
-    document.querySelectorAll(".eliminar_fila_compras").forEach((event)=>{
-        event.addEventListener("click", ()=>{
-            event.parentNode.parentNode.parentNode.remove()
-        })
     });
 };
 function crearBodyModificacion(codigoModificacion, id_prod){
@@ -560,13 +542,12 @@ function crearBodyModificacion(codigoModificacion, id_prod){
                     `<td class="invisible">${indice_sucursal_modificacion}</td>`+// Columna 12 > índice sucursal
                     `<td style="text-align: center">
                         <div class="tooltip">
-                            <span style="font-size:18px;" class="material-symbols-outlined eliminarTablaFila eliminar_fila_compras">delete</span>
+                            <span style="font-size:18px;" class="material-symbols-outlined eliminarTablaFila" onCLick = "clicKEliminarFila(this)">delete</span>
                             <span class="tooltiptext">Eliminar producto</span>
                         </div>
                     </td>`+// Columna 13 > botón eliminar fila
                 `</tr>`
     nuevaFilaTablaModificacion.innerHTML = fila;
-    eliminarFilaCompras()
     rellenarCategoria()
     rellenarProveedor()
 };
@@ -578,14 +559,14 @@ async function agregarATablaPreModificacion(e){
     let base_datos_busqueda = JSON.parse(localStorage.getItem("base_datos_consulta"))
     let base = 0;
     if(document.getElementById("id-modificacion").value > 0){
-        categoriaProductosCreacion(document.getElementById("categoria-modificacion").value, arrayCreacionCategoriaTallasModificacion);
+        let arrayCreacionCategoriaTallas = categoriaProductosCreacion(document.getElementById("categoria-modificacion"));
 
-        for(let i = 0; i < arrayCreacionCategoriaTallasModificacion.length; i++){
+        for(let i = 0; i < arrayCreacionCategoriaTallas.length; i++){
             if(document.getElementById("id-modificacion").value > 0){
                 let codigoModificacion = document.getElementById("codigo-modificacion").value
-                for(let j = 0; j < arrayCreacionCategoriaTallasModificacion.length; j++){
-                    if(codigoModificacion.includes("-" + arrayCreacionCategoriaTallasModificacion[j])){
-                        codigoModificacion = codigoModificacion.replace("-" + arrayCreacionCategoriaTallasModificacion[j], "-" + arrayCreacionCategoriaTallasModificacion[i])
+                for(let j = 0; j < arrayCreacionCategoriaTallas.length; j++){
+                    if(codigoModificacion.includes("-" + arrayCreacionCategoriaTallas[j])){
+                        codigoModificacion = codigoModificacion.replace("-" + arrayCreacionCategoriaTallas[j], "-" + arrayCreacionCategoriaTallas[i])
                     }
                 };
                 if(base_datos_busqueda.find(y => y.codigo == codigoModificacion)){
@@ -603,7 +584,7 @@ async function agregarATablaPreModificacion(e){
         await buscarPorCodidoModificacionOrigen();
         operacionCostoTotalModificacion()
         marcarIdRepetido(".id_modificacion_modal", ".id_modificacion_proforma", document.querySelector("#tabla-proforma-modificacion > thead > tr:nth-child(1) > th > h2").textContent)
-        arrayCreacionCategoriaTallasModificacion = [];
+        arrayCreacionCategoriaTallas = [];
     };
 };
 function rellenarCategoria(){
@@ -657,44 +638,34 @@ function rellenarProveedor(){
     });
 };
 async function buscarPorCodidoModificacionOrigen(){
-    const id_comparacion = document.querySelectorAll(".id_modificacion_modal");
     let suma = 0;
-    for(id_c of id_comparacion){
-        try{
-            let url = URL_API_almacen_central + `almacen_central_id_sucursal/${id_c.textContent}?`+
-                                                `sucursal_get=${sucursales_activas[indice_sucursal_modificacion]}`
-            let response = await fetch(url,{
-                "method": "GET",
-                "headers": {
-                    "Content-Type": 'application/json'
-                }
-            });
-            if(response.ok){
-                const dato_id_unitario = await response.json();
-                if(dato_id_unitario.codigo){
-                    id_c.parentNode.children[2].children[0].value = dato_id_unitario.categoria
-                    id_c.parentNode.children[4].children[0].value = dato_id_unitario.descripcion
-                    id_c.parentNode.children[6].children[0].value = dato_id_unitario.sucursal_get
-                    id_c.parentNode.children[7].children[0].value = dato_id_unitario.costo_unitario.toFixed(2)
-                    id_c.parentNode.children[8].textContent = dato_id_unitario.costo_unitario.toFixed(2) * dato_id_unitario.sucursal_get
-                    id_c.parentNode.children[9].children[0].value = dato_id_unitario.precio_venta.toFixed(2)
-                    id_c.parentNode.children[10].children[0].value = dato_id_unitario.lote
-                    id_c.parentNode.children[11].children[0].value = dato_id_unitario.proveedor
-                    if(id_c.parentNode.children[0].textContent == document.getElementById("id-modificacion").value){
-                        id_c.style.background = "rgb(105, 211, 35)"
-                    };
-                    rellenarMedidasCategoria(dato_id_unitario.categoria, suma)
-                    id_c.parentNode.children[5].children[0].value = dato_id_unitario.talla
-                    suma+=1;
-                };
-                if(id_c.parentNode.children[0].textContent  < 1){//OCULTAMOS LAS FILAS QUE NO MUESTRAN ID O NO EXISTEN EL LA TABLA PRODUCTOS
-                    id_c.parentNode.remove()
-                };
-            }else {
-                console.error("Error en la solicitud a la API");
+    const id_rem = document.querySelectorAll(".id_modificacion_modal");
+    let ids = Array.from(id_rem).map(element => element.textContent);
+    let response = await cargarDatos(   `almacen_central_id_sucursal?`+
+                                        `ids=${ids.join(",")}&`+
+                                        `sucursal_get=${sucursales_activas[indice_sucursal_modificacion]}`);
+ 
+    for(id_m of id_rem){
+        let row_ = id_m.closest("tr");
+        let fila_res = response.find(x=> x.idProd === Number(row_.children[0].textContent))
+        if(fila_res){
+            row_.children[2].children[0].value = fila_res.categoria
+            row_.children[4].children[0].value = fila_res.descripcion
+            row_.children[6].children[0].value = fila_res.sucursal_get
+            row_.children[7].children[0].value = fila_res.costo_unitario.toFixed(2)
+            row_.children[8].textContent = fila_res.costo_unitario.toFixed(2) * fila_res.sucursal_get
+            row_.children[9].children[0].value = fila_res.precio_venta.toFixed(2)
+            row_.children[10].children[0].value = fila_res.lote
+            row_.children[11].children[0].value = fila_res.proveedor
+            if(row_.children[0].textContent == document.getElementById("id-modificacion").value){
+                id_m.style.background = "rgb(105, 211, 35)"
             };
-        }catch (error) {
-            console.error("Error en la solicitud a la API:", error);
+            rellenarMedidasCategoria(fila_res.categoria, suma)
+            row_.children[5].children[0].value = fila_res.talla
+            suma+=1;
+        };
+        if(row_.children[0].textContent  < 1){//OCULTAMOS LAS FILAS QUE NO MUESTRAN ID O NO EXISTEN EL LA TABLA PRODUCTOS
+            row_.remove()
         };
     };
 };
@@ -786,7 +757,7 @@ function filaBodyProformaPincipalDos(){
                             `<td class="invisible">${event.parentNode.parentNode.children[2].children[0].value}</td>`+// Columna 14 > id categoria
                             `<td style="text-align: center">
                                 <div class="tooltip">
-                                    <span style="font-size:18px;" class="material-symbols-outlined eliminarTablaFila eliminar_fila_compras">delete</span>
+                                    <span style="font-size:18px;" class="material-symbols-outlined eliminarTablaFila" onCLick = "clicKEliminarFila(this)">delete</span>
                                     <span class="tooltiptext">Eliminar producto</span>
                                 </div>
                             </td>`+// Columna 15 > 
@@ -810,7 +781,6 @@ function filaBodyProformaPincipalDos(){
             event.parentNode.parentNode.children[10].children[0].style.background = "#b36659"
         };
     });
-    eliminarFilaCompras()
 };
 const procesarModificacionAProductos = document.getElementById("procesar-modificacion-principal");
 procesarModificacionAProductos.addEventListener("click", mandarModificacionAProductos)
@@ -904,7 +874,7 @@ document.getElementById("boton_borrar_").addEventListener("click", ()=>{
 function agregarBusquedaDetalleUno(button){
     if(document.getElementById("editar-modificacion").classList.contains('marcaBoton')){
         let linea = button.closest("li");
-        indice_sucursal_modificacion = document.getElementById("fffff-sucursal").selectedIndex;
+        indice_sucursal_modificacion = obtenerIndiceSucursal();
         document.getElementById('id-modificacion').value = linea.children[0].textContent;
         document.getElementById('categoria-modificacion').value = linea.children[1].textContent;
         document.getElementById('codigo-modificacion').value = linea.children[2].textContent;
@@ -913,4 +883,8 @@ function agregarBusquedaDetalleUno(button){
         modal_proceso_abrir(`Esta acción solo procederá en "Modificar Producto".`, ``)
         modal_proceso_salir_botones()
     };
+};
+function clicKEliminarFila(e) {
+    const fila = e.closest("tr");
+    fila.remove();
 };

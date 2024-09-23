@@ -33,6 +33,7 @@ def getAllCajaConteo():
                         "JOIN sucursales ON `caja`.`sucursal_caja` = `sucursales`.`id_sucursales` "
                         "WHERE `identificador_caja` = %s "
                         "AND sucursal_nombre LIKE %s "
+                        "AND caja.estado > 0 "
                         "AND fecha_caja >= %s AND fecha_caja < %s ")
             data_params = (usuarioLlave, f"{sucursal_aper_caja}%", fecha_inicio_aper_caja, fecha_fin_aper_caja + timedelta(days=1))
             cur.execute(query, data_params)
@@ -62,6 +63,7 @@ def getAllCaja(numero):
                         "JOIN sucursales ON `caja`.`sucursal_caja` = `sucursales`.`id_sucursales` "
                         "WHERE identificador_caja = %s "
                         "AND sucursal_nombre LIKE %s "
+                        "AND caja.estado > 0 "
                         "AND fecha_caja >= %s AND fecha_caja < %s "
                         "ORDER BY id_caja ASC "
                         "LIMIT 20 OFFSET %s")
@@ -99,6 +101,7 @@ def getCajaDiario():
             query = ("SELECT id_caja, sucursal_caja, saldo_apertura, llave_caja, saldo_cierre "
                         "FROM caja "
                         "WHERE identificador_caja = %s "
+                        "AND caja.estado > 0 "
                         "AND DATE(fecha_caja) = %s "
                         "GROUP BY id_caja, sucursal_caja, saldo_apertura, llave_caja, saldo_cierre")
             data_params = (usuarioLlave, dia_actual)
@@ -125,7 +128,10 @@ def getCajaDiario():
 def getCaja(id_caja):
     try:
         with mysql.connection.cursor() as cur:
-            query = ("SELECT id_caja, sucursal_caja, saldo_apertura, ingresos, egresos, saldo_cierre, fecha_caja, llave_caja FROM caja WHERE id_caja = %s")
+            query = ("SELECT id_caja, sucursal_caja, saldo_apertura, ingresos, egresos, saldo_cierre, fecha_caja, llave_caja "
+                     "FROM caja "
+                     "WHERE id_caja = %s "
+                     "AND caja.estado > 0 ")
             cur.execute(query, (id_caja,))
             data = cur.fetchall()
         contenido = {}
@@ -156,13 +162,14 @@ def saveCaja():
 
 def createCaja():
     try:
+        dato_uno = 1
         usuarioLlave = session.get('usernameDos')
         with mysql.connection.cursor() as cur:
             query = ("INSERT INTO `caja` "
-                     "(`id_caja`, `sucursal_caja`, `saldo_apertura`, `ingresos`, `egresos`, `saldo_cierre`, `fecha_caja`, `llave_caja`, `identificador_caja`) "
-                     "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s)")
+                     "(`id_caja`, `sucursal_caja`, `saldo_apertura`, `ingresos`, `egresos`, `saldo_cierre`, `fecha_caja`, `llave_caja`, `identificador_caja`, `estado`) "
+                     "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
             data = (request.json['sucursal_caja'], request.json['saldo_apertura'], request.json['ingresos'], request.json['egresos'], 
-                    request.json['saldo_cierre'], request.json['fecha_caja'], request.json['llave_caja'], usuarioLlave)
+                    request.json['saldo_cierre'], request.json['fecha_caja'], request.json['llave_caja'], usuarioLlave, dato_uno)
             cur.execute(query, data)
             mysql.connection.commit()
         return jsonify({"status": "success", "message": "Apertura creada correctamente."})

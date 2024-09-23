@@ -10,20 +10,12 @@
                     <span class="tooltiptext_ayuda">Se transfiere una determinada cantidad de unidades de un producto entre sucursales.</span>
                 </div>
             </h2>
-            <label>Origen
+            <label>
                 <select name="fffff-sucursal" id="fffff-sucursal" class="input-select-ventas">
                 </select>
                 <div class="tooltip_ayuda">
                     <span class="material-symbols-outlined">help</span>
                     <span class="tooltiptext_ayuda">Sucursal donante.</span>
-                </div>
-            </label>
-            <label>Destino
-                <select name="sucursal-destino-transferencias" id="sucursal-destino-transferencias" class="input-select-ventas">
-                </select>
-                <div class="tooltip_ayuda">
-                    <span class="material-symbols-outlined">help</span>
-                    <span class="tooltiptext_ayuda">Sucursal donataria.</span>
                 </div>
             </label>
             
@@ -106,20 +98,26 @@
     </div>
     
     <div class="contenedor-pre-transferencia">
-        <table id="tabla-pre-transferencias" class="tabla_modal contenido-tabla">
+        <table id="tabla_principal" class="tabla_modal contenido-tabla">
             <thead>
                 <tr>
-                    <th scope="row" colspan="11"><h2>Proforma</h2></th>
+                    <th scope="row" colspan="15"><h2>Proforma</h2></th>
                 </tr>
                 <tr>
                     <th style="width: 120px;">Sucursal / Origen</th>
                     <th style="width: 120px;">Código Origen</th>
                     <th style="width: 200px;">Descripción</th>
                     <th style="width: 70px;">Existencias en Origen</th>
-                    <th style="width: 70px;">Unidades a transferir</th>
-                    <th style="width: 120px;">Sucursal / Destino</th>
-                    <th style="width: 70px;">Existencias en Destino</th>
-                    <th style="width: 70px;">Nuevas Existencias en Destino</th>
+                    <th style="width: 70px;">Transferir AC</th>
+                    <th style="width: 70px;">Transferir SU</th>
+                    <th style="width: 70px;">Transferir SD</th>
+                    <th style="width: 70px;">Transferir ST</th>
+                    <th style="width: 70px;">Transferir SC</th>
+                    <th style="width: 70px;">AC</th>
+                    <th style="width: 70px;">SU</th>
+                    <th style="width: 70px;">SD</th>
+                    <th style="width: 70px;">ST</th>
+                    <th style="width: 70px;">SC</th>
                     <th style="width: 40px;">
                         <span style="font-size:18px;" class="material-symbols-outlined">delete</span>
                     </th>
@@ -128,7 +126,7 @@
             <tbody>
             </tbody>
             <tfoot>
-                <th scope="row" colspan="11">
+                <th scope="row" colspan="15">
                     <button id="procesar-pre-transferencias" class="myButtonAgregar">Enviar a Tabla Transferencias</button>
                     <button id="remover-tabla-transferencias-uno" class="eliminarTablaFila">Cancelar</button>
                 </th>
@@ -145,8 +143,11 @@
                     <th>Sucursal / Origen</th>
                     <th>Código Origen</th>
                     <th>Descripción	</th>
-                    <th>Unidades a transferir</th>
-                    <th>Sucursal / Destino</th>
+                    <th>Unidades a transferir AC</th>
+                    <th>Unidades a transferir SU</th>
+                    <th>Unidades a transferir SD</th>
+                    <th>Unidades a transferir ST</th>
+                    <th>Unidades a transferir SC</th>
                     <th style="width: 100%;" id="remover-tabla-transferencias-dos" class="eliminarTablaFila">
                         <div class="tooltip">
                             <span style="font-size:18px;" class="material-symbols-outlined">delete</span>
@@ -159,16 +160,15 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <th scope="row" colspan="3">Total Unidades Transferidas</th>
-                    <th id="total-cantidad-tabla-transferencias"></th>
-                    <th scope="row" colspan="4">
+                    <th scope="row" colspan="4">Total Unidades Transferidas</th>
+                    <th scope="row" colspan="5">
                         <label style="margin: 0 5px;" class="label-checkbox">Imprimir lista de transferencias
                             <input type="checkbox" id="check_comprobante">
                         </label>
                     </th>
                 </tr>
                 <tr>
-                    <th scope="row" colspan="8">
+                    <th scope="row" colspan="9">
                         <button id="procesar-transferencias-plus" class="myButtonProcesar">Procesar</button>
                     </th>
                 </tr>

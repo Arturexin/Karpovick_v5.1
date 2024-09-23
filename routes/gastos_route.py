@@ -40,6 +40,7 @@ def getAllGastosVariosConteo():
                         "AND concepto LIKE %s "
                         "AND comprobante LIKE %s "
                         "AND nombres LIKE %s "
+                        "AND gastos_varios.estado > 0 "
                         "AND fecha_gastos >= %s AND fecha_gastos < %s ")
             data_params = (usuarioLlave, f"{sucursal_gastos_varios}%", f"{concepto_gastos_varios}%", f"{comprobante_gastos_varios}%", f"{usuario_gastos_varios}%", 
                         fecha_inicio_gastos_varios, fecha_fin_gastos_varios + timedelta(days=1))
@@ -77,6 +78,7 @@ def getAllGastosVarios(numero):
                         "AND concepto LIKE %s "
                         "AND comprobante LIKE %s "
                         "AND nombres LIKE %s "
+                        "AND gastos_varios.estado > 0 "
                         "AND fecha_gastos >= %s AND fecha_gastos < %s "
                         "ORDER BY id_gastos ASC "
                         "LIMIT 20 OFFSET %s")
@@ -117,6 +119,7 @@ def getPagoMercancias(comprobante):
                         "JOIN usuarios ON `gastos_varios`.`usuario_gastos` = `usuarios`.`id` "
                         "WHERE identificador_gastos = %s "
                         "AND comprobante LIKE %s "
+                        "AND gastos_varios.estado > 0 "
                         "ORDER BY id_gastos ASC ")
             data_params = (usuarioLlave, comprobante)
             cur.execute(query, data_params)
@@ -165,6 +168,7 @@ def getSumaGastosPorMes():
                      "SUM(CASE WHEN concepto LIKE %s THEN (monto + caja_bancos) ELSE 0 END) AS devoluciones "
                      "FROM gastos_varios "
                      "WHERE `identificador_gastos` = %s "
+                     "AND gastos_varios.estado > 0 "
                      "AND YEAR(fecha_gastos) = %s "
                      "GROUP BY sucursal_gastos")
             data_params = ('1_%', '2_%', '3_%', '4_%', '5_%', '6_%', '7_%', '8_%', '9_%', '12_%', '13_%', '14_%', 'Dev%', usuarioLlave, year_actual)
@@ -211,6 +215,7 @@ def getSumaGastosPorMesSucursal():
                      "FROM gastos_varios "
                      "JOIN sucursales ON `gastos_varios`.`sucursal_gastos` = `sucursales`.`id_sucursales` "
                      "WHERE `identificador_gastos` = %s "
+                     "AND gastos_varios.estado > 0 "
                      "AND YEAR(fecha_gastos) = %s "
                      "GROUP BY mes")
             data_params = (usuarioLlave, year_actual)
@@ -243,14 +248,15 @@ def saveGastosVarios():
 
 def createGastosVarios():
     try:
+        dato_uno = 1
         usuarioLlave = session.get('usernameDos')
         usuarioId = session.get('identificacion_usuario')
         with mysql.connection.cursor() as cur:
             query = ("INSERT INTO `gastos_varios` (`id_gastos`, `sucursal_gastos`, `concepto`, `comprobante`, `monto`, `usuario_gastos`, `fecha_gastos`, `identificador_gastos`, "
-                     "`caja_bancos`, `credito_gastos`) "
-                     "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+                     "`caja_bancos`, `credito_gastos`, `estado`) "
+                     "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
             data = (request.json['sucursal_gastos'], request.json['concepto'], request.json['comprobante'], request.json['monto'], 
-                    usuarioId, request.json['fecha_gastos'], usuarioLlave, request.json['caja_bancos'], request.json['credito_gastos'])
+                    usuarioId, request.json['fecha_gastos'], usuarioLlave, request.json['caja_bancos'], request.json['credito_gastos'], dato_uno)
             cur.execute(query, data)
             mysql.connection.commit()
         return jsonify({"status": "success", "message": "Gasto creado correctamente."})

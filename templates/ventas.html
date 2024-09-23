@@ -94,13 +94,13 @@
                     <div>
 
                         <select class="dos_form input-select-ventas" id="input-tipo-comprobante">
-                            <option value="Nota de Venta">
+                            <option value="nota_venta">
                                 Nota de Venta
                             </option>
-                            <option value="Boleta de Venta">
+                            <option value="boleta_venta">
                                 Boleta de Venta
                             </option>
-                            <option value="Factura">
+                            <option value="factura">
                                 Factura
                             </option>
                             <option value="Proforma">
@@ -299,6 +299,18 @@
                 <ul id="lista_detalle"></ul>
             </div>
         </div>
+    </div>
+    <div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <ul class="flashes">
+            {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
     </div>
 </div>
 <script src="../static/ventas.js"></script>

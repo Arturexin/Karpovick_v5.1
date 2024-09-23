@@ -19,7 +19,6 @@ productos_individual_stock_suc_cod = Blueprint('productos_individual_stock_suc_c
 productos_crud = Blueprint('productos_crud', __name__)
 productos_modificacion = Blueprint('productos_modificacion', __name__)
 productos_remove = Blueprint('productos_remove', __name__)
-productos_transferencias = Blueprint('productos_transferencias', __name__)
 
 
 
@@ -44,7 +43,8 @@ def getAllProductosConteo():
                         "AND categoria_nombre LIKE %s "
                         "AND codigo LIKE %s "
                         "AND descripcion LIKE %s "
-                        "AND nombre_cli LIKE %s ")
+                        "AND nombre_cli LIKE %s "
+                        "AND almacen_central.estado > 0")
             data_params = (usuarioLlave, f"{categoria_producto}%", f"{codigo_producto}%", f"%{descripcion_producto}%", f"%{proveedor_producto}%")
             cur.execute(query, data_params)
             data = cur.fetchone()[0]
@@ -65,7 +65,7 @@ def getAllProductos(numero):
         proveedor_producto = request.args.get('proveedor_producto')
 
         with mysql.connection.cursor() as cur:
-            query = ("SELECT idProd, categoria_nombre, codigo, descripcion, talla, costo_unitario, precio_venta, lote, nombre_cli, existencias_ac, existencias_su, existencias_sd, existencias_st "
+            query = ("SELECT idProd, categoria_nombre, codigo, descripcion, talla, costo_unitario, precio_venta, lote, nombre_cli, existencias_ac, existencias_su, existencias_sd, existencias_st, existencias_sc "
                         "FROM almacen_central "
                         "JOIN categorias ON `almacen_central`.`categoria` = `categorias`.`id` "
                         "JOIN clientes ON almacen_central.proveedor = clientes.id_cli "
@@ -74,6 +74,7 @@ def getAllProductos(numero):
                         "AND codigo LIKE %s "
                         "AND descripcion LIKE %s "
                         "AND nombre_cli LIKE %s "
+                        "AND almacen_central.estado > 0 "
                         "ORDER BY idProd ASC "
                         "LIMIT 20 OFFSET %s")
             data_params = (usuarioLlave, f"{categoria_producto}%", f"{codigo_producto}%", f"%{descripcion_producto}%", f"%{proveedor_producto}%", numero)
@@ -95,7 +96,8 @@ def getAllProductos(numero):
                 'existencias_ac':fila[9],
                 'existencias_su':fila[10],
                 'existencias_sd':fila[11],
-                'existencias_st':fila[12]
+                'existencias_st':fila[12],
+                'existencias_sc':fila[13]
                 }
             resultado.append(contenido)
         return jsonify(resultado)
@@ -112,7 +114,8 @@ def getAllCCD():
         with mysql.connection.cursor() as cur:
             query = ("SELECT idProd, categoria, codigo, descripcion "
                      "FROM almacen_central "
-                     "WHERE `identificadorProd` = %s")
+                     "WHERE `identificadorProd` = %s "
+                     "AND almacen_central.estado > 0 ")
             cur.execute(query, (usuarioLlave,))
             data = cur.fetchall()
         resultado = []
@@ -142,7 +145,8 @@ def getSumaStockSucursal():
                      "SUM(existencias_sd * costo_unitario) AS sucursal_dos, "
                      "SUM(existencias_st * costo_unitario) AS sucursal_tres "
                      "FROM `almacen_central` "
-                     "WHERE `identificadorProd` = %s")
+                     "WHERE `identificadorProd` = %s "
+                     "AND almacen_central.estado > 0 ")
             cur.execute(query, (usuarioLlave,))
             data = cur.fetchall()
         resultado = []
@@ -158,15 +162,16 @@ def getSumaStockSucursal():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@productos_individual_id.route('/api/almacen_central/<int:idProd>')#Entradas, Productos, Salidas
+@productos_individual_id.route('/api/almacen_central/<int:idProd>')#Entradas, Salidas
 @cross_origin()
 @login_required
 def getProductos(idProd):
     try:
         with mysql.connection.cursor() as cur:
-            query = ("SELECT idProd, existencias_ac, existencias_su, existencias_sd, existencias_st "
+            query = ("SELECT idProd, existencias_ac, existencias_su, existencias_sd, existencias_st, existencias_sc "
                      "FROM almacen_central "
-                     "WHERE idProd = %s")
+                     "WHERE idProd = %s "
+                     "AND almacen_central.estado > 0 ")
             cur.execute(query, (idProd,))
             data = cur.fetchall()
         contenido = {}
@@ -176,24 +181,26 @@ def getProductos(idProd):
                 'existencias_ac':fila[1],
                 'existencias_su':fila[2],
                 'existencias_sd':fila[3],
-                'existencias_st':fila[4]
+                'existencias_st':fila[4],
+                'existencias_sc':fila[5]
                 }
         return jsonify(contenido)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 ###------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@productos_individual_stock_suc_id.route('/api/almacen_central_id_sucursal_datos/<int:idProd>')#VENTAS, Perdidas
+@productos_individual_stock_suc_id.route('/api/almacen_central_id_sucursal_datos/<int:idProd>')#VENTAS
 @cross_origin()
 @login_required
 def getProductosSucursal(idProd):
     try:
         sucursal_get = request.args.get('sucursal_get')
-        if sucursal_get not in ['existencias_ac', 'existencias_su', 'existencias_sd', 'existencias_st']:
+        if sucursal_get not in ['existencias_ac', 'existencias_su', 'existencias_sd', 'existencias_st', 'existencias_sc']:
             return jsonify({"status": "error", "message": "Sucursal no válida"}), 400
         with mysql.connection.cursor() as cur:
             query = (f"SELECT idProd, talla, costo_unitario, precio_venta, {sucursal_get} "
                      "FROM almacen_central "
-                     "WHERE idProd = %s")
+                     "WHERE idProd = %s "
+                     "AND almacen_central.estado > 0 ")
             cur.execute(query, (idProd,))
             data = cur.fetchall()
         contenido = {}
@@ -216,11 +223,13 @@ def getProductosExtraccion():
     try:
         usuarioLlave = session.get('usernameDos')
         with mysql.connection.cursor() as cur:
-            query = (   "SELECT categoria_nombre, codigo, descripcion, talla, costo_unitario, precio_venta, lote, nombre_cli, existencias_ac, existencias_su, existencias_sd, existencias_st "
+            query = (   "SELECT categoria_nombre, codigo, descripcion, talla, costo_unitario, precio_venta, lote, "
+                        "nombre_cli, existencias_ac, existencias_su, existencias_sd, existencias_st, existencias_sc "
                         "FROM almacen_central "
                         "JOIN categorias ON `almacen_central`.`categoria` = `categorias`.`id` "
                         "JOIN clientes ON almacen_central.proveedor = clientes.id_cli "
                         "WHERE identificadorProd = %s "
+                        "AND almacen_central.estado > 0 "
                         "ORDER BY idProd ASC ")
             data_params = (usuarioLlave, )
             cur.execute(query, data_params)
@@ -240,7 +249,8 @@ def getProductosExtraccion():
                 'existencias_ac':fila[8],
                 'existencias_su':fila[9],
                 'existencias_sd':fila[10],
-                'existencias_st':fila[11]
+                'existencias_st':fila[11],
+                'existencias_sc':fila[11]
                 }
             resultado.append(contenido)
         return jsonify(resultado)
@@ -255,7 +265,7 @@ def getProductosSucursalDos():
     try:
         # Obtener el parámetro de la sucursal
         sucursal_get = request.args.get('sucursal_get')
-        if sucursal_get not in ['existencias_ac', 'existencias_su', 'existencias_sd', 'existencias_st']:
+        if sucursal_get not in ['existencias_ac', 'existencias_su', 'existencias_sd', 'existencias_st', 'existencias_sc']:
             return jsonify({"status": "error", "message": "Sucursal no válida"}), 400
 
         # Obtener el parámetro de los IDs
@@ -269,7 +279,9 @@ def getProductosSucursalDos():
         # Construir la consulta SQL
         query = (f"SELECT idProd, talla, costo_unitario, precio_venta, {sucursal_get} "
                  "FROM almacen_central "
-                 "WHERE idProd IN (%s)" % ','.join(['%s'] * len(ids)))
+                 "WHERE almacen_central.estado > 0 "
+                 "AND almacen_central.estado > 0 "
+                 "AND idProd IN (%s) " % ','.join(['%s'] * len(ids)))
         
         with mysql.connection.cursor() as cur:
             cur.execute(query, ids)
@@ -293,55 +305,88 @@ def getProductosSucursalDos():
         return jsonify({'error': str(e)}), 500
 
 ###------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@productos_individual_stock_id.route('/api/almacen_central_codigo_doble_sucursal/<int:id_busqueda>')#Transferencias
+@productos_individual_stock_id.route('/api/almacen_central_codigo_transferencias')  # Transferencias
 @cross_origin()
 @login_required
-def getProductosDos(id_busqueda):
+def getProductosDos():
     try:
         usuarioLlave = session.get('usernameDos')
-        
+
+        # Obtener el parámetro de los IDs
+        ids_param = request.args.get('ids')
+        if not ids_param:
+            return jsonify({"status": "error", "message": "No se proporcionaron IDs"}), 400
+
+        # Convertir los IDs en una lista
+        ids = ids_param.split(',')
+
+        if not ids:  # Verificar que la lista no esté vacía
+            return jsonify({"status": "error", "message": "Lista de IDs vacía"}), 400
+
+        # Construir la consulta SQL con marcadores de posición (%s)
+        query = ("SELECT idProd, categoria, descripcion, existencias_ac, existencias_su, existencias_sd, existencias_st "
+                 "FROM almacen_central "
+                 "WHERE `identificadorProd` = %s "
+                 "AND almacen_central.estado > 0 "
+                 "AND idProd IN (" + ','.join(['%s'] * len(ids)) + ")")
+
+        # Ejecutar la consulta con los parámetros correctos
         with mysql.connection.cursor() as cur:
-            query = ("SELECT idProd, categoria, descripcion, existencias_ac, existencias_su, existencias_sd, existencias_st "
-                     "FROM almacen_central "
-                     "WHERE `identificadorProd` = %s "
-                     "AND idProd = %s")
-            data_params = (usuarioLlave, f"{id_busqueda}%")
+            # Crear los parámetros de la consulta (usuarioLlave seguido de los IDs)
+            data_params = [usuarioLlave] + ids
             cur.execute(query, data_params)
             data = cur.fetchall()
-        contenido = {}
+
+        # Crear una lista para almacenar los resultados
+        resultados = []
         for fila in data:
             contenido = { 
-                        'idProd': fila[0],
-                        'categoria': fila[1],
-                        'descripcion': fila[2],
-                        'existencias_ac':fila[3],
-                        'existencias_su':fila[4],
-                        'existencias_sd':fila[5],
-                        'existencias_st':fila[6]
-                        }
-        return jsonify(contenido)
+                'idProd': fila[0],
+                'categoria': fila[1],
+                'descripcion': fila[2],
+                'existencias_ac': fila[3],
+                'existencias_su': fila[4],
+                'existencias_sd': fila[5],
+                'existencias_st': fila[6]
+            }
+            resultados.append(contenido)
+
+        return jsonify(resultados)
+
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({"status": "error", "message": str(e)}), 500
 ###------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@productos_individual_datos_id.route('/api/almacen_central_id_sucursal/<int:id_busqueda>')#COMPRAS, MODIFICACIÓN
+@productos_individual_datos_id.route('/api/almacen_central_id_sucursal')#COMPRAS, MODIFICACIÓN
 @cross_origin()
 @login_required
-def getProductosDosSucursal(id_busqueda):
+def getProductosDosSucursal():
     try:
         usuarioLlave = session.get('usernameDos')
         sucursal_get = request.args.get('sucursal_get')
-        if sucursal_get not in ['existencias_ac', 'existencias_su', 'existencias_sd', 'existencias_st']:
+
+        ids_param = request.args.get('ids')
+        if not ids_param:
+            return jsonify({"status": "error", "message": "No se proporcionaron IDs"}), 400
+        # Convertir los IDs en una lista
+        ids = ids_param.split(',')
+        if not ids:  # Verificar que la lista no esté vacía
+            return jsonify({"status": "error", "message": "Lista de IDs vacía"}), 400
+
+        if sucursal_get not in ['existencias_ac', 'existencias_su', 'existencias_sd', 'existencias_st', 'existencias_sc']:
             return jsonify({"status": "error", "message": "Sucursal no válida"}), 400
         
+        query = (f"SELECT idProd, categoria, codigo, descripcion, talla, costo_unitario, precio_venta, lote, proveedor, {sucursal_get} "
+                "FROM almacen_central "
+                "WHERE `identificadorProd` = %s "
+                "AND almacen_central.estado > 0 "
+                "AND idProd IN (" + ','.join(['%s'] * len(ids)) + ")")
         with mysql.connection.cursor() as cur:
-            query = (f"SELECT idProd, categoria, codigo, descripcion, talla, costo_unitario, precio_venta, lote, proveedor, {sucursal_get} "
-                    "FROM almacen_central "
-                    "WHERE `identificadorProd` = %s "
-                    "AND idProd = %s")
-            data_params = (usuarioLlave, f"{id_busqueda}")
+            # data_params = (usuarioLlave, f"{id_busqueda}")
+            # Crear los parámetros de la consulta (usuarioLlave seguido de los IDs)
+            data_params = [usuarioLlave] + ids
             cur.execute(query, data_params)
             data = cur.fetchall()
-        contenido = {}
+        resultados = []
         for fila in data:
             contenido = { 
                         'idProd': fila[0],
@@ -355,7 +400,8 @@ def getProductosDosSucursal(id_busqueda):
                         'proveedor': fila[8],
                         'sucursal_get': fila[9],
                         }
-        return jsonify(contenido)
+            resultados.append(contenido)
+        return jsonify(resultados)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
@@ -366,13 +412,14 @@ def getProductosTresSucursal(codigo):
     try:
         usuarioLlave = session.get('usernameDos')
         sucursal_get = request.args.get('sucursal_get')
-        if sucursal_get not in ['existencias_ac', 'existencias_su', 'existencias_sd', 'existencias_st']:
+        if sucursal_get not in ['existencias_ac', 'existencias_su', 'existencias_sd', 'existencias_st', 'existencias_sc']:
             return jsonify({"status": "error", "message": "Sucursal no válida"}), 400
         
         with mysql.connection.cursor() as cur:
             query = (f"SELECT idProd, {sucursal_get} "
                     "FROM almacen_central "
                     "WHERE `identificadorProd` = %s "
+                    "AND almacen_central.estado > 0 "
                     "AND codigo LIKE %s")
             data_params = (usuarioLlave, f"{codigo}%")
             cur.execute(query, data_params)
@@ -399,15 +446,19 @@ def saveProductos():
 
 def createProductos():
     try:
+        dato_uno = 1
         usuarioLlave = session.get('usernameDos')
         with mysql.connection.cursor() as cur:
             query = ("INSERT INTO `almacen_central` "
-                     "(`idProd`, `categoria`, `codigo`, `descripcion`, `talla`, `costo_unitario`, `precio_venta`, `lote`, `proveedor`, `existencias_ac`, `existencias_su`, `existencias_sd`, `existencias_st`, `identificadorProd`) "
-                     "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+                     "(`idProd`, `categoria`, `codigo`, `descripcion`, `talla`, "
+                     "`costo_unitario`, `precio_venta`, `lote`, `proveedor`, "
+                     "`existencias_ac`, `existencias_su`, `existencias_sd`, "
+                     "`existencias_st`, `identificadorProd`, `estado`) "
+                     "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
             data = (request.json['categoria'], request.json['codigo'], request.json['descripcion'], request.json['talla'],
                     request.json['costo_unitario'], request.json['precio_venta'], request.json['lote'], request.json['proveedor'],
                     request.json['existencias_ac'], request.json['existencias_su'], request.json['existencias_sd'],
-                    request.json['existencias_st'], usuarioLlave)
+                    request.json['existencias_st'], usuarioLlave, dato_uno)
             cur.execute(query, data)
             mysql.connection.commit()
         return jsonify({"status": "success", "message": "Producto creado correctamente."})
@@ -420,7 +471,7 @@ def upDateProductos():
         sucursal_post = request.json['sucursal_post']
         usuarioLlave = session.get('usernameDos')
         
-        if sucursal_post not in ['existencias_ac', 'existencias_su', 'existencias_sd', 'existencias_st']:
+        if sucursal_post not in ['existencias_ac', 'existencias_su', 'existencias_sd', 'existencias_st', 'existencias_sc']:
             return jsonify({"status": "error", "message": "Sucursal no válida"}), 400
         
         with mysql.connection.cursor() as cur:
@@ -456,50 +507,21 @@ def upDateProductosCategorias():
         mysql.connection.rollback()
         return jsonify({"status": "error", "message": str(e)})
     
-@productos_remove.route('/api/almacen_central/<int:idProd>', methods=['DELETE'])
+@productos_remove.route('/api/almacen_central_remove', methods=['POST'])
 @cross_origin()
 @login_required
-def removeProductos(idProd):
+def removeProductos():
     try:
-        with mysql.connection.cursor() as cur:
-            query = "DELETE FROM `almacen_central` WHERE `almacen_central`.`idProd` = %s"
-            cur.execute(query, (idProd,))
-            mysql.connection.commit()
-        return "Producto eliminado"
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@productos_transferencias.route('/api/procesar_transferencia', methods=['POST'])##Transferencias, Productos
-@cross_origin()
-@login_required
-def operarTransferencia():
-    try:
-        sucursal_post = request.json['sucursal_post']
-        sucursal_post_dos = request.json['sucursal_post_dos']
-        
+        dato_cero = 0
         usuarioLlave = session.get('usernameDos')
-        usuarioId = session.get('identificacion_usuario')
-
-        if sucursal_post and sucursal_post_dos not in ['existencias_ac', 'existencias_su', 'existencias_sd', 'existencias_st']:
-            return jsonify({"status": "error", "message": "Sucursal no válida"}), 400
-        
         with mysql.connection.cursor() as cur:
-            query_productos = (f"UPDATE `almacen_central` SET {sucursal_post} = %s,  {sucursal_post_dos} = %s"
+            query = ("UPDATE `almacen_central` SET `estado` = %s "
                      "WHERE `almacen_central`.`idProd` = %s "
                      "AND identificadorProd = %s")
-            data_productos = (request.json['existencias_post'], request.json['existencias_post_dos'], request.json['idProd'], usuarioLlave)
-            cur.execute(query_productos, data_productos)
+            data = (dato_cero, request.json['idProd'], usuarioLlave)
+            cur.execute(query, data)
             mysql.connection.commit()
+        return jsonify({"status": "success", "message": "Producto eliminado correctamente."})
 
-            query_transferencias = ("INSERT INTO `transfrencias` "
-                                    "(`id_tran`, `id_suc_origen`, `id_suc_destino`, `id_prod`, `cantidad`, `comprobante`, `id_usuario`, `fecha_tran`, `identificador_tran`) "
-                                    "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s)");
-            data_transferencias = (request.json['id_suc_origen'], request.json['id_suc_destino'], request.json['idProd'], request.json['cantidad'], request.json['comprobante'], 
-                                usuarioId, request.json['fecha_tran'], usuarioLlave)
-            cur.execute(query_transferencias, data_transferencias)
-            mysql.connection.commit()
-
-        return jsonify({"status": "success", "message": "Catidades actualizadas correctamente."}), 200
     except Exception as e:
-        mysql.connection.rollback()
-        return jsonify({"status": "error", "message": str(e)}), 500
+        return jsonify({'error': str(e)}), 500

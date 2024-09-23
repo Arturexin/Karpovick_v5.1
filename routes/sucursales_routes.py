@@ -35,6 +35,7 @@ def getAllSucursalesConteo():
                      "WHERE `sucursal_nombre` LIKE %s "
                      "AND estado LIKE %s "
                      "AND identificador LIKE %s "
+                     "AND sucursales.estado > 0 "
                      "AND fecha_suc >= %s AND fecha_suc < %s ")
             data_params = (f"{nombre_sucursal}%", f"{estado_sucursal}%", f"{ident_sucursal}%", fecha_inicio_sucursal, fecha_fin_sucursal + timedelta(days=1))
             cur.execute(query, data_params)
@@ -65,6 +66,7 @@ def getAllSucursalesTabla(numero):
                     "WHERE `sucursal_nombre` LIKE %s "
                     "AND estado LIKE %s "
                     "AND identificador LIKE %s "
+                    "AND sucursales.estado > 0 "
                     "AND fecha_suc >= %s AND fecha_suc < %s "
                     "ORDER BY id_sucursales ASC "
                     "LIMIT 20 OFFSET %s")
@@ -104,6 +106,7 @@ def getConsolidadoEfectivo():
                             "SUM(modo_efectivo) AS suma_ventas "
                             "FROM ventas "
                             "WHERE identificador_ventas = %s "
+                            "AND ventas.estado > 0 "
                             "AND fecha_det_ventas >= %s AND fecha_det_ventas < %s "
                             "GROUP BY sucursal "
                             "ORDER BY sucursal ASC")
@@ -114,6 +117,7 @@ def getConsolidadoEfectivo():
                             "FROM caja "
                             "WHERE identificador_caja = %s "
                             "AND fecha_caja >= %s AND fecha_caja < %s "
+                            "AND caja.estado > 0 "
                             "GROUP BY sucursal_caja "
                             "ORDER BY sucursal_caja ASC")
             cur.execute(query_caja, data_params)
@@ -123,6 +127,7 @@ def getConsolidadoEfectivo():
                                 "SUM(efectivo) AS suma_creditos "
                                 "FROM creditos "
                                 "WHERE identificador_cre = %s "
+                                "AND creditos.estado > 0 "
                                 "AND fecha_cre >= %s AND fecha_cre < %s "
                                 "GROUP BY sucursal_cre "
                                 "ORDER BY sucursal_cre ASC")
@@ -134,6 +139,7 @@ def getConsolidadoEfectivo():
                             "SUM(monto) AS suma_gastos "
                             "FROM gastos_varios "
                             "WHERE identificador_gastos = %s "
+                            "AND gastos_varios.estado > 0 "
                             "AND fecha_gastos >= %s AND fecha_gastos < %s "
                             "GROUP BY sucursal_gastos "
                             "ORDER BY sucursal_gastos ASC")
@@ -170,6 +176,7 @@ def getAllSucursales():
         with mysql.connection.cursor() as cur:
             query = ("SELECT id_sucursales, sucursal_nombre, fecha_suc, estado FROM sucursales "
                      "WHERE `identificador` = %s "
+                     "AND sucursales.estado > 0 "
                      "ORDER BY id_sucursales ASC")
             cur.execute(query, (usuarioLlave,))
             data = cur.fetchall()
@@ -194,7 +201,8 @@ def getAllSucursalesIndex():
     try:
         usuarioLlave = session.get('usernameDos')
         with mysql.connection.cursor() as cur:
-            query = ("SELECT id_sucursales, sucursal_nombre, fecha_suc, estado FROM sucursales "
+            query = ("SELECT id_sucursales, sucursal_nombre, fecha_suc, estado "
+                     "FROM sucursales "
                      "WHERE `identificador` = %s "
                      "AND `estado` != 0 "
                      "AND `estado` != 3 "

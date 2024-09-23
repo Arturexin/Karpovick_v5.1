@@ -49,7 +49,8 @@ def getAllNumeracionComprobante():
         with mysql.connection.cursor() as cur:
             query = ("SELECT id, compras, recompras, transferencias, ventas, nota_venta, boleta_venta, factura "
                      "FROM numeracion_comprobante "
-                     "WHERE `identificador` = %s")
+                     "WHERE `identificador` = %s "
+                     "AND numeracion_comprobante.estado > 0 ")
             cur.execute(query, (usuarioLlave,))
             data = cur.fetchall()
 
@@ -82,13 +83,14 @@ def saveNumeracionComprobante():
 
 def createNumeracionComprobante():
     try:
+        dato_uno = 1
         with mysql.connection.cursor() as cur:
             query = ("INSERT INTO `numeracion_comprobante` (`id`, `compras`, `recompras`, `transferencias`, `ventas`, `nota_venta`, `boleta_venta`, `factura`, `identificador`, "
-                     "`nombre_empresa`, `ruc`, `direccion`, `moneda`, `web`) "
-                     "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+                     "`nombre_empresa`, `ruc`, `direccion`, `moneda`, `web`, `estado`) "
+                     "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
             dato = (request.json['compras'], request.json['recompras'], request.json['transferencias'], request.json['ventas'], request.json['nota_venta'], 
                     request.json['boleta_venta'], request.json['factura'], request.json['identificador'], request.json['nombre_empresa'], request.json['ruc'], 
-                    request.json['direccion'], request.json['moneda'], request.json['web'])
+                    request.json['direccion'], request.json['moneda'], request.json['web'], dato_uno)
             cur.execute(query, dato)
             mysql.connection.commit()
         return jsonify({"status": "success", "message": "Numeración creada correctamente."})
@@ -133,7 +135,10 @@ def getNumeracionDatos():
         usuarioLlave = session.get('usernameDos')
 
         with mysql.connection.cursor() as cur:
-            query = ("SELECT id, nombre_empresa, ruc, direccion, moneda, web FROM numeracion_comprobante WHERE `identificador` = %s")
+            query = ("SELECT id, nombre_empresa, ruc, direccion, moneda, web "
+                     "FROM numeracion_comprobante "
+                     "WHERE `identificador` = %s "
+                     "AND numeracion_comprobante.estado > 0 ")
             cur.execute(query, (usuarioLlave,))
             data = cur.fetchall()
 

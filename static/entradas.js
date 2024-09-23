@@ -6,8 +6,8 @@ function inicioEntradas(){
     inicioTablasEntradas()
     btnEntradasP = 1;
 };
-const url_array_conteo = ["entradas_conteo", "transferencias_conteo", "perdidas_conteo"]
-const url_array_tabla = ["entradas_tabla", "transferencias_tabla", "perdidas_tabla"]
+const url_array_conteo = ["entradas_conteo", "perdidas_conteo"]
+const url_array_tabla = ["entradas_tabla", "perdidas_tabla"]
 let url_conteo = url_array_conteo[Number(document.getElementById("filtro_tabla").value)]
 let url_tabla = url_array_tabla[Number(document.getElementById("filtro_tabla").value)]
 let sucursal_id_entradas = 0;
@@ -82,11 +82,11 @@ function cuerpoFilaTabla(e){
                 <td>${e.fecha}</td>
                 <td style="text-align: center;width: 80px">
                     <div class="tooltip">
-                        <span onclick="editEntradas(${e.idEntr})" style="font-size:18px;" class="material-symbols-outlined myButtonEditar">assignment_return</span>
+                        <span onclick="accionDevoluciones(${e.idEntr})" style="font-size:18px;" class="material-symbols-outlined myButtonEditar">assignment_return</span>
                         <span class="tooltiptext">Devolver</span>
                     </div>
                     <div class="tooltip">
-                        <span onclick="removeEntradas(${e.idEntr})" style="font-size:18px;" class="material-symbols-outlined eliminarTablaFila">delete</span>
+                        <span onclick="accionRemove(${e.idEntr})" style="font-size:18px;" class="material-symbols-outlined eliminarTablaFila">delete</span>
                         <span class="tooltiptext">Eliminar operación</span>
                     </div>
                 </td>
@@ -116,139 +116,166 @@ function manejoDeFechas(){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-async function removeEntradas(id) {
-    respuestaAlmacen = confirm(`Eliminar esta fila podría generar conflictos en el stock de este producto, `+
-                                `¿Desea continuar?.`)
-    if (respuestaAlmacen) {
-        let url = URL_API_almacen_central + `entradas/${id}`
-            await fetch(url, {
-            "method": 'DELETE',
-            "headers": {
-                "Content-Type": 'application/json'
-                }
-            })
+async function accionRemove(id) {
+    let entradas = base_datos.array.find(y => y.idEntr == id)// obtenemos los datos de la fila
+    let db = JSON.parse(localStorage.getItem("base_datos_consulta"))
+    let producto = db.find(x=> x.codigo === entradas.codigo)
+
+    tabla_proforma_productos(producto, "Eliminar entrada", entradas.categoria_nombre, entradas.comprobante);
+
+    let contenedor_tab = document.querySelector("#contenedor_tabla_producto");
+    contenedor_tab.children[0].remove();
+    
+    contenedorBotonesProducto(`procesarRemove(${entradas.idEntr})`, "Eliminar entrada")
+    document.getElementById("acciones_rapidas_entradas").classList.add("modal-show-entrada")
+};
+
+async function procesarRemove(idEntr){
+    manejoDeFechas();
+    let url = URL_API_almacen_central + 'entradas_remove'
+    let data = {
+        'idEntr': idEntr
+    };
+    let response = await funcionFetchDos(url, data);
+    if(response.status === "success"){
         await conteoFilas(subRutaA(1), filas_total_bd, indice_tabla, 
                         document.getElementById("numeracionTablaEntradas"), 20)
         await searchDatos(subRutaB(num_filas_tabla.value, 1), base_datos,"#tabla-entradas")
+        modal_proceso_abrir(`${response.message}.`)
+        modal_proceso_salir_botones()
+        removerContenido()
     };
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-let entradas_Id = "";
-let producto_Id_entradas = "";
-let indice_sucursal_entradas = 0;
-function editEntradas(id) {
+function accionDevoluciones(id) {
     let entradas = base_datos.array.find(x => x.idEntr == id)
+    let db = JSON.parse(localStorage.getItem("base_datos_consulta"))
     let sucursales_comparacion = JSON.parse(localStorage.getItem("sucursal_encabezado"))
     if(entradas.comprobante.startsWith("Compra") || entradas.comprobante.startsWith("Recompra")){
-        accionDevolucionEntradas();
-        sucursales_comparacion.forEach((e) =>{
+        let producto = db.find(x=> x.codigo === entradas.codigo)
+        tabla_proforma_productos(producto, "Devoluciones", entradas.categoria_nombre, entradas.comprobante)
+        sucursales_comparacion.forEach((e, i) =>{
             if(entradas.sucursal_nombre == e.sucursal_nombre){
                 sucursal_id_entradas = e.id_sucursales
+                tabla_body_productos(entradas, i, sucursal_id_entradas)
             }
         });
-        document.getElementById('accion_id_entradas').value = entradas.idEntr
-        document.getElementById('accion_codigo').textContent = "Devolución: " + entradas.codigo;
-        document.getElementById('accion_comprobante_entradas').value = entradas.comprobante
-        document.getElementById('accion_sucursal_entradas').value = entradas.sucursal_nombre
-        document.getElementById('accion_existencias_entradas').value = entradas.existencias_entradas
-        document.getElementById('accion_existencias_devueltas_entradas').value = entradas.existencias_devueltas
-        cargarDatosEntradasId(entradas.idEntr)
-        document.getElementById("accion_editar_entradas").focus()
+        contenedorBotonesProducto(`procesarDevolucion()`, "Procesar Devolución")
         document.getElementById("acciones_rapidas_entradas").classList.add("modal-show-entrada")
     }else{
         modal_proceso_abrir("No es una Compra o Recompra.", "")
         modal_proceso_salir_botones()
     };
 };
-function accionDevolucionEntradas(){
-    let formularioDevolucionesEntradas = `
-                                        <div id="form_accion_rapida_entradas" class="nuevo-contenedor-box">
-                                            <form action="" class="formulario-general fondo">
-                                                <h2 id="accion_codigo"></h2>
-                                                <input id="accion_id_entradas" class="input-general fondo invisible" type="text" disabled>
-                                                <input id="accion_id_productos" class="input-general fondo invisible" type="text" disabled>
-                                                <label class="label-general">Comprobante<input id="accion_comprobante_entradas" class="input-general fondo" type="text" disabled></label>
-                                                <label class="label-general">Sucursal de Origen<input id="accion_sucursal_entradas" class="input-general fondo" type="text" disabled></label>
-                                                <label class="label-general">Unidades Adquiridas<input id="accion_existencias_entradas" class="input-general fondo" type="text" disabled></label>
-                                                <label class="label-general">Unidades Devueltas<input id="accion_existencias_devueltas_entradas" class="input-general fondo" type="text" disabled></label>
-                                                <label class="label-general">Existencias en Stock<input id="accion_existencias_productos_entradas" class="input-general fondo" type="text" disabled></label>
-                                                <label class="label-general">Unidades a Devolver<input id="accion_editar_entradas" class="input-general-importante fondo-importante" type="text"></label>
-                                                <label class="label-general">Saldo en Devoluciones<input id="accion_saldo_devolucion_entradas" class="input-general fondo" type="text" disabled></label>
-                                                <label class="label-general">Saldo en Productos<input id="accion_saldo_productos_entradas" class="input-general fondo" type="text" disabled></label>
-                                                <label class="label-general">Causa de Devolución
-                                                    <select id="accion_causa_devolucion_entradas" class="input-general-importante fondo-importante">
-                                                        <option value= "1">Producto defectuoso</option>
-                                                        <option value= "2">Producto dañado durante el envío</option>
-                                                        <option value= "3">Producto incorrecto o equivocado</option>
-                                                        <option value= "4">Talla o ajuste incorrecto</option>
-                                                        <option value= "5">Insatisfacción con el producto</option>
-                                                        <option value= "6">Cambio por otro producto</option>
-                                                        <option value= "7">Cancelación del pedido</option>
-                                                        <option value= "8">Entrega retrasada</option>
-                                                    </select>
-                                                </label>
-                                                <input id="accion_existencias_ac_productos" class="input-general fondo invisible" type="text" disabled>
-                                                <input id="accion_existencias_su_productos" class="input-general fondo invisible" type="text" disabled>
-                                                <input id="accion_existencias_sd_productos" class="input-general fondo invisible" type="text" disabled>
-                                                <input id="accion_existencias_st_productos" class="input-general fondo invisible" type="text" disabled>
-                                                <button id="accion_procesar_devolucion_entradas" class="myButtonAgregar">Procesar Devolución</button>
-                                                <button id="remover_accion_rapida_entradas" class="myButtonEliminar">Cancelar</button>
-                                            </form>
-                                        </div>
-                                        `;
-    document.getElementById("acciones_rapidas_entradas").innerHTML = formularioDevolucionesEntradas;
-    removerAccionRapidaEntradas();
-    let editar = document.getElementById("accion_editar_entradas");
-    editar.addEventListener("keyup", (event)=>{
-        document.getElementById("accion_saldo_devolucion_entradas").value = Number(event.target.value) + Number(document.getElementById("accion_existencias_devueltas_entradas").value)
-        document.getElementById("accion_saldo_productos_entradas").value = Number(document.getElementById("accion_existencias_productos_entradas").value) - Number(event.target.value)
-    });
-    const procesarDevolucionesEntradas = document.getElementById("accion_procesar_devolucion_entradas");
-    procesarDevolucionesEntradas.addEventListener("click", procesamientoEntradasDevoluciones)
+function tabla_proforma_productos(producto, titulo, categoria, operacion){
+    let html = `<div id="form_accion_rapida" class="nuevo-contenedor-box">
+                    <h2 style="text-align: center;">${titulo}</h2>
+                    <table class="tabla_modal contenido-tabla">
+                        <thead>
+                            <tr>
+                                <th style="width: 120px;">Categoría</th>
+                                <th style="width: 120px;">Código</th>
+                                <th style="width: 200px;">Descripción</th>
+                                <th style="width: 200px;">Operación</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td id="id_prod" class="invisible">${producto.idProd}</td>
+                                <td style="width: 120px; text-align: center;">${categoria}</td>
+                                <td style="width: 120px; text-align: center;">${producto.codigo}</td>
+                                <td style="width: 200px; text-align: center;">${producto.descripcion}</td>
+                                <td style="width: 200px; text-align: center;">${operacion}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <div id="contenedor_tabla_producto">`;
+                html += `<table class="tabla-proforma" id="tabla_proforma_producto">
+                            <thead>
+                                <th>Operación</th>
+                                <th>Sucursal</th>
+                                <th>Unidades adquiridas</th>
+                                <th>Unidades devueltas</th>
+                                <th>Devolver</th>
+                                <th>Saldo</th>
+                                <th>Causa</th>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <br>
+                    <div id="contenedor_botones_producto" style="display: flex;justify-content: center;">
+                    </div>
+                </div>`;
+    document.getElementById("acciones_rapidas_entradas").innerHTML = html;
+};
+function tabla_body_productos(prod_, i, id_suc){
+    let tabla_= document.querySelector("#tabla_proforma_producto > tbody");
+    let nuevaFilaTabla_ = tabla_.insertRow(-1);
+    let fila =  `<tr>` +
+                    `<td class="invisible" id="id_prod">${prod_.idEntr}</td>` + //Operación
+                    `<td style="text-align: center; width: 120px">${prod_.comprobante}</td>` + //Operación
+                    `<td style="text-align: center; width: 120px">${prod_.sucursal_nombre}</td>` + // Sucursal
+                    `<td style="text-align: center; width: 120px">${prod_.existencias_entradas}</td>` + // existencias adquiridas
+                    `<td style="text-align: center; width: 120px">${prod_.existencias_devueltas}</td>` + // existencias devueltas
+                    `<td>
+                        <input class="input-tablas-dos-largo q_dev" onKeyup = "op_dev(this)">
+                    </td>` + //Devolución
+                    `<td style="text-align: center; width: 90px" class="s_dev">${prod_.existencias_entradas}</td>` + // Saldo
+                    `<td>   
+                        <select id="accion_causa_devolucion_entradas" class="input-general-importante fondo-importante">
+                            <option value="0" selected="">-- Causa de devolución --</option>                                    
+                            <option value= "1">Producto defectuoso</option>
+                            <option value= "2">Producto dañado durante el envío</option>
+                            <option value= "3">Producto incorrecto o equivocado</option>
+                            <option value= "4">Talla o ajuste incorrecto</option>
+                            <option value= "5">Insatisfacción con el producto</option>
+                            <option value= "6">Cambio por otro producto</option>
+                            <option value= "7">Cancelación del pedido</option>
+                            <option value= "8">Entrega retrasada</option>
+                        </select>
+                    </td>` + // id de la cucursal
+                    `<td class="invisible">${id_suc}</td>` + // id de la cucursal
+                    `<td class="invisible">${i}</td>` + // indice de la sucursal
+                `</tr>`;
+    nuevaFilaTabla_.innerHTML = fila;
+    document.querySelector(".q_dev").focus();
+};
+function op_dev(e){
+    let row_ = e.closest("tr");
+    row_.children[6].textContent = Number(row_.children[3].textContent) - Number(row_.children[5].children[0].value )
+    Number(row_.children[6].textContent) < 0 || 
+    isNaN(Number(row_.children[6].textContent)) ?   row_.children[6].style.background = "var(--boton-dos)": 
+                                                    row_.children[6].style.background = "";
 };
 
-async function cargarDatosEntradasId(id){
-    entradas_Id = await cargarDatos(`entradas/${id}`)
-    cargarDatosProductosIdEntradas(entradas_Id.idProd)
+function contenedorBotonesProducto(funcion, titulo){
+    let contenedor_bot = document.querySelector("#contenedor_botones_producto");
+    let html =  `
+                <button class="myButtonAgregar" onCLick="${funcion}">${titulo}</button>
+                <button class="myButtonEliminar" onClick="removerContenido()">Cancelar</button>
+                `;
+    contenedor_bot.innerHTML = html;
 }
-async function cargarDatosProductosIdEntradas(id){
-    let sucursales_comparacion = JSON.parse(localStorage.getItem("sucursal_encabezado"))
-    producto_Id_entradas = await cargarDatos(`almacen_central/${id}`)
-    let array_uso = [producto_Id_entradas.existencias_ac, producto_Id_entradas.existencias_su, producto_Id_entradas.existencias_sd, producto_Id_entradas.existencias_st]
-    array_uso.forEach((event, i)=>{
-        if(sucursales_comparacion[i] &&
-        document.getElementById('accion_sucursal_entradas').value === sucursales_comparacion[i].sucursal_nombre){
-            indice_sucursal_entradas = i
-            document.getElementById('accion_existencias_productos_entradas').value = event
-        }
-    })
-    document.getElementById('accion_id_productos').value = producto_Id_entradas.idProd
-    document.getElementById('accion_existencias_ac_productos').value = producto_Id_entradas.existencias_ac
-    document.getElementById('accion_existencias_su_productos').value = producto_Id_entradas.existencias_su
-    document.getElementById('accion_existencias_sd_productos').value = producto_Id_entradas.existencias_sd
-    document.getElementById('accion_existencias_st_productos').value = producto_Id_entradas.existencias_st
-}
-function removerAccionRapidaEntradas(){
-    let remover = document.getElementById("remover_accion_rapida_entradas");
-    remover.addEventListener("click", (e)=>{
-        e.preventDefault();
-        document.getElementById("form_accion_rapida_entradas").remove()
-        document.getElementById("acciones_rapidas_entradas").classList.remove("modal-show-entrada")
-    });
+function removerContenido(){
+    let contenido = document.getElementById("form_accion_rapida")
+    contenido.remove();
+    document.getElementById("acciones_rapidas_entradas").classList.remove("modal-show-entrada")
 };
 //////////////////BUSCA PRODUCTOS EN TABLA ALMACÉN CENTRAL////////////////////////////////////////////
 
-async function procesamientoEntradasDevoluciones(e){
-    e.preventDefault();
-    manejoDeFechas()
-    if(Number(document.getElementById("accion_editar_entradas").value) > 0 && 
-    (Number(document.getElementById("accion_existencias_entradas").value) >= Number(document.getElementById("accion_saldo_devolucion_entradas").value)) &&
-    Number(document.getElementById("accion_existencias_productos_entradas").value) > 0){
+async function procesarDevolucion(){
+    manejoDeFechas();
+    modal_proceso_abrir("Procesando la devolución!!!.", "")
+    let inputs = document.querySelectorAll(".q_dev");
+    let valores = Array.from(inputs).map(input => Number(input.value));
+    if (valores.every(valor => valor >= 0 && Number.isFinite(valor)) && valores.some(valor => valor > 0)){
         try{
             modal_proceso_abrir("Procesando la devolución de la compra!!!.", "")
-            await realizarDevolucionComprasEntradas()
+            await realizarDevolucion()
             await conteoFilas(subRutaA(1), filas_total_bd, indice_tabla, 
                             document.getElementById("numeracionTablaEntradas"), 20)
             await searchDatos(subRutaB((document.getElementById("numeracionTablaEntradas").value - 1) * 20, 1), 
@@ -258,43 +285,45 @@ async function procesamientoEntradasDevoluciones(e){
             console.error("Ocurrió un error. ", error)
             modal_proceso_salir_botones()
         };
-    }else if(Number(document.getElementById("accion_editar_entradas").value) <= 0){
-        modal_proceso_abrir("Las unidades a devolver deben ser mayores a cero.", "")
-        modal_proceso_salir_botones()
-    }else if(Number(document.getElementById("accion_existencias_entradas").value) < Number(document.getElementById("accion_saldo_devolucion_entradas").value)){
-        modal_proceso_abrir("Las unidades a devolver no deben ser mayores a las unidades en existencia.", "")
-        modal_proceso_salir_botones()
-    }else if(Number(document.getElementById("accion_existencias_productos_entradas").value) <= 0){
-        modal_proceso_abrir("El stock en inventario es cero.", "")
+    }else{
+        modal_proceso_abrir(`Uno o varios de los valores son incorrectos.`, ``)
         modal_proceso_salir_botones()
     };
 };
-async function realizarDevolucionComprasEntradas(){
-    function DatosDevolucionComprasEntradas(){
-        this.idProd = document.getElementById("accion_id_productos").value;
-        this.sucursal_post = sucursales_activas[indice_sucursal_entradas];
-        this.existencias_post = document.getElementById("accion_saldo_productos_entradas").value;
-        this.idEntr = document.getElementById('accion_id_entradas').value;
-        this.existencias_entradas_update = document.getElementById('accion_existencias_entradas').value;
-        this.existencias_devueltas_update = document.getElementById("accion_saldo_devolucion_entradas").value;
-        this.comprobante = "Dev-" + document.getElementById('accion_comprobante_entradas').value;
-        this.causa_devolucion = document.getElementById("accion_causa_devolucion_entradas").value;
-        this.sucursal = sucursal_id_entradas;
-        this.existencias_devueltas_insert = document.getElementById("accion_editar_entradas").value;
+async function realizarDevolucion(){
+    let array_devolucion = [];
+    function DatosDeDevolucionCompras(a){
+        this.idProd = document.getElementById("id_prod").textContent;
+        this.sucursal_post = sucursales_activas[a.children[9].textContent];
+        this.existencias_post = Number(a.children[5].children[0].value);
+
+        this.idEntr = a.children[0].textContent;
+
+        this.comprobante = "Dev-" + a.children[1].textContent;
+        this.causa_devolucion = a.children[7].children[0].value;
+        this.sucursal = a.children[8].textContent;
+    };
+    const numFilas = document.querySelector("#tabla_proforma_producto > tbody").children
+    for(let i = 0 ; i < numFilas.length; i++){
+        if(numFilas[i]){
+            array_devolucion.push(new DatosDeDevolucionCompras(numFilas[i]));
+        };
+    };
+    function DataDevoluciones(){
+        this.array_devolucion = array_devolucion;
         this.fecha = generarFecha();
-    };
-    let filaProducto = new DatosDevolucionComprasEntradas();
+    }
     let url = URL_API_almacen_central + 'procesar_devolucion_compras'
-    let response = await funcionFetch(url, filaProducto)
-    console.log("Respuesta Productos "+response.status)
-    if(response.status === 200){
-        modal_proceso_abrir("Operación completada exitosamente.", "")
+    let fila = new DataDevoluciones()
+
+    let response = await funcionFetchDos(url, fila)
+
+    if(response.status === "success"){
+        modal_proceso_abrir(`${response.message}`)
         modal_proceso_salir_botones()
-        document.getElementById("acciones_rapidas_entradas").classList.remove("modal-show-entrada")
-    }else{
-        modal_proceso_abrir(`Ocurrió un problema en la devolución`, "")
-        modal_proceso_salir_botones()
+        removerContenido()
     };
+    document.getElementById("acciones_rapidas_entradas").classList.remove("modal-show-entrada")
 };
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Volcado de datos/////////////////////////////////////////////////////////////////////////////////////////////////////////////////

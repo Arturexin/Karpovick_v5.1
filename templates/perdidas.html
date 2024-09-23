@@ -38,13 +38,6 @@
                             <label class="label-general">Descripción<input class="input-general fondo" type="text" id="descripcion-perdidas" name="descripcion-perdidas" disabled/></label>
                         </div>
                     </div>
-                    <div>
-                        <input class="input-general-importante fondo-importante" type="text" id="cantidad-perdida" placeholder="Cantidad">
-                        <div class="tooltip_ayuda">
-                            <span class="material-symbols-outlined">help</span>
-                            <span class="tooltiptext_ayuda">Ingrese caracteres numéricos.</span>
-                        </div>
-                    </div>
                     <label>Motivo de Salida
                             <select id="motivo_salida">motivo
                                 <option value="Donación">Donación</option>
@@ -58,34 +51,102 @@
                 </div>
             </form>
         </div>
-        <div>
-            <div class="titulo_graficos"><p>Salidas por Donaciones y Pérdidas</p></div>  
-            <div class="etiquetas_graficos_colores">
-                <div>
-                    <div class="color_item_grafico_compra"></div>
-                    <span class="descripcion_item_grafico">Donaciones</span>
+        <div class="contenedor_busqueda_detalle_general">
+            <div style="display: grid;">
+                <h2 style="text-align: center;">Buscador</h2>
+                <div style="display: grid;grid-template-columns: 1fr 1fr;align-items: center;">
+
+                        <input type="text" id="buscador_descripcion" placeholder="Buscar por palabras clave..." class="input-general-importante" style="width: 240px;">
+                        <select id="categoria_buscador_detalle" class="">
+                        </select>
                 </div>
-                <div>
-                    <div class="color_item_grafico_recompra"></div>
-                    <span class="descripcion_item_grafico">Pérdidas</span>
+                <div style="display: grid;grid-template-columns: 1fr 1fr 1fr;align-items: center;">
+
+                    <button id="boton_buscar_codigo" class="myButtonEditar">Buscar código</button>
+                    <button id="boton_buscar_descripcion" class="myButtonEditar">Buscar descirpción</button>
+                    <button id="boton_borrar_" class="eliminarTablaFila">Eliminar</button>
                 </div>
             </div>
-            <div class="grafico_compras">
-                <grafico-eje_y e_0="eje_y_numeracion"></grafico-eje_y>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
+            <div style="width: 510px;" class="contenedor_busqueda_cabecera">
+                <ul id="lista_cabecera"></ul>
+            </div>
+            <div class="contenedor_busqueda_detalle_general_interior">
+                <ul id="lista_detalle"></ul>
             </div>
         </div>
+    </div>
+    
+    <div class="contenedor-pre-recompra">
+        <table id="tabla-pre-despacho" class="tabla_modal contenido-tabla">
+            <thead>
+                <tr>
+                    <th scope="row" colspan="15"><h2>Proforma</h2></th>
+                </tr>
+                <tr>
+                    <th style="width: 120px;">Sucursal</th>
+                    <th style="width: 120px;">Categoría</th>
+                    <th style="width: 120px;">Código</th>
+                    <th style="width: 200px;">Descripción</th>
+                    <th style="width: 70px;">Existencias</th>
+                    <th style="width: 70px;">Despacho</th>
+                    <th style="width: 70px;">Saldo</th>
+                    <th style="width: 70px;">Motivo de salida</th>
+                    <th style="width: 40px;">
+                        <span style="font-size:18px;" class="material-symbols-outlined">delete</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+                <th scope="row" colspan="15">
+                    <button id="procesar-pre-despacho" class="myButtonAgregar">Enviar a tabla despacho</button>
+                    <button id="remover-tabla-despacho-uno" class="eliminarTablaFila">Cancelar</button>
+                </th>
+            </tfoot>
+        </table>
+    </div>
+    <div class="contenedor_tabla">
+        <table id="tabla_principal" class="tabla-proforma">
+            <thead>
+                <tr>
+                    <th scope="row" colspan="9"><h2>Lista de Despacho</h2></th>
+                </tr>
+                <tr>
+                    <th style="width: 150px;">Sucursal</th>
+                    <th style="width: 130px;">Categoría</th>
+                    <th style="width: 150px;">Código</th>
+                    <th style="width: 250px;">Descripción</th>
+                    <th style="width: 70px;">Existencias</th>
+                    <th style="width: 70px;">Despacho</th>
+                    <th style="width: 70px;">Saldo</th>
+                    <th style="width: 120px;">Motivo de salida</th>
+                    <th style="width: 100%;" id="remover-tabla-despacho-dos" class="eliminarTablaFila">
+                        <div class="tooltip">
+                            <span style="font-size:18px;" class="material-symbols-outlined">delete</span>
+                            <span class="tooltiptext">Descartar</span>
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th scope="row" colspan="4">Total unidades despachadas</th>
+                    <th scope="row" colspan="5">
+                        <label style="margin: 0 5px;" class="label-checkbox">Imprimir lista de despacho
+                            <input type="checkbox" id="check_comprobante">
+                        </label>
+                    </th>
+                </tr>
+                <tr>
+                    <th scope="row" colspan="9">
+                        <button id="procesar-despacho-plus" class="myButtonProcesar">Procesar</button>
+                    </th>
+                </tr>
+            </tfoot>
+        </table>
     </div>
 </div>
 <script src="../static/perdidas.js"></script>

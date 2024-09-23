@@ -28,6 +28,7 @@ def getAllCategoriasConteo():
                         "WHERE `identificador` = %s "
                         "AND categoria_nombre LIKE %s "
                         "AND unidad_medida LIKE %s "
+                        "AND categorias.estado > 0 "
                         "AND cantidad_item LIKE %s")
             data_params = (usuarioLlave, f"{categoria_categorias}%", f"{unidad_categorias}%", f"{cantidad_categorias}%")
             cur.execute(query, data_params)
@@ -53,6 +54,7 @@ def getAllCategorias(numero):
                         "WHERE identificador = %s "
                         "AND categoria_nombre LIKE %s "
                         "AND unidad_medida LIKE %s "
+                        "AND categorias.estado > 0 "
                         "AND cantidad_item LIKE %s "
                         "ORDER BY id ASC "
                         "LIMIT 10 OFFSET %s")
@@ -95,7 +97,8 @@ def getAllCategoriasLlenar():
         with mysql.connection.cursor() as cur:
             query = ("SELECT id, categoria_nombre, unidad_medida, cantidad_item, uno, dos, tres, cuatro, cinco, seis, siete, ocho, nueve, diez, once, doce "
                      "FROM categorias "
-                     "WHERE `identificador` = %s")
+                     "WHERE `identificador` = %s "
+                     "AND categorias.estado > 0 ")
             cur.execute(query, (usuarioLlave,))
             data = cur.fetchall()
 
@@ -136,15 +139,16 @@ def saveCategorias():
 
 def createCategorias():
     try:
+        dato_uno = 1
         usuarioLlave = session.get('usernameDos')
         with mysql.connection.cursor() as cur:
             query = ("INSERT INTO `categorias` "
                      "(`id`, `categoria_nombre`, `unidad_medida`, `cantidad_item`, `uno`, `dos`, `tres`, `cuatro`, `cinco`, `seis`, `siete`, `ocho`, "
-                     "`nueve`, `diez`, `once`, `doce`, `identificador`) "
-                     "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+                     "`nueve`, `diez`, `once`, `doce`, `identificador`, `estado`) "
+                     "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
             data = (request.json['categoria_nombre'], request.json['unidad_medida'], request.json['cantidad_item'], request.json['uno'], request.json['dos'], 
                     request.json['tres'], request.json['cuatro'], request.json['cinco'], request.json['seis'], request.json['siete'], request.json['ocho'], 
-                    request.json['nueve'], request.json['diez'], request.json['once'], request.json['doce'], usuarioLlave)
+                    request.json['nueve'], request.json['diez'], request.json['once'], request.json['doce'], usuarioLlave, dato_uno)
             cur.execute(query, data)
             mysql.connection.commit()
         return jsonify({"status": "success", "message": "Categoría creada correctamente."})

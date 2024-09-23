@@ -45,6 +45,7 @@ def getAllVentasConteo():
                         "AND comprobante LIKE %s "
                         "AND tipo_comprobante LIKE %s "
                         "AND nombre_cli LIKE %s "
+                        "AND ventas.estado > 0 "
                         "AND fecha_det_ventas >= %s AND fecha_det_ventas < %s ")
             data_params = (usuarioLlave, f"{sucursal_det_venta}%", f"{comprobante_det_venta}%", f"{tipComp_det_venta}%", f"{cliente_det_venta}%", 
                         fecha_inicio_det_venta, fecha_fin_det_venta + timedelta(days=1))
@@ -82,6 +83,7 @@ def getAllVentas(numero):
                         "AND comprobante LIKE %s "
                         "AND tipo_comprobante LIKE %s "
                         "AND nombre_cli LIKE %s "
+                        "AND ventas.estado > 0 "
                         "AND fecha_det_ventas >= %s AND fecha_det_ventas < %s "
                         "ORDER BY id_det_ventas ASC "
                         "LIMIT 20 OFFSET %s")
@@ -131,6 +133,7 @@ def getClientesReporte():
                         "FROM ventas "
                         "JOIN clientes ON `ventas`.`dni_cliente` = `clientes`.`id_cli` "
                         "WHERE `identificador_ventas` = %s "
+                        "AND ventas.estado > 0 "
                         "GROUP BY nombre_cli ASC")
             data_params = (usuarioLlave,)
             cur.execute(query, data_params)
@@ -174,6 +177,7 @@ def getAllVentasReporte():
                         "FROM ventas "
                         "JOIN sucursales ON `ventas`.`sucursal` = `sucursales`.`id_sucursales` "
                         "WHERE identificador_ventas = %s "
+                        "AND ventas.estado > 0 "
                         "AND fecha_det_ventas >= %s AND fecha_det_ventas < %s "
                         "GROUP BY sucursal_nombre")
             data_params = (usuarioLlave, fecha_inicio_det_venta, fecha_fin_det_venta + timedelta(days=1))
@@ -214,6 +218,7 @@ def getAllVentasGrafico():
                      "SUM(CASE WHEN modo_perdida > 0 THEN (+1) ELSE 0 END) AS suma_conteo_perdida "
                      "FROM ventas "
                      "WHERE `identificador_ventas` = %s "
+                     "AND ventas.estado > 0 "
                      "AND YEAR(fecha_det_ventas) = %s "
                      "GROUP BY mes, sucursal")
             cur.execute(query, (usuarioLlave, year_actual))
@@ -254,6 +259,7 @@ def getAllVentasFrecuencia():
                         "FROM ventas "
                         "WHERE `identificador_ventas` = %s "
                         "AND sucursal LIKE %s "
+                        "AND ventas.estado > 0 "
                         "AND YEAR(fecha_det_ventas) = %s "
                         "GROUP BY mes, sucursal "
                         "ORDER BY mes ASC")
@@ -289,6 +295,7 @@ def getAllVentasConteoMontos():
                         "FROM ventas "
                         "WHERE `identificador_ventas` = %s "
                         "AND sucursal = %s "
+                        "AND ventas.estado > 0 "
                         "AND YEAR(fecha_det_ventas) = %s "
                         "ORDER BY mes ASC")
             data_params = (usuarioLlave, f"{sucursal_det_venta}", year_actual)
@@ -317,6 +324,7 @@ def getVentasComprobante(comprobante):
             query = ("SELECT id_det_ventas, modo_efectivo, modo_credito, modo_tarjeta, modo_perdida, total_venta "
                      "FROM ventas "
                      "WHERE `identificador_ventas` = %s "
+                     "AND ventas.estado > 0 "
                      "AND comprobante LIKE %s")
             cur.execute(query, (usuarioLlave, comprobante))
             data = cur.fetchall()
@@ -347,6 +355,7 @@ def getVentasCliente(dni_cliente):
                      "SUM(total_venta) AS suma_total "
                      "FROM ventas "
                      "WHERE `identificador_ventas` = %s "
+                     "AND ventas.estado > 0 "
                      "AND dni_cliente LIKE %s")
             cur.execute(query, (usuarioLlave, dni_cliente))
             data = cur.fetchall()
@@ -374,14 +383,15 @@ def saveVentas():
 
 def createVentas():
     try:
+        dato_uno = 1
         usuarioLlave = session.get('usernameDos')
         with mysql.connection.cursor() as cur:
             query = ("INSERT INTO `ventas` (`id_det_ventas`, `sucursal`, `comprobante`, `tipo_comprobante`, `dni_cliente`, `modo_efectivo`, `modo_credito`, "
-                     "`modo_tarjeta`, `modo_perdida`, `total_venta`, `fecha_det_ventas`, `identificador_ventas`, `canal_venta`) "
-                     "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+                     "`modo_tarjeta`, `modo_perdida`, `total_venta`, `fecha_det_ventas`, `identificador_ventas`, `canal_venta`, `estado`) "
+                     "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
             data = (request.json['sucursal'],request.json['comprobante'], request.json['tipo_comprobante'], request.json['dni_cliente'], request.json['modo_efectivo'], 
                     request.json['modo_credito'], request.json['modo_tarjeta'], request.json['modo_perdida'], request.json['total_venta'], request.json['fecha_det_ventas'], 
-                    usuarioLlave, request.json['canal_venta'])
+                    usuarioLlave, request.json['canal_venta'], dato_uno)
             cur.execute(query, data)
             mysql.connection.commit()
         return jsonify({"status": "success", "message": "Detalle de venta creado correctamente."})

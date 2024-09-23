@@ -14,9 +14,10 @@ async function inicioCompras(){
 const formularioComprasUno = document.getElementById("formulario-compras-uno");
 const tablaProformaCompras = document.getElementById("tabla_principal");
 let comprasNumerador = 0;
-let indice_sucursal_compras = 0;
+let indice_sucursal_recompras = 0;
 let proveedores_llave;
 const barras_compras = [".cg_1_c", ".cg_2_c", ".cg_3_c", ".cg_4_c", ".cg_5_c"]
+let datos_usuario = JSON.parse(localStorage.getItem("datos_usuario"))
 /////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
 function cargarDatosAnio(){
@@ -185,11 +186,12 @@ function crearHeadCompra(){
     nuevaFilaTablaCompras.innerHTML = fila;
 };
 
+
 function crearBodyCompras (tallaAComprar, loteAComprar){
     let tablaCompras= document.querySelector("#tabla_modal > tbody");
     let nuevaFilaTablaCompras = tablaCompras.insertRow(-1);
     let fila = `<tr>`+
-                    `<td>${document.getElementById("fffff-sucursal").children[document.getElementById("fffff-sucursal").selectedIndex].textContent}</td>`+// Columna 0 > sucursal
+                    `<td>${suc_add[obtenerIndiceSucursal()]}</td>`+// Columna 0 > sucursal
                     `<td>${document.getElementById("categoria-compras").children[document.getElementById("categoria-compras").selectedIndex].textContent}</td>`+// Columna 1 > categoría
                     `<td class="codigo_compras_modal input-tablas fondo" style="background: rgb(105, 211, 35)">${document.getElementById("codigo-compras").value}-${tallaAComprar}-${loteAComprar}</td>`+// Columna 2 > codigo
                     `<td><input class="input-tablas-texto-largo" value="${document.getElementById("descripcion-compras").value}" placeholder="Rellene esta casilla"></td>`+// Columna 3 > descripción
@@ -203,27 +205,17 @@ function crearBodyCompras (tallaAComprar, loteAComprar){
                     `<td class="invisible">${document.getElementById("proveedor-compras").value}</td>`+// Columna 11 > id proveedor***
                     `<td class="invisible">${document.getElementById("fffff-sucursal").value}</td>`+// Columna 12 > id sucursal***
                     `<td class="invisible">${document.getElementById("categoria-compras").value}</td>`+// Columna 13 > id categoria***
-                    `<td class="invisible">${document.getElementById("fffff-sucursal").selectedIndex}</td>`+// Columna 14 > índice sucursal***
+                    `<td class="invisible">${obtenerIndiceSucursal()}</td>`+// Columna 14 > índice sucursal***
                     `<td style="text-align: center">
                         <div class="tooltip">
-                            <span style="font-size:18px;" class="material-symbols-outlined eliminarTablaFila eliminar_fila">delete</span>
+                            <span style="font-size:18px;" class="material-symbols-outlined eliminarTablaFila" onCLick = "clicKEliminarFila(this)">delete</span>
                             <span class="tooltiptext">Eliminar producto</span>
                         </div>
                     </td>`+// Columna 15 > botón eliminar fila
                 `</tr>`
     nuevaFilaTablaCompras.innerHTML = fila;
     codigoComprobacionCompra = `${document.getElementById("codigo-compras").value}-${tallaAComprar}-${loteAComprar}`;
-    eliminarFilasTabla(".eliminar_fila")
 };
-
-function eliminarFilasTabla(clasesAll){
-    document.querySelectorAll(clasesAll).forEach((event)=>{
-        event.addEventListener("click", ()=>{
-            event.parentNode.parentNode.parentNode.remove()
-        })
-    });
-};
-let arrayCreacionCategoriaTallasCompras = [];
 
 function agregarAtablaModal(e){
     e.preventDefault();
@@ -234,11 +226,11 @@ function agregarAtablaModal(e){
     expregul.precios.test(document.getElementById("costo-compras").value) &&
     expregul.precios.test(document.getElementById("precio-compras").value)){
         document.querySelector(".contenedor-pre-recompra").classList.add("modal-show")
-        categoriaProductosCreacion(document.getElementById("categoria-compras").value, arrayCreacionCategoriaTallasCompras);
+        let arrayCreacionCategoriaTallas =categoriaProductosCreacion(document.getElementById("categoria-compras"));
         compararCodigosNuevos(".codigo_compras_proforma", codigoComprobacionCompra);
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
         crearHeadCompra()
-        arrayCreacionCategoriaTallasCompras.forEach((event) =>{
+        arrayCreacionCategoriaTallas.forEach((event) =>{
             crearBodyCompras(event, document.getElementById("lote-compras").value)
         });
         document.getElementById("categoria-compras").style.background = ""
@@ -253,7 +245,7 @@ function agregarAtablaModal(e){
         operarCantidadAComprar();
         marcarCodigoRepetido(".codigo_compras_modal", ".codigo_compras_proforma", 
                             document.querySelector("#tabla_principal > thead > tr:nth-child(1) > th > h2").textContent)
-        arrayCreacionCategoriaTallasCompras = [];
+        arrayCreacionCategoriaTallas = [];
         document.querySelector("#tabla_modal > tbody > tr:nth-child(1) > td:nth-child(6) > input").focus()
 
     }else if(expregul.codigo.test(document.getElementById("codigo-compras").value) == false){
@@ -287,59 +279,58 @@ function operarCantidadAComprar(){
 function filaBodyProformaPincipalCompras(){
     const fila_modal = document.querySelectorAll(".codigo_compras_modal");
     fila_modal.forEach((event)=>{
+        let row_ = event.closest("tr");
+        row_.children[3].children[0].style.background = ""
+        row_.children[5].children[0].style.background = ""
+        row_.children[6].children[0].style.background = ""
+        row_.children[8].children[0].style.background = ""
 
-        event.parentNode.children[3].children[0].style.background = ""
-        event.parentNode.children[5].children[0].style.background = ""
-        event.parentNode.children[6].children[0].style.background = ""
-        event.parentNode.children[8].children[0].style.background = ""
-
-        if(event.parentNode.children[3].children[0].value !== "" &&
-        Number(event.parentNode.children[5].children[0].value) > 0 &&
-        event.parentNode.children[5].children[0].value !== "" &&
-        Number(event.parentNode.children[6].children[0].value) >= 0 &&
-        event.parentNode.children[6].children[0].value !== "" &&
-        Number(event.parentNode.children[8].children[0].value) >= Number(event.parentNode.children[6].children[0].value) &&
-        event.parentNode.children[8].children[0].value !== ""){
+        if(row_.children[3].children[0].value !== "" &&
+        Number(row_.children[5].children[0].value) > 0 &&
+        row_.children[5].children[0].value !== "" &&
+        Number(row_.children[6].children[0].value) >= 0 &&
+        row_.children[6].children[0].value !== "" &&
+        Number(row_.children[8].children[0].value) >= Number(row_.children[6].children[0].value) &&
+        row_.children[8].children[0].value !== ""){
             let fila_principal = document.querySelector("#tabla_principal > tbody");
             let nueva_fila_principal = fila_principal.insertRow(-1);
             let fila = `<tr>`+
-                            `<td>${event.parentNode.children[0].textContent}</td>`+// Columna 0 > sucursal
-                            `<td>${event.parentNode.children[1].textContent}</td>`+// Columna 1 > categoría
+                            `<td>${row_.children[0].textContent}</td>`+// Columna 0 > sucursal
+                            `<td>${row_.children[1].textContent}</td>`+// Columna 1 > categoría
                             `<td class="codigo_compras_proforma">${event.textContent}</td>`+// Columna 2 > código
-                            `<td>${event.parentNode.children[3].children[0].value}</td>`+// Columna 3 > descripción
-                            `<td>${event.parentNode.children[4].textContent}</td>`+// Columna 4 > talla
-                            `<td style="text-align: right">${event.parentNode.children[5].children[0].value}</td>`+// Columna 5 > cantidad
-                            `<td style="text-align: right">${event.parentNode.children[6].children[0].value}</td>`+// Columna 6 > costo de compra
-                            `<td style="text-align: right">${event.parentNode.children[7].textContent}</td>`+// Columna 7 > Costo Total
-                            `<td style="text-align: right">${event.parentNode.children[8].children[0].value}</td>`+// Columna 8 > precio de venta
-                            `<td style="text-align: right">${event.parentNode.children[9].textContent}</td>`+// Columna 9 > lote
-                            `<td style="text-align: right">${event.parentNode.children[10].textContent}</td>`+// Columna 10 > proveedor
-                            `<td class="invisible">${event.parentNode.children[11].textContent}</td>`+// Columna 11 > id proveedor
-                            `<td class="invisible">${event.parentNode.children[12].textContent}</td>`+// Columna 12 > id sucursal
-                            `<td class="invisible">${event.parentNode.children[13].textContent}</td>`+// Columna 13 > id categoría
-                            `<td class="invisible">${event.parentNode.children[14].textContent}</td>`+// Columna 14 > índice sucursal***
+                            `<td>${row_.children[3].children[0].value}</td>`+// Columna 3 > descripción
+                            `<td>${row_.children[4].textContent}</td>`+// Columna 4 > talla
+                            `<td style="text-align: right">${row_.children[5].children[0].value}</td>`+// Columna 5 > cantidad
+                            `<td style="text-align: right">${row_.children[6].children[0].value}</td>`+// Columna 6 > costo de compra
+                            `<td style="text-align: right">${row_.children[7].textContent}</td>`+// Columna 7 > Costo Total
+                            `<td style="text-align: right">${row_.children[8].children[0].value}</td>`+// Columna 8 > precio de venta
+                            `<td style="text-align: right">${row_.children[9].textContent}</td>`+// Columna 9 > lote
+                            `<td style="text-align: right">${row_.children[10].textContent}</td>`+// Columna 10 > proveedor
+                            `<td class="invisible">${row_.children[11].textContent}</td>`+// Columna 11 > id proveedor
+                            `<td class="invisible">${row_.children[12].textContent}</td>`+// Columna 12 > id sucursal
+                            `<td class="invisible">${row_.children[13].textContent}</td>`+// Columna 13 > id categoría
+                            `<td class="invisible">${row_.children[14].textContent}</td>`+// Columna 14 > índice sucursal***
                             `<td style="text-align: center">
                                 <div class="tooltip">
-                                    <span style="font-size:18px;" class="material-symbols-outlined eliminarTablaFila eliminar_fila">delete</span>
+                                    <span style="font-size:18px;" class="material-symbols-outlined eliminarTablaFila" onCLick = "clicKEliminarFila(this)">delete</span>
                                     <span class="tooltiptext">Eliminar producto</span>
                                 </div>
                             </td>`+// Columna 15 > botón eliminar fila
                         `</tr>`
             nueva_fila_principal.innerHTML = fila;
-        }else if(event.parentNode.children[3].children[0].value === ""){
-            event.parentNode.children[3].children[0].style.background = "#b36659"
-        }else if(Number(event.parentNode.children[5].children[0].value) <= 0 ||
-        event.parentNode.children[5].children[0].value === ""){
-            event.parentNode.children[5].children[0].style.background = "#b36659"
-        }else if(Number(event.parentNode.children[6].children[0].value) < 0 ||
-        event.parentNode.children[6].children[0].value === ""){
-            event.parentNode.children[6].children[0].style.background = "#b36659"
-        }else if(Number(event.parentNode.children[8].children[0].value) < Number(event.parentNode.children[6].children[0].value) ||
-        event.parentNode.children[8].children[0].value === ""){
-            event.parentNode.children[8].children[0].style.background = "#b36659"
+        }else if(row_.children[3].children[0].value === ""){
+            row_.children[3].children[0].style.background = "#b36659"
+        }else if(Number(row_.children[5].children[0].value) <= 0 ||
+        row_.children[5].children[0].value === ""){
+            row_.children[5].children[0].style.background = "#b36659"
+        }else if(Number(row_.children[6].children[0].value) < 0 ||
+        row_.children[6].children[0].value === ""){
+            row_.children[6].children[0].style.background = "#b36659"
+        }else if(Number(row_.children[8].children[0].value) < Number(row_.children[6].children[0].value) ||
+        row_.children[8].children[0].value === ""){
+            row_.children[8].children[0].style.background = "#b36659"
         };
     });
-    eliminarFilasTabla(".eliminar_fila")
 };
 const mandarATablaComprasPrincipal = document.getElementById("procesar-pre-compra");
 mandarATablaComprasPrincipal.addEventListener("click", mandarATablaPrincipalCompras)
@@ -387,18 +378,12 @@ async function procesamientoCompras(e){
     try{
         if(document.querySelector("#tabla_principal > tbody").children.length > 0){
             modal_proceso_abrir("Procesando la compra!!!.", "")
-            let obteniendo_numeracion = await cargarNumeracionComprobante();
-            if(obteniendo_numeracion.status === 200){
-                await funcionGeneralCompras();
-                if(document.querySelector("#check_comprobante").checked){
-                    imprimirListaTabla()//Lista de compras
-                };
-                document.querySelector("#tabla_principal > tbody").remove();
-                document.querySelector("#tabla_principal").createTBody();
-            }else{
-                modal_proceso_abrir("La conexión con el servidor no es buena.", "")
-                modal_proceso_salir_botones()
+            await funcionGeneralCompras();
+            if(document.querySelector("#check_comprobante").checked){
+                imprimirListaTabla()//Lista de compras
             };
+            document.querySelector("#tabla_principal > tbody").remove();
+            document.querySelector("#tabla_principal").createTBody();
         };
     }catch(error){
         modal_proceso_abrir("Ocurrió un error. " + error, "")
@@ -410,8 +395,6 @@ async function funcionGeneralCompras(){
     let array_productos = [];
     let array_entradas = [];
     function DatosProductos(a){
-        let array = [0,0,0,0]
-
         this.categoria = a.children[13].textContent;
         this.codigo = a.children[2].textContent;
         this.costo_unitario = a.children[6].textContent;
@@ -421,21 +404,15 @@ async function funcionGeneralCompras(){
         this.proveedor = a.children[11].textContent;
         this.talla = a.children[4].textContent;
 
-        for(let i = 0; i < array.length; i++){//agregamos la cantidad a comprar de acuerdo al índice de la sucursal
-            (a.children[14].textContent == i) ? array[i] = a.children[5].textContent : "";
+        for(let i = 0; i < sucursales_activas.length; i++){//agregamos la cantidad a comprar de acuerdo al índice de la sucursal
+            this[sucursales_activas[i]] = Number(a.children[14].textContent) === i ? Number(a.children[5].textContent) : 0;
         };
-        this.existencias_ac = array[0];
-        this.existencias_su = array[1];
-        this.existencias_sd = array[2];
-        this.existencias_st = array[3];
-    }
+    };
     function DatosEntradas(a){
         this.codigo = a.children[2].textContent;
         this.sucursal = a.children[12].textContent;
-        this.comprobante = "Compra-" + (Number(numeracion[0].compras) + 1);
         this.existencias_entradas = a.children[5].textContent;
-        this.fecha = generarFecha();
-    }
+    };
     let numFilas = document.querySelector("#tabla_principal > tbody").children;
     for(let i = 0 ; i < numFilas.length; i++ ){
         if(numFilas[i]){
@@ -443,29 +420,20 @@ async function funcionGeneralCompras(){
             array_entradas.push(new DatosEntradas(numFilas[i]))
         };
     };
-
     function DatosCompras(){
-        this.id = numeracion[0].id;
-        this.compras = Number(numeracion[0].compras) + 1;
-
-        this.sucursal_gastos = document.getElementById("fffff-sucursal")[0].value;
-        this.concepto = "1_mercancía";
-        this.comprobante = "Compra-" + (Number(numeracion[0].compras) + 1);
-        this.fecha_gastos = generarFecha();
-        this.monto = 0;
-        this.caja_bancos = 0;
-        this.credito_gastos = Number(document.getElementById("total-importe-tabla-compras").textContent);
-        
+        this.id_num = datos_usuario[0].id;//Para la numeración
+        this.fecha = generarFecha();
         this.array_productos = array_productos;
         this.array_entradas = array_entradas;
     };
 
     let url_compra = URL_API_almacen_central + 'gestion_de_compras'
     let objeto_compra = new DatosCompras();
-    let response = await funcionFetch(url_compra, objeto_compra);
-    if(response.status === 200){
+    let response = await funcionFetchDos(url_compra, objeto_compra);
+
+    if(response.status === "success"){
         localStorage.setItem("base_datos_consulta", JSON.stringify(await cargarDatos('almacen_central_ccd')))
-        modal_proceso_abrir('Operación completada exitosamente.', "")
+        modal_proceso_abrir(`Operación "${response.message}" completada exitosamente.`)
         modal_proceso_salir_botones()
     };
 };
@@ -474,7 +442,7 @@ async function funcionGeneralCompras(){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function cambioSucursalCompras(id){
     document.getElementById(id).addEventListener("change", ()=>{
-        indice_sucursal_compras = document.getElementById("fffff-sucursal").selectedIndex;
+        indice_sucursal_recompras = obtenerIndiceSucursal();
         document.getElementById("buscador-productos-compras").focus();
     });
 };
@@ -553,8 +521,6 @@ function mostrarFormrecompraProductoPlus(){
     document.querySelector("#tabla_principal > tbody").remove()
     document.querySelector("#tabla_principal").createTBody()
 
-    /* document.getElementById("grafico_circular_compras_recompras").classList.add("invisible") */
-
     comprasNumerador = 1;
     const mandarATablaRecomprasPlus = document.getElementById("agregarATablaComprasPlus");
     mandarATablaRecomprasPlus.addEventListener("click", agregarATablaPreRecompras)
@@ -572,7 +538,7 @@ document.addEventListener("keyup", () =>{
     }else{
         let almacenCentral = indice_base.find(y => y.codigo.toLowerCase().startsWith(document.getElementById('buscador-productos-compras').value.toLowerCase()))
         if(almacenCentral){
-            indice_sucursal_compras = document.getElementById("fffff-sucursal").selectedIndex;
+            indice_sucursal_recompras = obtenerIndiceSucursal();
             document.getElementById('id-compras').value = almacenCentral.idProd
             document.getElementById('categoria-compras').value = almacenCentral.categoria
             document.getElementById('codigo-compras').value = almacenCentral.codigo
@@ -620,7 +586,7 @@ function crearBodyRecompras (codigoMovimientos, id_prod){
     let nuevaFilaTablaRecompras = tablaRecompras.insertRow(-1);
     let fila = `<tr>`+
                     `<td class="id_compras_modal invisible">${id_prod}</td>`+// Columna 0 > id
-                    `<td>${document.getElementById("fffff-sucursal").children[document.getElementById("fffff-sucursal").selectedIndex].textContent}</td>`+// Columna 1 > sucursal
+                    `<td>${suc_add[indice_sucursal_recompras]}</td>`+// Columna 1 > sucursal
                     `<td>${document.getElementById("categoria-compras").children[document.getElementById("categoria-compras").selectedIndex].textContent}</td>`+// Columna 2 > categoría
                     `<td class="codigo_compras_modal insertarMovimientos" style="border-radius: 5px">${codigoMovimientos}</td>`+// Columna 3 > código
                     `<td class="invisible"></td>`+// Columna 4 > descripción
@@ -634,16 +600,15 @@ function crearBodyRecompras (codigoMovimientos, id_prod){
                     `<td class="invisible"></td>`+// Columna 12 > proveedor
                     `<td style="text-align: right"></td>`+// Columna 13 > existencias + cantidad a comprar
                     `<td class="invisible">${document.getElementById("fffff-sucursal").value}</td>`+// Columna 14 > id sucursal
-                    `<td class="invisible">${indice_sucursal_compras}</td>`+// Columna 15 > índice sucursal sucursal
+                    `<td class="invisible">${indice_sucursal_recompras}</td>`+// Columna 15 > índice sucursal sucursal
                     `<td style="text-align: center">
                         <div class="tooltip">
-                            <span style="font-size:18px;" class="material-symbols-outlined eliminarTablaFila eliminar_fila">delete</span>
+                            <span style="font-size:18px;" class="material-symbols-outlined eliminarTablaFila"  onCLick = "clicKEliminarFila(this)">delete</span>
                             <span class="tooltiptext">Eliminar producto</span>
                         </div>
                     </td>`+// Columna 15 > botón eliminar fila
                 `</tr>`
     nuevaFilaTablaRecompras.innerHTML = fila;
-    eliminarFilasTabla(".eliminar_fila")
 };
 async function agregarATablaPreRecompras(e){
     e.preventDefault();
@@ -651,14 +616,14 @@ async function agregarATablaPreRecompras(e){
     let base = 0;
     if(document.getElementById("id-compras").value > 0){
         crearHeadRecompra()
-        categoriaProductosCreacion(document.getElementById("categoria-compras").value, arrayCreacionCategoriaTallasCompras);
+        let arrayCreacionCategoriaTallas =categoriaProductosCreacion(document.getElementById("categoria-compras"));
 
-        for(let i = 0; i < arrayCreacionCategoriaTallasCompras.length; i++){
+        for(let i = 0; i < arrayCreacionCategoriaTallas.length; i++){
             if(document.getElementById("id-compras").value > 0){
                 let codigoMovimientos = document.getElementById("codigo-compras").value
-                for(let j = 0; j < arrayCreacionCategoriaTallasCompras.length; j++){
-                    if(codigoMovimientos.includes("-" + arrayCreacionCategoriaTallasCompras[j])){
-                        codigoMovimientos = codigoMovimientos.replace("-" + arrayCreacionCategoriaTallasCompras[j], "-" + arrayCreacionCategoriaTallasCompras[i])
+                for(let j = 0; j < arrayCreacionCategoriaTallas.length; j++){
+                    if(codigoMovimientos.includes("-" + arrayCreacionCategoriaTallas[j])){
+                        codigoMovimientos = codigoMovimientos.replace("-" + arrayCreacionCategoriaTallas[j], "-" + arrayCreacionCategoriaTallas[i])
                     }
                 };
                 if(base_datos_busqueda.find(y => y.codigo == codigoMovimientos)){
@@ -673,50 +638,40 @@ async function agregarATablaPreRecompras(e){
             }
         });
         document.querySelector(".contenedor-pre-recompra").classList.add("modal-show")
-        await buscarPorCodidoMovimientosOrigen();
+        await buscarPorCodido();
         operarCantidadARecomprar();
         marcarIdRepetido(".id_compras_modal", ".id_compras_proforma", document.querySelector("#tabla_principal > thead > tr:nth-child(1) > th > h2").textContent)
-        arrayCreacionCategoriaTallasCompras = [];
+        arrayCreacionCategoriaTallas = [];
         document.querySelector("#tabla_modal > tbody > tr > td:nth-child(8) > input").focus();
     };
 };
 ////////////////CON ESTO SE LLENA LA TABLA PREMODIFICACION Y SE FILTRA LAS FILAS CON ID///////////////////////////////////
-async function buscarPorCodidoMovimientosOrigen(){
-    const id_comparacion = document.querySelectorAll(".id_compras_modal");
-    for(id_c of id_comparacion){
-        try{
-            let url = URL_API_almacen_central + `almacen_central_id_sucursal/${id_c.textContent}?`+//buscar por id
-                                            `sucursal_get=${sucursales_activas[indice_sucursal_compras]}`
-            let response = await fetch(url,{
-                "method": "GET",
-                "headers": {
-                    "Content-Type": 'application/json'
-                }
-            });
-            if(response.ok){
-                let proveedor_busqueda = JSON.parse(localStorage.getItem("base_datos_prov"))
-                const dato_id_unitario = await response.json();
-                if(dato_id_unitario.codigo){
-                    id_c.parentNode.children[4].textContent = dato_id_unitario.descripcion
-                    id_c.parentNode.children[5].textContent = dato_id_unitario.talla
-                    id_c.parentNode.children[6].textContent = dato_id_unitario.sucursal_get
-                    id_c.parentNode.children[8].textContent = dato_id_unitario.costo_unitario.toFixed(2)
-                    id_c.parentNode.children[10].textContent = dato_id_unitario.precio_venta.toFixed(2)
-                    id_c.parentNode.children[11].textContent = dato_id_unitario.lote
-                    id_c.parentNode.children[12].textContent = proveedor_busqueda.find(y => y.id_cli == dato_id_unitario.proveedor).nombre_cli//buscamos nombre de proveedor
-                    if(id_c.parentNode.children[0].textContent == document.getElementById("id-compras").value){
-                        id_c.style.background = "var(--boton-tres)"
-                        id_c.style.color = "var(--color-secundario)"
-                    };
-                };
-                if(id_c.parentNode.children[0].textContent  < 1){//OCULTAMOS LAS FILAS QUE NO MUESTRAN ID O NO EXISTEN EL LA TABLA PRODUCTOS
-                    id_c.parentNode.remove()
-                };
-            }else {
-                console.error("Error en la solicitud a la API");
+async function buscarPorCodido(){
+    const id_rec = document.querySelectorAll(".id_compras_modal");
+    let ids = Array.from(id_rec).map(element => element.textContent);
+    let response = await cargarDatos(   `almacen_central_id_sucursal?`+
+                                        `ids=${ids.join(",")}&`+
+                                        `sucursal_get=${sucursales_activas[indice_sucursal_recompras]}`);
+
+    for(id_c of id_rec){
+        let row_ = id_c.closest("tr");
+        let proveedor_busqueda = JSON.parse(localStorage.getItem("base_datos_prov"))
+        let fila_res = response.find(x=> x.idProd === Number(row_.children[0].textContent))
+        if(fila_res){
+            row_.children[4].textContent = fila_res.descripcion
+            row_.children[5].textContent = fila_res.talla
+            row_.children[6].textContent = fila_res.sucursal_get
+            row_.children[8].textContent = fila_res.costo_unitario.toFixed(2)
+            row_.children[10].textContent = fila_res.precio_venta.toFixed(2)
+            row_.children[11].textContent = fila_res.lote
+            row_.children[12].textContent = proveedor_busqueda.find(y => y.id_cli == fila_res.proveedor).nombre_cli//buscamos nombre de proveedor
+            if(row_.children[0].textContent == document.getElementById("id-compras").value){
+                id_c.style.background = "var(--boton-tres)"
+                id_c.style.color = "var(--color-secundario)"
             };
-        }catch (error) {
-            console.error("Error en la solicitud a la API:", error);
+        };
+        if(row_.children[0].textContent  < 1){//OCULTAMOS LAS FILAS QUE NO MUESTRAN ID O NO EXISTEN EL LA TABLA PRODUCTOS
+            row_.remove()
         };
     };
 };
@@ -737,43 +692,42 @@ function operarCantidadARecomprar(){
 function filaBodyProformaPincipal(){
     const fila_modal = document.querySelectorAll(".codigo_compras_modal");
     fila_modal.forEach((event)=>{
+        let row_ = event.closest("tr");
+        row_.children[7].children[0].style.background = ""
 
-        event.parentNode.children[7].children[0].style.background = ""
-
-        if(Number(event.parentNode.children[7].children[0].value) > 0 &&
-        event.parentNode.children[7].children[0].value !== "" ){
+        if(Number(row_.children[7].children[0].value) > 0 &&
+        row_.children[7].children[0].value !== "" ){
             let fila_principal = document.querySelector("#tabla_principal > tbody");
             let nueva_fila_principal = fila_principal.insertRow(-1);
             let fila = `<tr>`+
-                            `<td class="id_compras_proforma invisible">${event.parentNode.children[0].textContent}</td>`+// Columna 0 > id
-                            `<td>${event.parentNode.children[1].textContent}</td>`+// Columna 1 > sucursal
-                            `<td>${event.parentNode.children[2].textContent}</td>`+// Columna 2 > categoría
+                            `<td class="id_compras_proforma invisible">${row_.children[0].textContent}</td>`+// Columna 0 > id
+                            `<td>${row_.children[1].textContent}</td>`+// Columna 1 > sucursal
+                            `<td>${row_.children[2].textContent}</td>`+// Columna 2 > categoría
                             `<td class="codigo_compras_proforma">${event.textContent}</td>`+// Columna 3 > código
-                            `<td>${event.parentNode.children[4].textContent}</td>`+// Columna 4 > descripción
-                            `<td>${event.parentNode.children[5].textContent}</td>`+// Columna 5 > talla
-                            `<td style="text-align: right">${event.parentNode.children[7].children[0].value}</td>`+// Columna 6 > cantidad a comprar
-                            `<td style="text-align: right">${event.parentNode.children[8].textContent}</td>`+// Columna 7 > Costo unitario
-                            `<td style="text-align: right">${event.parentNode.children[9].textContent}</td>`+// Columna 8 > Costo Total
-                            `<td style="text-align: right">${event.parentNode.children[10].textContent}</td>`+// Columna 9 > precio de venta
-                            `<td style="text-align: right">${event.parentNode.children[11].textContent}</td>`+// Columna 10 > lote
-                            `<td style="text-align: right">${event.parentNode.children[12].textContent}</td>`+// Columna 11 > proveedor
-                            `<td class="invisible">${event.parentNode.children[13].textContent}</td>`+// Columna 12 > esistencias + cantidad a comprar
-                            `<td class="invisible">${event.parentNode.children[14].textContent}</td>`+// Columna 13 > id sucursal
-                            `<td class="invisible">${event.parentNode.children[15].textContent}</td>`+// Columna 14 > índice sucursal sucursal
+                            `<td>${row_.children[4].textContent}</td>`+// Columna 4 > descripción
+                            `<td>${row_.children[5].textContent}</td>`+// Columna 5 > talla
+                            `<td style="text-align: right">${row_.children[7].children[0].value}</td>`+// Columna 6 > cantidad a comprar
+                            `<td style="text-align: right">${row_.children[8].textContent}</td>`+// Columna 7 > Costo unitario
+                            `<td style="text-align: right">${row_.children[9].textContent}</td>`+// Columna 8 > Costo Total
+                            `<td style="text-align: right">${row_.children[10].textContent}</td>`+// Columna 9 > precio de venta
+                            `<td style="text-align: right">${row_.children[11].textContent}</td>`+// Columna 10 > lote
+                            `<td style="text-align: right">${row_.children[12].textContent}</td>`+// Columna 11 > proveedor
+                            `<td class="invisible">${row_.children[13].textContent}</td>`+// Columna 12 > esistencias + cantidad a comprar
+                            `<td class="invisible">${row_.children[14].textContent}</td>`+// Columna 13 > id sucursal
+                            `<td class="invisible">${row_.children[15].textContent}</td>`+// Columna 14 > índice sucursal sucursal
                             `<td style="text-align: center">
                                 <div class="tooltip">
-                                    <span style="font-size:18px;" class="material-symbols-outlined eliminarTablaFila eliminar_fila">delete</span>
+                                    <span style="font-size:18px;" class="material-symbols-outlined eliminarTablaFila" onCLick = "clicKEliminarFila(this)">delete</span>
                                     <span class="tooltiptext">Eliminar producto</span>
                                 </div>
                             </td>`+// Columna 15 >
                         `</tr>`
             nueva_fila_principal.innerHTML = fila;
-        }else if(Number(event.parentNode.children[7].children[0].value) <= 0 ||
-        event.parentNode.children[7].children[0].value === ""){
-            event.parentNode.children[7].children[0].style.background = "#b36659"
+        }else if(Number(row_.children[7].children[0].value) <= 0 ||
+        row_.children[7].children[0].value === ""){
+            row_.children[7].children[0].style.background = "#b36659"
         };
     });
-    eliminarFilasTabla(".eliminar_fila")
 };
 const mandarATablaRecomprasPrincipal = document.getElementById("procesar-pre-recompra");
 mandarATablaRecomprasPrincipal.addEventListener("click", mandarATablaPrincipal)
@@ -814,18 +768,14 @@ async function procesamientoRecompras(e){
     try{
         if(document.querySelector("#tabla_principal > tbody").children.length > 0){
             modal_proceso_abrir("Procesando la recompra!!!.", "")
-            let obteniendo_numeracion = await cargarNumeracionComprobante();
-            if(obteniendo_numeracion.status === 200){
-                await funcionGeneralRecompras();
-                if(document.querySelector("#check_comprobante").checked){
-                    imprimirListaTabla()//Lista de compras
-                };
-                document.querySelector("#tabla_principal > tbody").remove();
-                document.querySelector("#tabla_principal").createTBody();
-            }else{
-                modal_proceso_abrir("La conexión con el servidor no es buena.", "")
-                modal_proceso_salir_botones()
+            
+            await funcionGeneralRecompras();
+            if(document.querySelector("#check_comprobante").checked){
+                imprimirListaTabla()//Lista de compras
             };
+            document.querySelector("#tabla_principal > tbody").remove();
+            document.querySelector("#tabla_principal").createTBody();
+            
         };
     }catch(error){
         modal_proceso_abrir("Ocurrió un error. " + error, "")
@@ -838,15 +788,13 @@ async function funcionGeneralRecompras(){
     let array_entradas_dos = [];
     function DatosProductosDos(a){
         this.idProd = a.children[0].textContent;
-        this.sucursal_post = sucursales_activas[a.children[14].textContent];
-        this.existencias_post = a.children[12].textContent;
+        this.sucursal_post = sucursales_activas[Number(a.children[14].textContent)];//Elegimos la columna de la sucursal a agregar
+        this.existencias_post = a.children[6].textContent;
     };
     function DatosEntradasDos(a){
         this.idProd = a.children[0].textContent;
-        this.comprobante = "Recompra-" + (Number(numeracion[0].recompras) + 1);
         this.existencias_entradas = a.children[6].textContent;
         this.sucursal = a.children[13].textContent;
-        this.fecha = generarFecha();
     };
     const numFilas = document.querySelector("#tabla_principal > tbody").children
     for(let i = 0 ; i < numFilas.length; i++ ){
@@ -856,26 +804,17 @@ async function funcionGeneralRecompras(){
         };
     };
     function DatosRecompra(){
-        this.id = numeracion[0].id;
-        this.recompras = Number(numeracion[0].recompras) + 1;
-
-        this.sucursal_gastos = document.getElementById("fffff-sucursal")[0].value;
-        this.concepto = "1_mercancía";
-        this.comprobante = "Recompra-" + (Number(numeracion[0].recompras) + 1);
-        this.fecha_gastos = generarFecha();
-        this.monto = 0;
-        this.caja_bancos = 0;
-        this.credito_gastos = Number(document.getElementById("total-importe-tabla-compras").textContent);
-
+        this.id_num = datos_usuario[0].id;
+        this.fecha = generarFecha();
         this.array_productos_dos = array_productos_dos;
         this.array_entradas_dos = array_entradas_dos;
     };
     let url_recompra = URL_API_almacen_central + 'gestion_de_recompras'
     let objeto_recompra = new DatosRecompra();
-    console.log(objeto_recompra)
-    let response = await funcionFetch(url_recompra, objeto_recompra);
-    if(response.status === 200){
-        modal_proceso_abrir('Operación completada exitosamente.', "")
+
+    let response = await funcionFetchDos(url_recompra, objeto_recompra);
+    if(response.status === "success"){
+        modal_proceso_abrir(`Operación "${response.message}" completada exitosamente.`)
         modal_proceso_salir_botones()
     };
 };
@@ -925,7 +864,7 @@ document.getElementById("boton_borrar_").addEventListener("click", ()=>{
 function agregarBusquedaDetalleUno(button){
     if(document.getElementById("recompra-producto-plus").classList.contains('marcaBoton')){
         let linea = button.closest("li");
-        indice_sucursal_compras = document.getElementById("fffff-sucursal").selectedIndex;
+        indice_sucursal_recompras = obtenerIndiceSucursal();
         document.getElementById('id-compras').value = linea.children[0].textContent;
         document.getElementById('categoria-compras').value = linea.children[1].textContent;
         document.getElementById('codigo-compras').value = linea.children[2].textContent;
@@ -940,7 +879,7 @@ function agregarBusquedaDetalleDos(button){
         let linea = button.closest("li");
         document.getElementById('id-compras').value = linea.children[0].textContent;
         document.getElementById("fffff-sucursal").value = linea.children[1].textContent;
-        indice_sucursal_compras = document.getElementById("fffff-sucursal").selectedIndex;
+        indice_sucursal_recompras = obtenerIndiceSucursal();
         document.getElementById('categoria-compras').value = linea.children[2].textContent;
         document.getElementById('codigo-compras').value = linea.children[3].textContent;
         document.getElementById('descripcion-compras').value = linea.children[4].textContent;
@@ -948,4 +887,8 @@ function agregarBusquedaDetalleDos(button){
         modal_proceso_abrir(`Esta acción solo procederá en "Recomprar Producto".`, ``)
         modal_proceso_salir_botones()
     };
+};
+function clicKEliminarFila(e) {
+    const fila = e.closest("tr");
+    fila.remove();
 };
