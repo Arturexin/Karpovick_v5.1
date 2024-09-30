@@ -7,9 +7,10 @@
         <button id="recompra-producto-plus" class="myButtonAgregarDos">Recomprar Producto</button>
     </div>
     <div class="contenedor_compras_principal">
-        <div class="contenedor_formulario_compras">
-            <form id="formulario-compras-uno">
-            </form>
+        <div>
+            <div class="contenedor_formulario_compras" id="form_contenedor"></div>
+            <div  class="boton-cli" id="button_contenedor"></div>
+
         </div>
         <div class="contenedor_busqueda_detalle_general">
             <div style="display: grid;">
@@ -71,17 +72,15 @@
         <table id="tabla_modal" class="tabla_modal contenido-tabla">
             <thead>
                 <tr>
-                    <th scope="row" colspan="18"><h2>Proforma</h2></th>
+                    <th scope="row" colspan="18">
+                        <h2>Pre lista</h2>
+                    </th>
                 </tr>
             </thead>
             <tbody>
             </tbody>
             <tfoot>
-                <th scope="row" colspan="18">
-                    <button id="procesar-pre-recompra" class="myButtonAgregar">Enviar Recompra</button>
-                    <button id="procesar-pre-compra" class="myButtonAgregar">Enviar Nueva Compra</button>
-                    <button id="remover-tabla-compras-uno" class="eliminarTablaFila">Cancelar</button>
-                </td>
+                <th scope="row" colspan="18" id="contenedor_botones_modal"></th>
             </tfoot>
         </table>
     </div>
@@ -89,16 +88,19 @@
         <table id="tabla_principal" class="tabla-proforma">
             <thead>
                 <tr>
-                    <th scope="row" colspan="12"><h2>Lista de Compras</h2></th>
+                    <th scope="row" colspan="16"><h2>Lista de Compras</h2></th>
                     
                 </tr>
                 <tr>
-                    <th>Sucursal</th>
                     <th>Categoria</th>
                     <th>Código</th>
                     <th>Descripción</th>
                     <th>Medidas</th>
-                    <th>Cantidad</th>
+                    <th>Q AC</th>
+                    <th>Q SU</th>
+                    <th>Q SD</th>
+                    <th>Q ST</th>
+                    <th>Q SC</th>
                     <th>Costo Unitario</th>
                     <th>Costo Total</th>
                     <th>Precio de Venta</th>
@@ -117,10 +119,14 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <th scope="row" colspan="5">Total</th>
-                    <th id="total-cantidad-tabla-compras"></th>
+                    <th scope="row" colspan="4">Total</th>
+                    <th class="t_e_1">0</th>
+                    <th class="t_e_2">0</th>
+                    <th class="t_e_3">0</th>
+                    <th class="t_e_4">0</th>
+                    <th class="t_e_5">0</th>
                     <th class="moneda_compras"></th>
-                    <th id="total-importe-tabla-compras"></th>
+                    <th class="t_i_0">0.00</th>
                     <th scope="row" colspan="4">
                         <label style="margin: 0 5px;" class="label-checkbox">Imprimir lista de compras 
                             <input type="checkbox" id="check_comprobante">
@@ -128,7 +134,7 @@
                     </th>
                 </tr>
                 <tr>
-                    <th scope="row" colspan="12">
+                    <th scope="row" colspan="16">
                         <button id="procesar-compras" class="myButtonProcesar">Procesar</button>
                         <button id="procesar-compras-plus" class="myButtonProcesar invisible">Procesar</button>
                     </th>
@@ -138,4 +144,5 @@
     </div>
 </div>
 <script src="../static/compras.js"></script>
+<script src="../static/form.js"></script>
 {% endblock %}

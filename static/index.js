@@ -124,8 +124,10 @@ async function cargarIndices(){
     };
 };
 let indice_base = [];
-let suc_enc = JSON.parse(localStorage.getItem("sucursal_encabezado"))
-let cat_con = JSON.parse(localStorage.getItem("categoria_consulta"))
+let suc_db = JSON.parse(localStorage.getItem("sucursal_encabezado"))
+let cat_db = JSON.parse(localStorage.getItem("categoria_consulta"))
+let prv_db = JSON.parse(localStorage.getItem("base_datos_prov"))
+
 let indice_cli = [];
 async function cargarDatos(ruta){
     let url = URL_API_almacen_central + ruta
@@ -209,9 +211,9 @@ async function funcionFetchDos(url, fila){
         throw error;  // Propaga el error si lo hay
     }
 };
-function obtenerIndiceSucursal(){
+function obtenerIndiceSucursal(select){
     let indice = ""
-    let nom_ = suc_enc.find(x => x.id_sucursales === Number(document.getElementById("fffff-sucursal").value))
+    let nom_ = suc_db.find(x => x.id_sucursales === Number(document.querySelector(select).value))
     suc_add.forEach((e, i)=>{
         if(e === nom_.sucursal_nombre){
             indice = i
@@ -222,19 +224,19 @@ function obtenerIndiceSucursal(){
 function cargarSucursalesEjecucion(elemento_id){// SE LLAMA AL CARGAR LA PAGINA INDEX
     
     let html_sucursal = ''
-    for(let i = 0; i < suc_enc.length; i++){
+    for(let i = 0; i < suc_db.length; i++){
         let fila = ""
         if(array_sucursales.length < 4){
-            array_sucursales.push(suc_enc[i].sucursal_nombre)
+            array_sucursales.push(suc_db[i].sucursal_nombre)
         }
         if(document.getElementById("puesto_usuario").textContent == 1){
-            fila = `<option value="${suc_enc[1].id_sucursales }">${suc_enc[1].sucursal_nombre}</option>`
+            fila = `<option value="${suc_db[1].id_sucursales }">${suc_db[1].sucursal_nombre}</option>`
         }else if(document.getElementById("puesto_usuario").textContent == 2){
-            fila = `<option value="${suc_enc[2].id_sucursales }">${suc_enc[2].sucursal_nombre}</option>`
+            fila = `<option value="${suc_db[2].id_sucursales }">${suc_db[2].sucursal_nombre}</option>`
         }else if(document.getElementById("puesto_usuario").textContent == 3){
-            fila = `<option value="${suc_enc[3].id_sucursales }">${suc_enc[3].sucursal_nombre}</option>`
+            fila = `<option value="${suc_db[3].id_sucursales }">${suc_db[3].sucursal_nombre}</option>`
         }else{
-            fila = `<option value="${suc_enc[i].id_sucursales }">${suc_enc[i].sucursal_nombre}</option>`
+            fila = `<option value="${suc_db[i].id_sucursales }">${suc_db[i].sucursal_nombre}</option>`
         }
         html_sucursal = html_sucursal + fila;
     }
@@ -243,7 +245,7 @@ function cargarSucursalesEjecucion(elemento_id){// SE LLAMA AL CARGAR LA PAGINA 
 function llenarCategoriaProductosEjecucion(cate){
     
     let html_cat = `<option value="0" selected>-- Categorías --</option>`;
-    for(categoria of cat_con) {
+    for(categoria of cat_db) {
         let fila = `<option value="${categoria.id}">${categoria.categoria_nombre}</option>`
         html_cat = html_cat + fila;
     };
@@ -263,7 +265,7 @@ function categoriaProductosCreacion(categoria){
     let array = [];
     const event = categoria;
     let cat = ['uno', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve', 'diez', 'once', 'doce']
-    let cat_id = cat_con.find(x=> x.id === Number(event.value))
+    let cat_id = cat_db.find(x=> x.id === Number(event.value))
     if(cat_id){
         cat.forEach((e)=>{
             cat_id[e] !== "" ? array.push(cat_id[e]): "";
@@ -281,7 +283,7 @@ function compararCodigosProformaRecompra(idTabla, idFormulario, formulario){
         };
     });
 };
-async function comprobarCodigoProductos(codigo){//verificamos que el nuevo producto no tenga el mismo código en la tabla productos
+async function comprobarCodigoProductos(codigo){//verificamos que el nuevo producto no tenga el mismo código en la base de datos
     const codigoTablaProformaProductos = document.querySelectorAll(codigo);
     let suma = 0;
     let arrayMensaje = [];
@@ -344,7 +346,7 @@ function sidebarMarcadito(){
     }else if(btnTransferencias == 1){
         document.getElementById("button-transferencias").classList.add("marcadito")
         document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
-        document.getElementById("buscador-productos-transferencias").focus();
+        document.getElementById("buscador-productos-form").focus();
     }else if(btnKardex == 1){
         document.getElementById("button-kardex").classList.add("marcadito")
         document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
@@ -570,7 +572,7 @@ function cerrarMensajesModal(){
 //////////////////////////////////////////////////////////////////////////////
 //Modal y tablas
 /////////////////////////////////////////////////////////////////////////////
-function marcarCodigoRepetido(class_codigo_modal, class_codigo_proforma, nombre_tabla_proforma){//verificamos que el nuevo producto no tenga el mismo código en la tabla proforma modificación
+function marcarCodigoRepetido(class_codigo_modal, class_codigo_proforma, nombre_tabla_proforma){//verificamos que el nuevo producto no tenga el mismo código en la tabla proforma
     const codigoModal = document.querySelectorAll(class_codigo_modal);
     codigoModal.forEach((event) => {
         document.querySelectorAll(class_codigo_proforma).forEach((elemento) => {

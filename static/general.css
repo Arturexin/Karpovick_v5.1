@@ -173,15 +173,14 @@ caption {
 .label-general{
     display: flex;
     justify-content: space-between;
-    margin: 3px;
-    height: 23px;
+    margin: 5px 0;
 }
 .input-general{
     width: 280px;
-    margin: 0px 10px;
+    height: 28px;
+    margin: 0px 2px;
     border: none;
     border-radius: 5px;
-    padding: 4px;
 }
 .input-general-importante{
     width: 300px;

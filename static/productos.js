@@ -226,7 +226,7 @@ function accion_recompras(id){
     tabla_proforma_productos(prod_, "Recompra");
     tabla_head_productos("Sucursal", "Existencias", "Recompra", "Saldo", "");
     suc_add.forEach((e, i)=>{
-        let coincidencia = suc_enc.find(x=> x.sucursal_nombre === e)
+        let coincidencia = suc_db.find(x=> x.sucursal_nombre === e)
         coincidencia ? tabla_body_productos(prod_, i, coincidencia.id_sucursales) : ";"
     });
     contenedorBotonesProducto(`procesarRecompra()`, "Procesar recompra")
@@ -328,7 +328,7 @@ function accion_transferencias(id){
     tabla_proforma_productos(prod_, "Transferencia");
     tabla_head_productos("Sucursal", "Existencias", "Transferencia", "Saldo", "Orígen");
     suc_add.forEach((e, i)=>{
-        let coincidencia = suc_enc.find(x=> x.sucursal_nombre === e)
+        let coincidencia = suc_db.find(x=> x.sucursal_nombre === e)
         coincidencia ? tabla_transferencias_body(prod_, i, coincidencia.id_sucursales) : "";
     });
     contenedorBotonesProducto("procesarTransferencia()", "Procesar transferencia")

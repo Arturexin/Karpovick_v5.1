@@ -52,7 +52,7 @@ document.addEventListener("keyup", (e) =>{
         document.getElementById('id-perdidas').value = almacenCentral.idProd
 
         sucursal_id_perdidas = document.getElementById("fffff-sucursal").value
-        indice_sucursal_despacho = obtenerIndiceSucursal()
+        indice_sucursal_despacho = obtenerIndiceSucursal("#fffff-sucursal")
         document.getElementById('categoria-perdidas').value = almacenCentral.categoria
         document.getElementById('codigo-perdidas').value = almacenCentral.codigo
         document.getElementById('descripcion-perdidas').value = almacenCentral.descripcion
@@ -263,7 +263,7 @@ document.getElementById("boton_borrar_").addEventListener("click", ()=>{
 });
 function agregarBusquedaDetalleUno(button){
     let linea = button.closest("li");
-    indice_sucursal_despacho = obtenerIndiceSucursal();
+    indice_sucursal_despacho = obtenerIndiceSucursal("#fffff-sucursal");
     document.getElementById('id-perdidas').value = linea.children[0].textContent;
     document.getElementById('categoria-perdidas').value = linea.children[1].textContent;
     document.getElementById('codigo-perdidas').value = linea.children[2].textContent;

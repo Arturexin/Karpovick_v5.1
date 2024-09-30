@@ -162,7 +162,7 @@ function crearBodyRegistro(tallaRegistro, loteRegistro){
     let tablaRegistro = document.querySelector("#tabla-pre-modificacion > tbody");
     let nuevaFilaTablaRegistro = tablaRegistro.insertRow(-1);
     let fila = `<tr>`+
-                    `<td>${suc_add[obtenerIndiceSucursal()]}</td>`+// Columna 0 > sucursal
+                    `<td>${suc_add[obtenerIndiceSucursal("#fffff-sucursal")]}</td>`+// Columna 0 > sucursal
                     `<td>${document.getElementById("categoria-modificacion").children[document.getElementById("categoria-modificacion").selectedIndex].textContent}</td>`+// Columna 1 > categoría
                     `<td class="codigo_modal" style="background: rgb(105, 211, 35)">${document.getElementById("codigo-modificacion").value}-${tallaRegistro}-${loteRegistro}</td>`+// Columna 2 > código
                     `<td><input class="input-tablas-texto-largo" value="${document.getElementById("descripcion-modificacion").value}" placeholder="Rellene esta celda"></td>`+// Columna 3 > descripción
@@ -176,7 +176,7 @@ function crearBodyRegistro(tallaRegistro, loteRegistro){
                     `<td class="invisible">${document.getElementById("proveedor-modificacion").value}</td>`+// Columna 11 > id proveedor
                     `<td class="invisible">${document.getElementById("fffff-sucursal").value}</td>`+// Columna 12 > id sucursal
                     `<td class="invisible">${document.getElementById("categoria-modificacion").value}</td>`+// Columna 13 > id categoría
-                    `<td class="invisible">${obtenerIndiceSucursal()}</td>`+// Columna 14 > índice sucursal
+                    `<td class="invisible">${obtenerIndiceSucursal("#fffff-sucursal")}</td>`+// Columna 14 > índice sucursal
                     `<td style="text-align: center">
                         <div class="tooltip">
                             <span style="font-size:18px;" class="material-symbols-outlined eliminarTablaFila" onCLick = "clicKEliminarFila(this)">delete</span>
@@ -486,7 +486,7 @@ document.addEventListener("keyup", () =>{
         
         let almacenCentral = indice_base.find(y => y.codigo.toLowerCase().startsWith(document.getElementById('buscador-productos-modificacion').value.toLocaleLowerCase()))
         if(almacenCentral){
-            indice_sucursal_modificacion = obtenerIndiceSucursal();
+            indice_sucursal_modificacion = obtenerIndiceSucursal("#fffff-sucursal");
             document.getElementById('id-modificacion').value = almacenCentral.idProd
             document.getElementById('categoria-modificacion').value = almacenCentral.categoria
             document.getElementById('codigo-modificacion').value = almacenCentral.codigo
@@ -588,11 +588,11 @@ async function agregarATablaPreModificacion(e){
     };
 };
 function rellenarCategoria(){
-    cat_con = JSON.parse(localStorage.getItem("categoria_consulta"));
+    cat_db = JSON.parse(localStorage.getItem("categoria_consulta"));
     let html_cat = "";
     document.querySelectorAll(".categoria_cambio").forEach((event, i)=>{
         html_cat = "";
-        for(categoria of cat_con) {
+        for(categoria of cat_db) {
             let fila = `<option value="${categoria.id}">${categoria.categoria_nombre}</option>`
             html_cat = html_cat + fila;
         };
@@ -609,7 +609,7 @@ function rellenarMedidasCategoria(id_categoria, i){
     let fila_ = document.querySelectorAll(".medida_cambio");
     let fila_codigo = document.querySelectorAll(".codigo_modal");
 
-    let cat = cat_con.find(x => x.id === id_categoria)
+    let cat = cat_db.find(x => x.id === id_categoria)
     let _medidas = [cat.uno, cat.dos, cat.tres, cat.cuatro, cat.cinco, cat.seis, cat.siete, cat.ocho, cat.nueve, cat.diez, cat.once, cat.doce] 
 
     html_cat = "";
@@ -874,7 +874,7 @@ document.getElementById("boton_borrar_").addEventListener("click", ()=>{
 function agregarBusquedaDetalleUno(button){
     if(document.getElementById("editar-modificacion").classList.contains('marcaBoton')){
         let linea = button.closest("li");
-        indice_sucursal_modificacion = obtenerIndiceSucursal();
+        indice_sucursal_modificacion = obtenerIndiceSucursal("#fffff-sucursal");
         document.getElementById('id-modificacion').value = linea.children[0].textContent;
         document.getElementById('categoria-modificacion').value = linea.children[1].textContent;
         document.getElementById('codigo-modificacion').value = linea.children[2].textContent;

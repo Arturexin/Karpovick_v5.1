@@ -503,7 +503,7 @@ def operarRecompra():
                             "existencias_st = existencias_st + %s, "
                             "existencias_sc = existencias_sc + %s "
                             "WHERE `almacen_central`.`idProd` = %s "
-                            "AND `almacen_central`.`estado` = 1 "
+                            "AND `almacen_central`.`estado` > 0 "
                             "AND identificadorProd = %s")
         
         data_productos = (  request.json['existencias_ac'],request.json['existencias_su'], request.json['existencias_sd'], 
@@ -525,35 +525,45 @@ def operarRecompra():
 def gestionDeRecompras():
     try:
         # Obtener los datos del cuerpo de la solicitud
-        recompra_data = request.json
+        array_productos = request.json.get('array_productos_dos', [])
+        array_entradas = request.json.get('array_entradas_dos', [])
         usuarioLlave = session.get('usernameDos')
+        usuarioId = session.get('identificacion_usuario')
+        fecha = request.json.get('fecha')
+        dato_cero = 0
         dato_uno = 1
 
-        # Iniciar la transacción manualmente
-        cur = mysql.connection.cursor()
-        cur.execute("BEGIN")
+        # Validar que los datos necesarios están presentes
+        if not array_productos or not array_entradas or not fecha or not usuarioLlave:
+            return jsonify({"status": "error", "message": "Faltan datos requeridos para procesar la recompra"}), 400
 
-        # Numeración
-        numeracion = incrementar_obtener_numeracion(cur, dato_uno, usuarioLlave, 'Recompra', 'recompras')
-        # Actualizar el inventario en 'almacen_central'
-        error_message = actualizar_almacen_central_suma(cur, recompra_data, usuarioLlave, 'array_productos_dos')
-        if error_message:
-            return error_message
+        # Iniciar la transacción con el uso de context manager
+        with mysql.connection.cursor() as cur:
+            # Numeración
+            numeracion = incrementar_obtener_numeracion(cur, dato_uno, usuarioLlave, 'Recompra', 'recompras')
 
-        # Procesar e insertar las entradas en la tabla 'entradas'
-        procesar_e_insertar_entradas(cur, recompra_data, numeracion, session.get('identificacion_usuario'), usuarioLlave, 'array_entradas_dos')
+            # Actualizar el inventario en 'almacen_central'
+            try:
+                actualizar_almacen_central(cur, array_productos, usuarioLlave)
+            except Exception as e:
+                mysql.connection.rollback()  # Hacer rollback si hay un error en actualizar_almacen_central
+                return jsonify({"status": "error", "message": f"Error al actualizar el inventario: {str(e)}"}), 400
 
-        # Confirmar la transacción
-        mysql.connection.commit()
+            # Insertar las entradas en la tabla 'entradas'
+            try:
+                insertar_entradas(cur, array_entradas, numeracion, usuarioId, usuarioLlave, dato_cero, dato_uno, fecha)
+            except Exception as e:
+                mysql.connection.rollback()  # Hacer rollback si hay un error en insertar_entradas
+                return jsonify({"status": "error", "message": f"Error al insertar las entradas: {str(e)}"}), 400
 
-        return jsonify({"status": "success", "message": f"{numeracion}"}), 200
-    
+            # Confirmar la transacción
+            mysql.connection.commit()
+
+        return jsonify({"status": "success", "message": f"Recompra realizada con numeración {numeracion}"}), 200
+
     except Exception as e:
-        mysql.connection.rollback()# Hacer rollback en caso de cualquier error
-        return jsonify({"status": "error", "message": str(e)})
-    
-    finally:
-        cur.close()  # Asegurarse de cerrar el cursor
+        mysql.connection.rollback()  # Hacer rollback en caso de cualquier otro error
+        return jsonify({"status": "error", "message": f"Error general: {str(e)}"}), 500
 #######################################################################################################
 
 @entradas_traspasos_get_post.route('/api/gestion_de_traspasos', methods=['GET', 'POST'])##Compras-Registro#ya no se usa
@@ -625,63 +635,38 @@ def gestionDeTraspasos():
 @login_required
 def gestionDeCompras():
     try:
+        array_productos = request.json.get('array_productos', [])
+        array_entradas = request.json.get('array_entradas', [])
         usuarioLlave = session.get('usernameDos')
         usuarioId = session.get('identificacion_usuario')
+        fecha = request.json.get('fecha')
         dato_cero = 0
         dato_uno = 1
 
-        productos_compra = request.json.get('array_productos', [])
-        entradas_compra = request.json.get('array_entradas', [])
-
-        # Iniciar la transacción manualmente
-        cur = mysql.connection.cursor()
-        cur.execute("BEGIN")
-
-        # Numeración
-        numeracion = incrementar_obtener_numeracion(cur, dato_uno, usuarioLlave, 'Compra', 'compras')
-        # Inserciones en lote para productos
-        query_productos = ( "INSERT INTO `almacen_central` "
-                            "(`categoria`, `codigo`, `descripcion`, `talla`, `costo_unitario`, `precio_venta`, `lote`, `proveedor`, "
-                            "`existencias_ac`, `existencias_su`, `existencias_sd`, `existencias_st`, `identificadorProd`, `estado`) "
-                            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+        # Validar que los datos necesarios están presentes
+        if not array_productos or not array_entradas or not fecha or not usuarioLlave:
+            return jsonify({"status": "error", "message": "Faltan datos requeridos para procesar la recompra"}), 400
         
-        data_productos =    [
-                            (p['categoria'], p['codigo'], p['descripcion'], p['talla'],
-                            p['costo_unitario'], p['precio_venta'], p['lote'], p['proveedor'],
-                            p['existencias_ac'], p['existencias_su'], p['existencias_sd'],
-                            p['existencias_st'], usuarioLlave, dato_uno) 
-                            for p in productos_compra
-                            ]
-        cur.executemany(query_productos, data_productos)
+        # Iniciar la transacción con el uso de context manager
+        with mysql.connection.cursor() as cur:
 
-        # Recuperar IDs de productos insertados
-        codigos = [p['codigo'] for p in productos_compra]
-        query_productos_busqueda = ("SELECT idProd, codigo "
-                                    "FROM almacen_central "
-                                    "WHERE `identificadorProd` = %s AND codigo IN (%s) "
-                                    "ORDER BY idProd DESC")
-        
-        in_placeholder = ', '.join(['%s'] * len(codigos))
-        cur.execute(query_productos_busqueda % (usuarioLlave, in_placeholder), codigos)
-        id_map = {codigo: idProd for idProd, codigo in cur.fetchall()} 
+            # Numeración
+            numeracion = incrementar_obtener_numeracion(cur, dato_uno, usuarioLlave, 'Compra', 'compras')
+            # Actualizar el inventario en 'almacen_central'
+            try:
+                insertar_almacen_central(cur, array_productos, usuarioLlave, dato_uno)
+            except Exception as e:
+                mysql.connection.rollback()  # Hacer rollback si hay un error en actualizar_almacen_central
+                return jsonify({"status": "error", "message": f"Error al actualizar el inventario: {str(e)}"}), 400
 
-        # Inserciones en lote para entradas
-        query_entradas = (  "INSERT INTO `entradas` "
-                            "(`idEntr`, `idProd`, `sucursal`, `existencias_entradas`, `comprobante`, `causa_devolucion`, `usuario`, `fecha`, "
-                            "`existencias_devueltas`, `identificadorEntr`, `estado`) "
-                            "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
-        
-        data_entradas =     [
-                            (id_map[e['codigo']], e['sucursal'], e['existencias_entradas'], numeracion, dato_cero,
-                            usuarioId, request.json['fecha'], dato_cero, usuarioLlave, dato_uno) 
-                            for e in entradas_compra if e['codigo'] in id_map
-                            ]
-        #if e['codigo'] in id_map: Filtra los elementos en entradas para incluir solo 
-        # aquellos cuyo codigo existe como clave en el diccionario id_map.  
-        # Esto asegura que solo los registros que tienen un código que corresponde a un idProd en id_map se procesen.
-        cur.executemany(query_entradas, data_entradas)
-        
-        mysql.connection.commit()
+            # Insertar las entradas en la tabla 'entradas'
+            try:
+                insertar_entradas_new(cur, array_entradas, array_productos, numeracion, usuarioId, usuarioLlave, dato_cero, dato_uno, fecha)
+            except Exception as e:
+                mysql.connection.rollback()  # Hacer rollback si hay un error en insertar_entradas
+                return jsonify({"status": "error", "message": f"Error al insertar las entradas: {str(e)}"}), 400
+            
+            mysql.connection.commit()
 
         return jsonify({"status": "success", "message": f"{numeracion}"}), 200
     
@@ -692,6 +677,10 @@ def gestionDeCompras():
     finally:
         cur.close()  # Asegurarse de cerrar el cursor
     
+
+#####################################################################################################################    
+#####################################################################################################################    
+#####################################################################################################################    
 def incrementar_obtener_numeracion(cur, dato_uno, usuarioLlave, nombre, concepto):
     # Actualizar la numeración
     query_numeracion = (f"UPDATE `numeracion_comprobante` SET {concepto} = {concepto} + %s "
@@ -718,6 +707,56 @@ def incrementar_obtener_numeracion(cur, dato_uno, usuarioLlave, nombre, concepto
 
     return f"{nombre}-{contenido[concepto]}"
 
+def insertar_almacen_central(cur, array_productos, usuarioLlave, dato_uno):
+    query_productos = ( "INSERT INTO `almacen_central` "
+                        "(`categoria`, `codigo`, `descripcion`, `talla`, "
+                        "`costo_unitario`, `precio_venta`, `lote`, `proveedor`, "
+                        "`existencias_ac`, `existencias_su`, `existencias_sd`, "
+                        "`existencias_st`, `existencias_sc`, `identificadorProd`, `estado`) "
+                        "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+        
+    data_productos =    [
+                            (p['categoria'], p['codigo'], p['descripcion'], p['talla'],
+                            p['costo_unitario'], p['precio_venta'], p['lote'], p['proveedor'],
+                            p['existencias_ac'], p['existencias_su'], p['existencias_sd'],
+                            p['existencias_st'], p['existencias_sc'], usuarioLlave, dato_uno) 
+                            for p in array_productos
+                        ]
+    cur.executemany(query_productos, data_productos)
+
+    # Verificar si la cantidad de filas actualizadas es igual a la cantidad de productos
+    if cur.rowcount != len(array_productos):
+        raise Exception("Uno de los productos no cuenta con unidades suficientes, actualice los saldos.")
+    
+def actualizar_almacen_central(cur, array_productos, usuarioLlave):
+    query = (   "UPDATE `almacen_central` SET "
+                "existencias_ac = existencias_ac + %s, "
+                "existencias_su = existencias_su + %s, "
+                "existencias_sd = existencias_sd + %s, "
+                "existencias_st = existencias_st + %s, "
+                "existencias_sc = existencias_sc + %s "
+                "WHERE `almacen_central`.`idProd` = %s "
+                "AND `almacen_central`.`estado` > 0 "
+                "AND identificadorProd = %s "
+                # Validación: asegurarse de que las existencias no queden negativas
+                "AND (existencias_ac + %s) >= 0 "
+                "AND (existencias_su + %s) >= 0 "
+                "AND (existencias_sd + %s) >= 0 "
+                "AND (existencias_st + %s) >= 0 "
+                "AND (existencias_sc + %s) >= 0")
+    data_productos =    [
+                            (p['existencias_ac'], p['existencias_su'], p['existencias_sd'],
+                            p['existencias_st'], p['existencias_sc'], p['idProd'], usuarioLlave,
+                            p['existencias_ac'], p['existencias_su'], p['existencias_sd'],
+                            p['existencias_st'], p['existencias_sc']) 
+                            for p in array_productos
+                        ]
+    cur.executemany(query, data_productos)
+
+    # Verificar si la cantidad de filas actualizadas es igual a la cantidad de productos
+    if cur.rowcount != len(array_productos):
+        raise Exception("Uno de los productos no cuenta con unidades suficientes, actualice los saldos.")
+    
 def actualizar_almacen_central_suma(cur, recompra_data, usuarioLlave, nombre_array):
     """
     Procesa los productos, agrupa los datos por sucursal y actualiza el inventario en la tabla 'almacen_central'.
@@ -796,7 +835,8 @@ def procesar_e_insertar_entradas(cur, recompra_data, numeracion, usuarioId, usua
     dato_uno = 1
     # Preparar los datos para la inserción en 'entradas'
     data_entradas = [(entrada['idProd'], entrada['sucursal'], entrada['existencias_entradas'],
-                    numeracion, dato_cero, usuarioId, recompra_data['fecha'], dato_cero, usuarioLlave, dato_uno)
+                    numeracion, dato_cero, usuarioId, recompra_data['fecha'], 
+                    dato_cero, usuarioLlave, dato_uno)
                     for entrada in recompra_data[nombre_array]]
 
     # Insertar los datos procesados en la tabla 'entradas'
@@ -809,3 +849,53 @@ def procesar_e_insertar_entradas(cur, recompra_data, numeracion, usuarioId, usua
     # Ejecutar la inserción con `executemany`
     cur.executemany(query_entradas, data_entradas)
 
+def insertar_entradas(cur, array_entradas, numeracion, usuarioId, usuarioLlave, dato_cero, dato_uno, fecha):
+    query_entradas = ("INSERT INTO `entradas` "
+                      "(`idEntr`, `idProd`, `sucursal`, `existencias_entradas`, "
+                      "`comprobante`, `causa_devolucion`, `usuario`, `fecha`, "
+                      "`existencias_devueltas`, `identificadorEntr`, `estado`) "
+                      "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+
+    data_entradas = [(entrada['idProd'], entrada['sucursal'], entrada['existencias_entradas'],
+                    numeracion, dato_cero, usuarioId, fecha, 
+                    dato_cero, usuarioLlave, dato_uno)
+                    for entrada in array_entradas]
+
+    cur.executemany(query_entradas, data_entradas)
+
+    # Comprobar si la inserción se realizó correctamente
+    if cur.rowcount != len(array_entradas):
+        raise Exception("No se pudieron insertar todas las entradas correctamente.")
+    
+def insertar_entradas_new(cur, array_entradas, array_productos, numeracion, usuarioId, usuarioLlave, dato_cero, dato_uno, fecha):
+    # Recuperar IDs de productos insertados
+    codigos = [p['codigo'] for p in array_productos]
+    query_productos_busqueda = ("SELECT idProd, codigo "
+                                "FROM almacen_central "
+                                "WHERE `identificadorProd` = %s AND codigo IN (%s) "
+                                "ORDER BY idProd DESC")
+    
+    in_placeholder = ', '.join(['%s'] * len(codigos))
+    cur.execute(query_productos_busqueda % (usuarioLlave, in_placeholder), codigos)
+    id_map = {codigo: idProd for idProd, codigo in cur.fetchall()} 
+
+    query_entradas = ("INSERT INTO `entradas` "
+                      "(`idEntr`, `idProd`, `sucursal`, `existencias_entradas`, "
+                      "`comprobante`, `causa_devolucion`, `usuario`, `fecha`, "
+                      "`existencias_devueltas`, `identificadorEntr`, `estado`) "
+                      "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+
+    data_entradas = [
+                        (id_map[e['codigo']], e['sucursal'], e['existencias_entradas'], 
+                        numeracion, dato_cero, usuarioId, fecha, 
+                        dato_cero, usuarioLlave, dato_uno) 
+                        for e in array_entradas if e['codigo'] in id_map
+                    ]
+    #if e['codigo'] in id_map: Filtra los elementos en entradas para incluir solo 
+    # aquellos cuyo codigo existe como clave en el diccionario id_map.  
+    # Esto asegura que solo los registros que tienen un código que corresponde a un idProd en id_map se procesen.
+    cur.executemany(query_entradas, data_entradas)
+
+    # Comprobar si la inserción se realizó correctamente
+    if cur.rowcount != len(array_entradas):
+        raise Exception("No se pudieron insertar todas las entradas correctamente.")

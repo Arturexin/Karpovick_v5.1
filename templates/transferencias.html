@@ -3,45 +3,9 @@
 {% block content %}
 <div class="transferencias-form baja_opacidad">
     <div class="contenedor_compras">
-        <div class="contenedor_formulario_tr">
-            <h2>Transferencias
-                <div class="tooltip_ayuda">
-                    <span class="material-symbols-outlined">help</span>
-                    <span class="tooltiptext_ayuda">Se transfiere una determinada cantidad de unidades de un producto entre sucursales.</span>
-                </div>
-            </h2>
-            <label>
-                <select name="fffff-sucursal" id="fffff-sucursal" class="input-select-ventas">
-                </select>
-                <div class="tooltip_ayuda">
-                    <span class="material-symbols-outlined">help</span>
-                    <span class="tooltiptext_ayuda">Sucursal donante.</span>
-                </div>
-            </label>
-            
-            <div style="display: flex;">
-                <input id="buscador-productos-transferencias" type="text" class="input-compras fondo-importante" placeholder="Buscar Código"> 
-                <div class="tooltip_ayuda">
-                    <span class="material-symbols-outlined">find_in_page</span>
-                    <span class="tooltiptext_ayuda">Digite caracteres clave del código a buscar.</span>
-                </div>
-            </div>
-            <form id="formulario-transferencias" class="">
-                <div>
-                    <input class="input-compras fondo" type="hidden" id="id-transferencias" name="id-transferencias" disabled/>
-                    <label class="label-general">Categoría
-                        <select name="categoria-transferencias" id="categoria-transferencias" class="input-general fondo" disabled>
-                        </select>
-                    </label>
-                    <label class="label-general">Código<input class="input-general fondo" type="text" id="codigo-transferencias" name="codigo-transferencias" disabled/></label>
-                    <label class="label-general">Descripción<input class="input-general fondo" type="text" id="descripcion-transferencias" name="descripcion-transferencias" disabled/></label>
-                    
-                </div>
-                <div class="">
-                    <button id="agregarATablaPreTransferencias" class="myButtonAgregar">Agregar a Proforma</button>
-                    <input onclick="reseteoFormulario()" type="reset" class="myButtonEliminar">
-                </div> 
-            </form>
+        <div>
+            <div class="contenedor_formulario_compras" id="form_contenedor"></div>
+            <div  class="boton-cli" id="button_contenedor"></div>
         </div>
         <div class="contenedor_busqueda_detalle_general">
             <div style="display: grid;">
@@ -98,49 +62,27 @@
     </div>
     
     <div class="contenedor-pre-transferencia">
-        <table id="tabla_principal" class="tabla_modal contenido-tabla">
+        <table id="tabla_modal" class="tabla_modal contenido-tabla">
             <thead>
                 <tr>
-                    <th scope="row" colspan="15"><h2>Proforma</h2></th>
-                </tr>
-                <tr>
-                    <th style="width: 120px;">Sucursal / Origen</th>
-                    <th style="width: 120px;">Código Origen</th>
-                    <th style="width: 200px;">Descripción</th>
-                    <th style="width: 70px;">Existencias en Origen</th>
-                    <th style="width: 70px;">Transferir AC</th>
-                    <th style="width: 70px;">Transferir SU</th>
-                    <th style="width: 70px;">Transferir SD</th>
-                    <th style="width: 70px;">Transferir ST</th>
-                    <th style="width: 70px;">Transferir SC</th>
-                    <th style="width: 70px;">AC</th>
-                    <th style="width: 70px;">SU</th>
-                    <th style="width: 70px;">SD</th>
-                    <th style="width: 70px;">ST</th>
-                    <th style="width: 70px;">SC</th>
-                    <th style="width: 40px;">
-                        <span style="font-size:18px;" class="material-symbols-outlined">delete</span>
+                    <th scope="row" colspan="18">
+                        <h2>Pre lista</h2>
                     </th>
                 </tr>
             </thead>
-            <tbody>
-            </tbody>
+            <tbody></tbody>
             <tfoot>
-                <th scope="row" colspan="15">
-                    <button id="procesar-pre-transferencias" class="myButtonAgregar">Enviar a Tabla Transferencias</button>
-                    <button id="remover-tabla-transferencias-uno" class="eliminarTablaFila">Cancelar</button>
-                </th>
+                <th scope="row" colspan="15" id="contenedor_botones_modal"></th>
             </tfoot>
         </table>
     </div>
     <div class="contenedor_tabla">
-        <table id="tabla-proforma-transferencias" class="tabla-proforma">
+        <table id="tabla_principal" class="tabla-proforma">
             <thead>
                 <tr>
                     <th scope="row" colspan="11"><h2>Lista de Transferencias</h2></th>
                 </tr>
                 <tr>
-                    <th>Sucursal / Origen</th>
                     <th>Código Origen</th>
                     <th>Descripción	</th>
                     <th>Unidades a transferir AC</th>
@@ -177,4 +119,5 @@
     </div>
 </div>
 <script src="../static/transferencias.js"></script>
+<script src="../static/form.js"></script>
 {% endblock %}

@@ -324,7 +324,8 @@ def getProductosDos():
             return jsonify({"status": "error", "message": "Lista de IDs vacía"}), 400
 
         # Construir la consulta SQL con marcadores de posición (%s)
-        query = ("SELECT idProd, categoria, descripcion, existencias_ac, existencias_su, existencias_sd, existencias_st "
+        query = ("SELECT idProd, categoria, codigo, descripcion, talla, costo_unitario, precio_venta, lote, "
+                 "proveedor, existencias_ac, existencias_su, existencias_sd, existencias_st, existencias_sc "
                  "FROM almacen_central "
                  "WHERE `identificadorProd` = %s "
                  "AND almacen_central.estado > 0 "
@@ -343,11 +344,18 @@ def getProductosDos():
             contenido = { 
                 'idProd': fila[0],
                 'categoria': fila[1],
-                'descripcion': fila[2],
-                'existencias_ac': fila[3],
-                'existencias_su': fila[4],
-                'existencias_sd': fila[5],
-                'existencias_st': fila[6]
+                'codigo': fila[2],
+                'descripcion': fila[3],
+                'talla': fila[4],
+                'costo_unitario': fila[5],
+                'precio_venta': fila[6],
+                'lote': fila[7],
+                'proveedor': fila[8],
+                'existencias_ac': fila[9],
+                'existencias_su': fila[10],
+                'existencias_sd': fila[11],
+                'existencias_st': fila[12],
+                'existencias_sc': fila[13],
             }
             resultados.append(contenido)
 

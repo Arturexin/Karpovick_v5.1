@@ -171,10 +171,10 @@ buscador_codigo.addEventListener("keyup", async () =>{
         id_ventas.value = almacenCentral.idProd;
 
         sucursal_ventas = select_sucursal.value;
-        if(document.getElementById("puesto_usuario").textContent == obtenerIndiceSucursal()){
-            indice_sucursal_ventas = obtenerIndiceSucursal();
+        if(document.getElementById("puesto_usuario").textContent == obtenerIndiceSucursal("#fffff-sucursal")){
+            indice_sucursal_ventas = obtenerIndiceSucursal("#fffff-sucursal");
         }else{
-            indice_sucursal_ventas = obtenerIndiceSucursal();
+            indice_sucursal_ventas = obtenerIndiceSucursal("#fffff-sucursal");
         };
         input_sucursal.value = select_sucursal.children[indice_sucursal_ventas].textContent
 
@@ -1079,10 +1079,10 @@ function agregarBusquedaDetalleUno(button){
 
     id_ventas.value = linea.children[0].textContent;
     sucursal_ventas = select_sucursal.value;
-    if(document.getElementById("puesto_usuario").textContent == obtenerIndiceSucursal()){
-        indice_sucursal_ventas = obtenerIndiceSucursal();
+    if(document.getElementById("puesto_usuario").textContent == obtenerIndiceSucursal("#fffff-sucursal")){
+        indice_sucursal_ventas = obtenerIndiceSucursal("#fffff-sucursal");
     }else{
-        indice_sucursal_ventas = obtenerIndiceSucursal();
+        indice_sucursal_ventas = obtenerIndiceSucursal("#fffff-sucursal");
     };
     input_sucursal.value = document.querySelector("#fffff-sucursal").children[indice_sucursal_ventas].textContent
     categoria_ventas.value = Number(linea.children[1].textContent); 
