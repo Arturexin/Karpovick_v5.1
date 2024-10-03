@@ -3,10 +3,15 @@ let anio_principal = ""
 function inicioKardex(){
     anio_principal = new Date().getFullYear()
     btnKardex = 1;
+    document.getElementById("form_contenedor").innerHTML = formUpdate('Kardex')
+    document.querySelector(".baja_opacidad_interior").classList.add("alta_opacidad_interior")
+    document.getElementById("button_contenedor").innerHTML = formButton("Consultar", "procesarKardex()", "reseteoFormulario()")
+    document.getElementById("categoria-form").innerHTML = llenarCategoriaProductosEjecucion();
     cargarSucursalesEjecucion(document.getElementById("fffff-sucursal"))
     cambioSucursalKardex("fffff-sucursal")
-    llenarCategoriaProductosEjecucion("#categoria-detalle-movimientos")
+
     cargarDatosAnio()
+    indice_base = JSON.parse(localStorage.getItem("base_datos_consulta"))
 };
 let ventasMensuales = [];
 
@@ -28,11 +33,11 @@ function cargarDatosAnio(){
 async function cargarGraficos(){
     reinicioBarraGrafico(barras_venta);//Reinicia gráfico Ventas Mensuales
     anio_principal = anio_referencia.value;
-    ventasMensuales = await cargarDatos(`suma_ventas_por_mes_kardex/${document.getElementById("id_producto").value}?`+
+    ventasMensuales = await cargarDatos(`suma_ventas_por_mes_kardex/${document.getElementById("id-form").value}?`+
                                         `salidas_sucursal=${document.getElementById("fffff-sucursal").value}&`+     
                                         `year_actual=${anio_principal}`)
                                         
-    kardex_salidas_categoria = await cargarDatos(`salidas_categoria_kardex/${document.getElementById("categoria-detalle-movimientos").value}?`+
+    kardex_salidas_categoria = await cargarDatos(`salidas_categoria_kardex/${document.getElementById("categoria-form").value}?`+
                                                 `sucursal_salidas=${document.getElementById("fffff-sucursal").value}&`+     
                                                 `year_actual=${anio_principal}`)
     kardex_salidas_sucursal = await cargarDatos(`salidas_sucursal_kardex/${document.getElementById("fffff-sucursal").value}?`+    
@@ -49,29 +54,24 @@ async function cargarGraficos(){
 let sucursal_kardex = 0;
 let indice_sucursal_kardex = 0;
 function reseteoFormulario(){
-    document.getElementById("id_producto").value = "";
-    document.getElementById('categoria-detalle-movimientos').value = "0";
-    document.getElementById('codigo-detalle-movimientos').value = "";
-    document.getElementById('descripcion-detalle-movimientos').value = "";
-    document.getElementById("costo-unitario-detalle-movimientos").value = "";
+    document.getElementById("id-form").value = "";
+    document.getElementById('categoria-form').value = "0";
+    document.getElementById('codigo-form').value = "";
+    document.getElementById('descripcion-form').value = "";
+    /* document.getElementById("costo-unitario-detalle-movimientos").value = ""; */
 };
 document.addEventListener("keyup", () => {
-    indice_base = JSON.parse(localStorage.getItem("base_datos_consulta"))
-    let almacenCentral = indice_base.find(y => y.codigo.toLowerCase().startsWith(document.getElementById('buscador-productos-detalle-movimientos').value.toLocaleLowerCase()))
+    let almacenCentral = indice_base.find(y => y.codigo.toLowerCase().startsWith(document.getElementById('buscador-productos-form').value.toLocaleLowerCase()))
     if(almacenCentral){
-        document.getElementById("id_producto").value = almacenCentral.idProd
-        sucursal_kardex = document.getElementById("fffff-sucursal").value
-        indice_sucursal_kardex = document.getElementById("fffff-sucursal").selectedIndex
-
-        document.getElementById("categoria-detalle-movimientos").value = almacenCentral.categoria
-        document.getElementById("codigo-detalle-movimientos").value = almacenCentral.codigo
-        document.getElementById("descripcion-detalle-movimientos").value = almacenCentral.descripcion
-        document.getElementById("costo-unitario-detalle-movimientos").value = almacenCentral.costo_unitario
-        if(document.getElementById('buscador-productos-detalle-movimientos').value == ""){
-            reseteoFormulario()
+        document.getElementById('id-form').value = almacenCentral.idProd
+        document.getElementById('categoria-form').value = almacenCentral.categoria
+        document.getElementById('codigo-form').value = almacenCentral.codigo
+        document.getElementById('descripcion-form').value = almacenCentral.descripcion
+        if(document.getElementById('buscador-productos-form').value == ""){
+            reseteoFormulario();
         };
     }else{
-        reseteoFormulario()
+        reseteoFormulario();
     };
 });
 function llenadoTablaDetalle(array, id_tabla, nombre_propiedad_objeto_valor){
@@ -109,18 +109,18 @@ function llenadoTablaDetalle(array, id_tabla, nombre_propiedad_objeto_valor){
         suma_existencias += dato;
         suma_monto += (dato * event[nombre_propiedad_objeto_valor]);
     });
-    if(array.length > 0){
+    /* if(array.length > 0){
         document.querySelector("#costo-unitario-detalle-movimientos").value = array[0].costo_unitario
-    }
+    } */
     document.querySelector(`#${id_tabla} > tbody`).innerHTML = html;
     document.getElementById(`${id_tabla}`).children[2].children[0].children[1].textContent = suma_existencias;
     document.getElementById(`${id_tabla}`).children[2].children[0].children[2].textContent = `${suma_monto.toFixed(2)}`;
 };
 function llenarKardex(){
-    let costo = Number(document.querySelector("#costo-unitario-detalle-movimientos").value)
+    /* let costo = Number(document.querySelector("#costo-unitario-detalle-movimientos").value) */
     let html = `<tr>`+
-                    `<td>${document.getElementById("codigo-detalle-movimientos").value}</td>`+
-                    `<td>${document.getElementById("descripcion-detalle-movimientos").value}</td>`+
+                    `<td>${document.getElementById("codigo-form").value}</td>`+
+                    `<td>${document.getElementById("descripcion-form").value}</td>`+
                     `<td style="text-align:center;">${costo.toFixed(2)}</td>`+
                     `<td style="text-align:center;">${document.getElementById("total-existencias-detalle-entradas").textContent}</td>`+
                     `<td style="text-align:center;">${(document.getElementById("total-existencias-detalle-entradas").textContent * costo).toFixed(2)}</td>`+
@@ -145,26 +145,21 @@ function llenarKardex(){
     document.querySelector(`#tabla-consolidado-kardex > tbody`).innerHTML = html;
 };
 
-const mandarATablaDetalle = document.getElementById("agregar-detalle-movimientos");
-mandarATablaDetalle.addEventListener("click", (e) =>{
-    e.preventDefault();
-    procesarKardex();
-});
 async function procesarKardex(){
-    if(document.querySelector("#codigo-detalle-movimientos").value !== ""){
+    if(document.querySelector("#codigo-form").value !== ""){
         anio_principal = anio_referencia.value;
         removerTablas()
-        kardex_entradas = await cargarDatos(`entradas_codigo_kardex/${document.getElementById("id_producto").value}?`+
+        kardex_entradas = await cargarDatos(`entradas_codigo_kardex/${document.getElementById("id-form").value}?`+
                                             `entradas_sucursal=${document.getElementById("fffff-sucursal").value}&`+
                                             `year_actual=${anio_principal}`)
-        kardex_salidas = await cargarDatos(`salidas_codigo_kardex/${document.getElementById("id_producto").value}?`+
+        kardex_salidas = await cargarDatos(`salidas_codigo_kardex/${document.getElementById("id-form").value}?`+
                                             `salidas_sucursal=${document.getElementById("fffff-sucursal").value}&`+
                                             `year_actual=${anio_principal}`)
-        kardex_perdidas = await cargarDatos(`perdidas_codigo_kardex/${document.getElementById("id_producto").value}?`+
+        kardex_perdidas = await cargarDatos(`perdidas_codigo_kardex/${document.getElementById("id-form").value}?`+
                                             `perdidas_sucursal=${document.getElementById("fffff-sucursal").value}&`+
                                             `year_actual=${anio_principal}`)
-        kardex_transferencias = await cargarDatos(`transfrencias_codigo_kardex/${document.getElementById("id_producto").value}?`+
-                                            `transferencias_sucursal=${indice_sucursal_kardex}&`+
+        kardex_transferencias = await cargarDatos(`transfrencias_codigo_kardex/${document.getElementById("id-form").value}?`+
+                                            `transferencias_sucursal=${document.getElementById("fffff-sucursal").value}&`+
                                             `year_actual=${anio_principal}`)
         cargarGraficos()
         
@@ -181,12 +176,12 @@ reiniciarTablas.addEventListener("click", () =>{
     reinicarKardex()
     borrarAnalisis()
 });
-const reiniciarForm = document.getElementById("reset_form");
+/* const reiniciarForm = document.getElementById("reset_form");
 reiniciarForm.addEventListener("click", () =>{
     formularioDetalleMovimientos.reset();
     reinicarKardex()
     borrarAnalisis()
-});
+}); */
 function reinicarKardex(){
     removerTablas()
     document.getElementById("total-existencias-detalle-entradas").textContent = "";
@@ -197,7 +192,7 @@ function reinicarKardex(){
     document.getElementById("total-importe-detalle-perdidas").textContent = "";
     document.getElementById("total-existencias-detalle-transferencias").textContent = "";
     document.getElementById("total-importe-detalle-transferencias").textContent = "";
-    document.getElementById("id_producto").value = "";
+    document.getElementById("id-form").value = "";
 };
 function cambioSucursalKardex(id){
     document.getElementById(id).addEventListener("change", ()=>{
@@ -206,7 +201,7 @@ function cambioSucursalKardex(id){
         document.getElementById("codigo-detalle-movimientos").value = ""
         document.getElementById("descripcion-detalle-movimientos").value = ""
         document.getElementById("costo-unitario-detalle-movimientos").value = ""
-        document.getElementById("id_producto").value = "";
+        document.getElementById("id-form").value = "";
         document.getElementById("buscador-productos-detalle-movimientos").focus();
         reinicarKardex();
         borrarAnalisis()

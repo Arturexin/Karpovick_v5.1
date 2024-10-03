@@ -9,7 +9,7 @@ async function inicioCompras(){
     /* mostrarFormNuevoProducto() */
     agregarMoneda(document.querySelectorAll(".moneda_compras"));
     busquedaStock()
-    llenarCategoriaProductosEjecucion("#categoria_buscador_detalle")
+    document.getElementById("categoria_buscador_detalle").innerHTML = llenarCategoriaProductosEjecucion();
 };
 let comprasNumerador = 0;
 let datos_usuario = JSON.parse(localStorage.getItem("datos_usuario"))
@@ -24,72 +24,6 @@ function cargarDatosAnio(){
         modal_proceso_salir_botones()
     })
 };
-
-class ObjCompra {
-    constructor(categoria, codigo, descripcion, talla, existencias_ac, existencias_su, 
-                existencias_sd, existencias_st, existencias_sc, costo, precio, lote, 
-                proveedor, idProd, in_ac, in_su, in_sd, in_st, in_sc) {
-        this.categoria = categoria;
-        this.codigo = codigo;
-        this.descripcion = descripcion;
-        this.talla = talla;
-        this.existencias_ac = existencias_ac;
-        this.existencias_su = existencias_su;
-        this.existencias_sd = existencias_sd;
-        this.existencias_st = existencias_st;
-        this.existencias_sc = existencias_sc;
-        this.costo = costo;
-        this.precio = precio;
-        this.lote = lote;
-        this.proveedor = proveedor;
-        this.idProd = idProd;
-        this.in_ac = in_ac;
-        this.in_su = in_su;
-        this.in_sd = in_sd;
-        this.in_st = in_st;
-        this.in_sc = in_sc;
-    };
-
-    total_costo(indice) {
-        if (indice >= 0 && indice < sucursales_activas.length) {
-            return this[sucursales_activas[indice]] * this.costo;
-        } else {
-            throw new Error('Índice fuera de rango');
-        };
-    };
-    in_q(input, indice){
-        if(Number(input.value) < 0 || isNaN(Number(input.value))){
-            input.style.background = "var(--fondo-marca-uno)";
-        }else{
-            this[sucursales_activas[indice]] = Number(input.value);
-            input.style.background = "";
-        };
-    };
-    in_c(input){
-        if(Number(input.value) < 0 || isNaN(Number(input.value))){
-            input.style.background = "var(--fondo-marca-uno)";
-        }else{
-            this.costo = Number(input.value);
-            input.style.background = "";
-        };
-    };
-    in_p(input){
-        if(Number(input.value) < 0 || isNaN(Number(input.value))){
-            input.style.background = "var(--fondo-marca-uno)";
-        }else{
-            this.costo = Number(input.value);
-            input.style.background = "";
-        };
-    };
-    in_d(input){
-        if(expregul.descripcion.test(input.value) || input.value !== ""){
-            this.descripcion = input.value;
-            input.style.background = "";
-        } else {
-            input.style.background = "var(--fondo-marca-uno)";
-        };
-    };
-};
 /////////////////////////////////////////////////////////////////////
 ///////////////////////////sucursal/////////////////////////////////
 const nuevoProducto = document.getElementById("nuevo-producto");
@@ -99,9 +33,9 @@ nuevoProducto.addEventListener("click", (e)=>{
 });
 function mostrarFormNuevoProducto(){
     document.getElementById("form_contenedor").innerHTML = formInsert('Compras')
-    document.getElementById("button_contenedor").innerHTML = formButton("Agregar a pre lista", "agregarAtablaModal()", "reseteoFormulario()")
-    llenarCategoriaProductosEjecucion("#categoria-form")
-    baseProv("#proveedor-form")
+    document.getElementById("button_contenedor").innerHTML = formButton("Agregar a pre lista", "agregarAtablaModal()", "reseteoFormulario()");
+    document.getElementById("categoria-form").innerHTML = llenarCategoriaProductosEjecucion();
+    document.getElementById("proveedor-form").innerHTML = baseProv();
 
     document.getElementById("nuevo-producto").classList.add("marcaBoton")
     document.getElementById("recompra-producto-plus").classList.remove("marcaBoton")
@@ -116,9 +50,7 @@ function mostrarFormNuevoProducto(){
     document.querySelector("#tabla_principal").createTBody()
     comprasNumerador = 0;
     array_saldos = [];
-}
-
-
+};
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////COMPRA NUEVO PRODUCTO///////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -155,7 +87,7 @@ function crearBodyCompras (tallaAComprar, loteAComprar){
     let fila = `<tr>`+
                     `<td class="suc_modal">${suc_add[obtenerIndiceSucursal("#sun_opc")]}</td>`+// Columna 0 > sucursal
                     `<td>${document.getElementById("categoria-form").children[document.getElementById("categoria-form").selectedIndex].textContent}</td>`+// Columna 1 > categoría
-                    `<td class="codigo_compras_modal input-tablas fondo" style="background: rgb(105, 211, 35)">${document.getElementById("codigo-form").value}-${tallaAComprar}-${loteAComprar}</td>`+// Columna 2 > codigo
+                    `<td class="codigo_modal input-tablas fondo" style="background: rgb(105, 211, 35)">${document.getElementById("codigo-form").value}-${tallaAComprar}-${loteAComprar}</td>`+// Columna 2 > codigo
                     `<td><input class="input-tablas-texto-largo" value="${document.getElementById("descripcion-form").value}" placeholder="Rellene esta casilla" onKeyup="op_descri(this)"></td>`+// Columna 3 > descripción
                     `<td>${tallaAComprar}</td>`+// Columna 4 > talla
                     `<td><input class="input-tablas-dos-largo insertarNumero" placeholder="Valor > 0" onKeyup="op_cantidad(this)" value = "0"></td>`+// Columna 5 > cantidad a comprar
@@ -233,7 +165,7 @@ function agregarAtablaModal(){
                 array_cod_a_s.push(cod_a_s.codigo)// recolectamos los codigos que se repiten en la Lista de Compras
             }else{
                 crearBodyCompras(event, document.getElementById("lote-form").value)
-                array_saldos.push(new ObjCompra(
+                array_saldos.push(new ObjGeneral(
                                                 document.getElementById("categoria-form").value,
                                                 `${document.getElementById("codigo-form").value}-${event}-${document.getElementById("lote-form").value}`,
                                                 document.getElementById("descripcion-form").value,
@@ -303,7 +235,7 @@ function filaBodyProformaPincipalCompras(){
     const fila_principal = document.querySelector("#tabla_principal > tbody");
     let ccp = document.querySelectorAll(".codigo_compras_proforma");
     let codigo_prof = Array.from(ccp).map(x => x.textContent);
-    const cod_remove = document.querySelectorAll(".codigo_compras_modal");
+    const cod_remove = document.querySelectorAll(".codigo_modal");
     array_saldos.forEach((obj_compra)=>{
         let coincidencia_codigo = codigo_prof.find(x=> x === obj_compra.codigo)
         if(coincidencia_codigo === undefined){
@@ -463,7 +395,7 @@ recompraProductoPlus.addEventListener("click", (e)=>{
 function mostrarFormrecompraProductoPlus(){
     document.getElementById("form_contenedor").innerHTML = formUpdate('Recompras')
     document.getElementById("button_contenedor").innerHTML = formButton("Agregar a pre lista", "agregarATablaPreRecompras()", "reseteoFormulario()")
-    llenarCategoriaProductosEjecucion("#categoria-form")
+    document.getElementById("categoria-form").innerHTML = llenarCategoriaProductosEjecucion();
 
     document.getElementById("nuevo-producto").classList.remove("marcaBoton")
     document.getElementById("recompra-producto-plus").classList.add("marcaBoton")
@@ -514,19 +446,6 @@ document.addEventListener("keyup", () =>{
     };
 });
 
-function removerProductoRepetido(){//verificamos que el nuevo producto no tenga el mismo código en la tabla compras
-    const codigoComprasComparacionProductos = document.querySelectorAll(".id_compras_modal");
-    codigoComprasComparacionProductos.forEach((event) => {
-        document.querySelectorAll(".id_compras_proforma").forEach((elemento) => {
-            if(elemento.textContent === event.textContent &&
-                event.parentNode.children[7].children[0].value > 0 && 
-                elemento.parentNode.children[1].textContent === event.parentNode.children[1].textContent){
-                elemento.parentNode.remove()
-            }
-        });
-    });
-};
-
 function crearHeadRecompra(){
     let tablaCompras= document.querySelector("#tabla_modal > thead");
     let nuevaFilaTablaCompras = tablaCompras.insertRow(-1);
@@ -552,10 +471,10 @@ function crearBodyRecompras (codigoMovimientos, id_prod){
     let tablaRecompras= document.querySelector("#tabla_modal > tbody");
     let nuevaFilaTablaRecompras = tablaRecompras.insertRow(-1);
     let fila = `<tr>`+
-                    `<td class="id_compras_modal invisible">${id_prod}</td>`+// Columna 0 > id
+                    `<td class="id_modal invisible">${id_prod}</td>`+// Columna 0 > id
                     `<td class="suc_modal">${suc_add[obtenerIndiceSucursal("#sun_opc")]}</td>`+// Columna 1 > sucursal
                     `<td>${document.getElementById("categoria-form").children[document.getElementById("categoria-form").selectedIndex].textContent}</td>`+// Columna 2 > categoría
-                    `<td class="codigo_compras_modal" style="border-radius: 5px">${codigoMovimientos}</td>`+// Columna 3 > código
+                    `<td class="codigo_modal" style="border-radius: 5px">${codigoMovimientos}</td>`+// Columna 3 > código
                     `<td></td>`+// Columna 4 > descripción
                     `<td class="invisible"></td>`+// Columna 5 > talla
                     `<td style="text-align: right"></td>`+// Columna 6 > existencias
@@ -622,7 +541,7 @@ async function agregarATablaPreRecompras(){
                                 `existen en la Lista de Compras, no podrá continuar con la compra de estos.`, "")
             modal_proceso_salir_botones()
         };
-        document.querySelectorAll(".codigo_compras_modal").forEach((event)=>{//Pinta el código form que coincide en la tabla pre lista
+        document.querySelectorAll(".codigo_modal").forEach((event)=>{//Pinta el código form que coincide en la tabla pre lista
             if(event.textContent === document.getElementById("codigo-form").value){
                 event.style.background = "var(--boton-tres)"
             }
@@ -644,7 +563,7 @@ function op_cantidad_dos(e){
 };
 ////////////////CON ESTO SE LLENA LA TABLA PREMODIFICACION Y SE FILTRA LAS FILAS CON ID///////////////////////////////////
 async function buscarCodigo(){
-    const id_rec = document.querySelectorAll(".id_compras_modal");
+    const id_rec = document.querySelectorAll(".id_modal");
     let ids = Array.from(id_rec).map(element => element.textContent);
     let response = await cargarDatos(   `almacen_central_codigo_transferencias?`+
                                         `ids=${ids.join(",")}`);
@@ -664,7 +583,7 @@ async function buscarCodigo(){
                 id_c.style.background = "var(--boton-tres)"
                 id_c.style.color = "var(--color-secundario)"
             };
-            array_saldos.push(new ObjCompra(fila_res.categoria,
+            array_saldos.push(new ObjGeneral(fila_res.categoria,
                                             fila_res.codigo,
                                             fila_res.descripcion,
                                             fila_res.talla,
@@ -686,9 +605,9 @@ async function buscarCodigo(){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function filaBodyProformaPincipalRecompras(){
     const fila_principal = document.querySelector("#tabla_principal > tbody");
-    let idd = document.querySelectorAll(".id_compras_proforma");
+    let idd = document.querySelectorAll(".id_proforma");
     let id_prof = Array.from(idd).map(x => Number(x.textContent));
-    const id_remove = document.querySelectorAll(".id_compras_modal");
+    const id_remove = document.querySelectorAll(".id_modal");
     array_saldos.forEach((obj_recompra)=>{
         let coincidencia_id = id_prof.find(x=> x === obj_recompra.idProd)
         if(coincidencia_id === undefined){
@@ -720,7 +639,7 @@ function filaBodyProformaPincipalRecompras(){
                                 `<td style="text-align: right">${formatoMoneda(obj_recompra.precio)}</td>`+// Columna 11 > precio de venta
                                 `<td style="text-align: right">${obj_recompra.lote}</td>`+// Columna 12 > lote
                                 `<td style="text-align: right">${d_proveedor.nombre_cli}</td>`+// Columna 13 > proveedor
-                                `<td class="id_compras_proforma invisible">${obj_recompra.idProd}</td>`+// Columna 14 > id
+                                `<td class="id_proforma invisible">${obj_recompra.idProd}</td>`+// Columna 14 > id
                                 `<td style="text-align: center">
                                     <div class="tooltip">
                                         <span style="font-size:18px;" class="material-symbols-outlined eliminarTablaFila" onCLick = "clicKEliminarFilaDos(this)">delete</span>
@@ -828,7 +747,7 @@ function removerModal(){
     };
 }
 function removerListaModal(){// Elimina los elementos del array_saldos que coincidan con los elementos de la tabla modal
-    let filas = document.querySelectorAll(".codigo_compras_modal")
+    let filas = document.querySelectorAll(".codigo_modal")
     filas.forEach((e) =>{
         array_saldos.forEach((event, i)=>{
             event.codigo === e.textContent ? array_saldos.splice(i, 1): "";
@@ -903,18 +822,4 @@ function clicKEliminarFilaDos(e) {
     });
     fila.remove();
     sumaSaldosProforma();
-};
-function formatoMoneda(valor_numerico){
-    let value = valor_numerico.toString();
-    value = value.replace(/[^0-9.]/g, '');// Eliminar todo lo que no sea un número o un punto decimal
-    if (value.includes('.')) {// Verificar si el valor contiene un punto decimal
-        let parts = value.split('.');
-        let integerPart = parts[0].padStart(1, '0');// Asegurar que la parte entera tenga al menos un caracter (añadir 0 si es necesario)
-        let decimalPart = parts[1] ? parts[1].substring(0, 2) : '';// Limitar la parte decimal a dos dígitos
-        decimalPart = decimalPart.padEnd(2, '0');// Si la parte decimal tiene menos de dos dígitos, añadir ceros
-        value = `${integerPart}.${decimalPart}`;// Formatear el valor final
-    } else {
-        value = value.padStart(1, '0') + '.00';// Si no hay punto decimal, añadir ".00" al final y asegurar que la parte entera tiene un dígitos
-    }
-    return value;// Ajustar el valor del input al valor formateado
 };

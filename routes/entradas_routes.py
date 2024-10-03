@@ -14,12 +14,9 @@ entradas_individual_id = Blueprint('entradas_individual_id', __name__)
 entradas_extraccion_csv = Blueprint('entradas_extraccion_csv', __name__)
 entradas_id_kardex = Blueprint('entradas_id_kardex', __name__)
 entradas_comprobante = Blueprint('entradas_comprobante', __name__)
-entradas_post = Blueprint('entradas_post', __name__)
 entradas_delete = Blueprint('entradas_delete', __name__)
 entradas_devolucion_post = Blueprint('entradas_devolucion_post', __name__)
-entradas_recompra_individual_post = Blueprint('entradas_recompra_individual_post', __name__)
 entradas_recompra_grupal_post = Blueprint('entradas_recompra_grupal_post', __name__)
-entradas_traspasos_get_post = Blueprint('entradas_traspasos_get_post', __name__)
 entradas_compras_grupal_get_post = Blueprint('entradas_compras_grupal_get_post', __name__)
 
 
@@ -363,50 +360,6 @@ def getEntradasComprobante(comprobante):
         return jsonify({'error': str(e)}), 500
 
 ###------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@entradas_post.route('/api/entradas', methods=['POST'])
-@cross_origin()
-@login_required
-def saveEntradas():
-    if 'idEntr' in request.json:
-        editEntradas()
-    else:
-        createEntradas()
-    return "ok"
-
-def createEntradas(): #Entradas
-    try:
-        dato_uno = 0
-        usuarioLlave = session.get('usernameDos')
-        usuarioId = session.get('identificacion_usuario')
-        dato_cero = 0
-        with mysql.connection.cursor() as cur:
-            query = ("INSERT INTO `entradas` "
-                     "(`idEntr`, `idProd`, `sucursal`, `existencias_entradas`, `comprobante`, `causa_devolucion`, "
-                     "`usuario`, `fecha`, `existencias_devueltas`, `identificadorEntr`, `estado`) "
-                     "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
-            data = (request.json['idProd'], request.json['sucursal'], request.json['existencias_entradas'], request.json['comprobante'], dato_cero, 
-                    usuarioId, request.json['fecha'], dato_cero, usuarioLlave, dato_uno)
-            cur.execute(query, data)
-            mysql.connection.commit()
-        return jsonify({"status": "success", "message": "Entrada creada correctamente."})
-    except Exception as e:
-        mysql.connection.rollback()
-        return jsonify({"status": "error", "message": str(e)})
-
-def editEntradas():
-    try:
-        usuarioLlave = session.get('usernameDos')
-        with mysql.connection.cursor() as cur:
-            query = ("UPDATE `entradas` SET `existencias_entradas` = %s, `existencias_devueltas` = %s "
-                     "WHERE `entradas`.`idEntr` = %s "
-                     "AND identificadorEntr = %s")
-            data = (request.json['existencias_entradas'], request.json['existencias_devueltas'], request.json['idEntr'], usuarioLlave)
-            cur.execute(query, data)
-            mysql.connection.commit()
-        return jsonify({"status": "success", "message": "Entrada actualizada correctamente."})
-    except Exception as e:
-        mysql.connection.rollback()
-        return jsonify({"status": "error", "message": str(e)})
 
 @entradas_delete.route('/api/entradas_remove', methods=['POST'])#Elimina fila
 @cross_origin()
@@ -481,45 +434,8 @@ def operarDevolucionCompra():
     finally:
         cur.close()
 
-@entradas_recompra_individual_post.route('/api/procesar_recompra', methods=['POST'])##Productos
-@cross_origin()
-@login_required
-def operarRecompra():
-    try:
-        recompra_data = request.json
-        dato_uno = 1
-        usuarioLlave = session.get('usernameDos')
-
-        cur = mysql.connection.cursor()
-        cur.execute("BEGIN")
-
-        # Numeración
-        numeracion = incrementar_obtener_numeracion(cur, dato_uno, usuarioLlave, 'Recompra', 'recompras')
-
-        query_productos = ( "UPDATE `almacen_central` SET "
-                            "existencias_ac = existencias_ac + %s, "
-                            "existencias_su = existencias_su + %s, "
-                            "existencias_sd = existencias_sd + %s, "
-                            "existencias_st = existencias_st + %s, "
-                            "existencias_sc = existencias_sc + %s "
-                            "WHERE `almacen_central`.`idProd` = %s "
-                            "AND `almacen_central`.`estado` > 0 "
-                            "AND identificadorProd = %s")
-        
-        data_productos = (  request.json['existencias_ac'],request.json['existencias_su'], request.json['existencias_sd'], 
-                            request.json['existencias_st'], request.json['existencias_sc'],  request.json['idProd'], usuarioLlave)
-        cur.execute(query_productos, data_productos)
-
-        procesar_e_insertar_entradas(cur, recompra_data, numeracion, session.get('identificacion_usuario'), usuarioLlave, 'array_entradas')
-        
-        mysql.connection.commit()
-
-        return jsonify({"status": "success", "message": f"{numeracion}"}), 200
-    except Exception as e:
-        mysql.connection.rollback()
-        return jsonify({"status": "error", "message": str(e)}), 500
 ########################################################################################################
-@entradas_recompra_grupal_post.route('/api/gestion_de_recompras', methods=['POST'])##Recompras
+@entradas_recompra_grupal_post.route('/api/gestion_de_recompras', methods=['POST'])##Recompras, Productos
 @cross_origin()
 @login_required
 def gestionDeRecompras():
@@ -566,71 +482,7 @@ def gestionDeRecompras():
         return jsonify({"status": "error", "message": f"Error general: {str(e)}"}), 500
 #######################################################################################################
 
-@entradas_traspasos_get_post.route('/api/gestion_de_traspasos', methods=['GET', 'POST'])##Compras-Registro#ya no se usa
-@cross_origin()
-@login_required
-def gestionDeTraspasos():
-    try:
-        dato_uno = 1
-        usuarioLlave = session.get('usernameDos')
-        usuarioId = session.get('identificacion_usuario')
-        dato_cero = 0
-
-        productos_compra = request.json.get('array_productos', [])
-        entradas_compra = request.json.get('array_entradas', [])
-
-        with mysql.connection.cursor() as cur:
-            # Inserciones en lote para productos
-            query_productos = ( "INSERT INTO `almacen_central` "
-                                "(`categoria`, `codigo`, `descripcion`, `talla`, `costo_unitario`, `precio_venta`, `lote`, `proveedor`, "
-                                "`existencias_ac`, `existencias_su`, `existencias_sd`, `existencias_st`, `identificadorProd`, `estado`) "
-                                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
-            
-            data_productos =    [
-                                ( p['categoria'], p['codigo'], p['descripcion'], p['talla'],
-                                p['costo_unitario'], p['precio_venta'], p['lote'], p['proveedor'],
-                                p['existencias_ac'], p['existencias_su'], p['existencias_sd'],
-                                p['existencias_st'], usuarioLlave, dato_uno) 
-                                for p in productos_compra
-                                ]
-            cur.executemany(query_productos, data_productos)
-
-            # Recuperar IDs de productos insertados
-            codigos = [p['codigo'] for p in productos_compra]
-            query_productos_busqueda = ("SELECT idProd, codigo "
-                                        "FROM almacen_central "
-                                        "WHERE `identificadorProd` = %s AND codigo IN (%s) "
-                                        "ORDER BY idProd DESC")
-            
-            in_placeholder = ', '.join(['%s'] * len(codigos))
-            cur.execute(query_productos_busqueda % (usuarioLlave, in_placeholder), codigos)
-            id_map = {codigo: idProd for idProd, codigo in cur.fetchall()} 
-
-            # Inserciones en lote para entradas
-            query_entradas = (  "INSERT INTO `entradas` "
-                                "(`idProd`, `sucursal`, `existencias_entradas`, `comprobante`, `causa_devolucion`, `usuario`, `fecha`, "
-                                "`existencias_devueltas`, `identificadorEntr`, `estado`) "
-                                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
-            
-            data_entradas =     [
-                                (id_map[e['codigo']], e['sucursal'], e['existencias_entradas'], e['comprobante'], dato_cero,
-                                usuarioId, e['fecha'], dato_cero, usuarioLlave, dato_uno) 
-                                for e in entradas_compra if e['codigo'] in id_map
-                                ]
-            #if e['codigo'] in id_map: Filtra los elementos en entradas para incluir solo 
-            # aquellos cuyo codigo existe como clave en el diccionario id_map.  
-            # Esto asegura que solo los registros que tienen un código que corresponde a un idProd en id_map se procesen.
-            cur.executemany(query_entradas, data_entradas)
-
-            mysql.connection.commit() 
-
-        return jsonify({"status": "success", "message": "Productos creados correctamente."})
-
-    except Exception as e:
-        mysql.connection.rollback()
-        return jsonify({"status": "error", "message": str(e)})
-
-@entradas_compras_grupal_get_post.route('/api/gestion_de_compras', methods=['GET', 'POST'])##Compras-Registro
+@entradas_compras_grupal_get_post.route('/api/gestion_de_compras', methods=['GET', 'POST'])##Compras
 @cross_origin()
 @login_required
 def gestionDeCompras():
@@ -657,7 +509,7 @@ def gestionDeCompras():
                 insertar_almacen_central(cur, array_productos, usuarioLlave, dato_uno)
             except Exception as e:
                 mysql.connection.rollback()  # Hacer rollback si hay un error en actualizar_almacen_central
-                return jsonify({"status": "error", "message": f"Error al actualizar el inventario: {str(e)}"}), 400
+                return jsonify({"status": "error", "message": f"Error al insertar en el inventario: {str(e)}"}), 400
 
             # Insertar las entradas en la tabla 'entradas'
             try:

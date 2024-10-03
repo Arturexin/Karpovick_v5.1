@@ -2,54 +2,16 @@
 
 {% block content %}
 <div class="perdidas-form baja_opacidad">
-    <div class="contenedor_compras">
-        <div class="contenedor_compras_dos">
-            <form id="formulario-perdidas">
-                <div class="into_form">
-                    <h2>Despacho sin venta
-                        <div class="tooltip_ayuda">
-                            <span class="material-symbols-outlined">help</span>
-                            <span class="tooltiptext_ayuda">Registra salidas de productos sin intercambio monetario.</span>
-                        </div>
-                    </h2>
-                    <label>Sucursal 
-                        <select name="fffff-sucursal" id="fffff-sucursal" class="input-select-ventas">
-                        </select>
-                        <div class="tooltip_ayuda">
-                            <span class="material-symbols-outlined">help</span>
-                            <span class="tooltiptext_ayuda">Seleccione la sucursal del producto a buscar.</span>
-                        </div>
-                    </label>
-                    <div>
-                        <input class="input-general-importante fondo-importante" type="text" id="buscador-perdidas" placeholder="Buscar por código">
-                        <div class="tooltip_ayuda">
-                            <span class="material-symbols-outlined">find_in_page</span>
-                            <span class="tooltiptext_ayuda">Digite caracteres clave del código a buscar.</span>
-                        </div>
-                    </div>
-                    <div class="contenedor-label-input-compras">
-                        <div class="label">
-                            <input class="input-general" type="hidden" id="id-perdidas" name="id-perdidas" disabled/>
-                            <label class="label-general">Categoria
-                                <select name="categoria-perdidas" id="categoria-perdidas" class="input-general fondo" disabled>
-                                </select>
-                            </label>
-                            <label class="label-general">Código<input class="input-general fondo" type="text" id="codigo-perdidas" name="codigo-perdidas" disabled/></label>
-                            <label class="label-general">Descripción<input class="input-general fondo" type="text" id="descripcion-perdidas" name="descripcion-perdidas" disabled/></label>
-                        </div>
-                    </div>
-                    <label>Motivo de Salida
-                            <select id="motivo_salida">motivo
-                                <option value="Donación">Donación</option>
-                                <option value="Pérdida">Pérdida</option>
-                            </select>
-                    </label>
-                    <div>
-                        <button id="agregarATablaPrePerdidas" class="myButtonAgregar">Agregar a Tabla de Pérdidas</button>
-                        <input onclick="reseteoFormulario()" type="reset" class="myButtonEliminar">
-                    </div> 
-                </div>
-            </form>
+    <div class="contenedor_compras_principal">
+        <div>
+            <div class="contenedor_formulario_compras" id="form_contenedor"></div>
+            <label>Motivo de Salida
+                <select id="motivo_salida">motivo
+                    <option value="Donación">Donación</option>
+                    <option value="Pérdida">Pérdida</option>
+                </select>
+            </label>
+            <div  class="boton-cli" id="button_contenedor"></div>
         </div>
         <div class="contenedor_busqueda_detalle_general">
             <div style="display: grid;">
@@ -150,4 +112,5 @@
     </div>
 </div>
 <script src="../static/perdidas.js"></script>
+<script src="../static/form.js"></script>
 {% endblock %}

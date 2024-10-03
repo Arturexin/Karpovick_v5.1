@@ -270,31 +270,37 @@ async function procesarRecompra(){
 };
 async function realizarRecompra(){
     let nom_suc = Array.from(document.querySelectorAll(".nom_suc"));
-    let array_entradas = [];
-    const numFilas = document.querySelector("#tabla_proforma_producto > tbody").children
-
-    function DatosEntradas(a){
+    let array_productos_dos = [];
+    let array_entradas_dos = [];
+    function DataProductos(){
         this.idProd = Number(document.getElementById("id_prod").textContent);
-        this.sucursal = Number(a.children[4].textContent);
-        this.existencias_entradas = Number(a.children[2].children[0].value);
-    }
-    for(let i = 0; i < numFilas.length; i++){
-        numFilas[i].children[2].children[0].value > 0 ? array_entradas.push(new DatosEntradas(numFilas[i])): "";
-    }
-
-    function DataRecompras(){
-        this.idProd = Number(document.getElementById("id_prod").textContent);
-        this.id_num = datos_usuario[0].id;
         suc_add.forEach((e, i)=>{
-            let coincidencia = nom_suc.find(x => x.textContent === e)
-            coincidencia ?  this[sucursales_activas[i]] = Number(coincidencia.parentNode.children[2].children[0].value):
+            let coincidencia = nom_suc.find(x => x.textContent === e);
+            coincidencia ?  this[sucursales_activas[i]] = Number(coincidencia.parentNode.children[2].children[0].value): 
                             this[sucursales_activas[i]] = 0;
         });
-        this.array_entradas = array_entradas;
+    };
+    array_productos_dos.push(new DataProductos())
+    function DatosEntradas(existencias, sucursal){
+        this.idProd = Number(document.getElementById("id_prod").textContent);
+        this.existencias_entradas = existencias;
+        this.sucursal = sucursal;
+    }
+    document.querySelectorAll(".q_recompra").forEach((event, i)=>{
+        let row_ = event.closest("tr");
+        if(event.value > 0){
+            array_entradas_dos.push(new DatosEntradas(Number(event.value), Number(row_.children[4].textContent)))
+        }
+    })
+
+    function DataRecompras(){
+        this.id_num = datos_usuario[0].id;
         this.fecha = generarFecha();
+        this.array_productos_dos = array_productos_dos;
+        this.array_entradas_dos = array_entradas_dos;
     };
     let fila_recompra = new DataRecompras();
-    let url = URL_API_almacen_central + 'procesar_recompra';
+    let url = URL_API_almacen_central + 'gestion_de_recompras';
     let response = await funcionFetchDos(url, fila_recompra)
     if(response.status === "success"){
         modal_proceso_abrir(`La ${response.message} se ejecutó satisfactoriamente.`)
@@ -397,7 +403,10 @@ async function procesarTransferencia(){
 };
 async function realizarTransferencia(){
     let nom_suc = Array.from(document.querySelectorAll(".nom_suc"));
-    function DatosTransferencia(){
+    /* const numFilas = document.querySelector("#tabla-proforma-transferencias > tbody").children */
+    let array_data_prod = [];
+    let array_data_tran = [];
+    function DataProductos(){
         this.idProd = Number(document.getElementById("id_prod").textContent);
         suc_add.forEach((e, i)=>{
             let coincidencia = nom_suc.find(x => x.textContent === e)
@@ -405,12 +414,36 @@ async function realizarTransferencia(){
                                                                                         this[sucursales_activas[i]] = Number(coincidencia.parentNode.children[2].children[0].value):
                             this[sucursales_activas[i]] = 0;
         });
+    };
+    array_data_prod.push(new DataProductos())
+    function DataTransferencia(existencias, sucursal_origen, sucursal_destino){
+        this.idProd = Number(document.getElementById("id_prod").textContent);
+        this.cantidad = existencias;
+        this.id_suc_origen = sucursal_origen;
+        this.id_suc_destino = sucursal_destino;
+    };
+    let suc_o = 0;
+    document.querySelectorAll(".suc_tran").forEach((event)=>{//Buscamos la sucursal de origen
+        let row_ = event.closest("tr");
+        if(row_.children[5].children[0].checked){
+            suc_o = Number(row_.children[4].textContent)
+        }
+    })
+    document.querySelectorAll(".q_tran").forEach((event, i)=>{
+        let row_ = event.closest("tr");
+        if(event.value > 0){
+            array_data_tran.push(new DataTransferencia(Number(event.value), Number(suc_o), Number(row_.children[4].textContent)))
+        }
+    })
+    function DatosTransferencia(){
+        this.array_data_prod = array_data_prod;
+        this.array_data_tran = array_data_tran;
         this.id_num = datos_usuario[0].id;
         this.fecha = generarFecha();
-    };
-    let fila = new DatosTransferencia();
+    }
 
-    let url = URL_API_almacen_central + 'procesar_transferencia_p'
+    let fila = new DatosTransferencia();
+    let url = URL_API_almacen_central + 'procesar_transferencia'
     let response = await funcionFetchDos(url, fila)
     if(response.status === "success"){
         modal_proceso_abrir(`La trnasferencia "${response.message}" fue procesada satisfactoriamente!!!.`, ``)

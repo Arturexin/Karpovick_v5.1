@@ -99,29 +99,17 @@ function subRutaB(num, index){
             `fecha_fin_salidas=${fecha_fin[index]}`
 };
 function cuerpoFilaTabla(e){
-    
-    let fila_t =[e.q_ac,e.q_su,e.q_sd,e.q_st]
-    let fila_s=[e.existencias_salidas, e.existencias_devueltas, e.precio_venta_salidas, e.existencias_salidas + e.existencias_devueltas + e.precio_venta_salidas]
-    let tit_t = ["Uni. AC", "Unid. SU", "Unid. SD", "Unid. ST"]
-    let tit_s = ["Salidas de existencias","Devolución de salidas","Precio de venta","Total venta"]
-    document.querySelectorAll(".tit_").forEach((event, i)=>{
-        if(tabla.value > 0){
-            event.textContent = tit_t[i]
-        }else{
-            event.textContent = tit_s[i]
-        }
-    });
     return  `<tr class="busqueda-salidas">
-                <td class="invisible">${tabla.value > 0 ? e.id_tran : e.idSal}</td>
-                <td>${tabla.value > 0 ? "" :e.sucursal_nombre}</td>
+                <td class="invisible">${e.idSal}</td>
+                <td>${e.sucursal_nombre}</td>
                 <td>${e.categoria_nombre}</td>
                 <td>${e.codigo}</td>
-                <td style="text-align: end;">${tabla.value > 0 ? fila_t[0] : fila_s[0]}</td>
-                <td style="text-align: end;">${tabla.value > 0 ? fila_t[1] : fila_s[1]}</td>
-                <td style="text-align: end;">${tabla.value > 0 ? fila_t[2] : fila_s[2]}</td>
-                <td style="text-align: end;">${tabla.value > 0 ? fila_t[3] : fila_s[3]}</td>
+                <td style="text-align: end;">${e.existencias_salidas}</td>
+                <td style="text-align: end;">${e.existencias_devueltas}</td>
+                <td style="text-align: end;">${formatoMoneda(e.precio_venta_salidas)}</td>
+                <td style="text-align: end;">${formatoMoneda((e.existencias_salidas - e.existencias_devueltas) * e.precio_venta_salidas)}</td>
                 <td>${e.comprobante}</td>
-                <td>${tabla.value > 0 ? e.fecha_tran : e.fecha}</td>
+                <td>${e.fecha}</td>
                 <td style="text-align: center;width: 80px">
                     <div class="tooltip">
                         <span onclick="accionDevoluciones(${e.idSal})" style="font-size:18px;" class="material-symbols-outlined myButtonEditar">assignment_return</span>
@@ -731,3 +719,18 @@ extraccion_.addEventListener("click", async ()=>{
     console.log(csvContent)
     downloadCSV(csvContent, 'dataSalidas.csv');
 });
+
+function formatoMoneda(valor_numerico){
+    let value = valor_numerico.toString();
+    value = value.replace(/[^0-9.]/g, '');// Eliminar todo lo que no sea un número o un punto decimal
+    if (value.includes('.')) {// Verificar si el valor contiene un punto decimal
+        let parts = value.split('.');
+        let integerPart = parts[0].padStart(1, '0');// Asegurar que la parte entera tenga al menos un caracter (añadir 0 si es necesario)
+        let decimalPart = parts[1] ? parts[1].substring(0, 2) : '';// Limitar la parte decimal a dos dígitos
+        decimalPart = decimalPart.padEnd(2, '0');// Si la parte decimal tiene menos de dos dígitos, añadir ceros
+        value = `${integerPart}.${decimalPart}`;// Formatear el valor final
+    } else {
+        value = value.padStart(1, '0') + '.00';// Si no hay punto decimal, añadir ".00" al final y asegurar que la parte entera tiene un dígitos
+    }
+    return value;// Ajustar el valor del input al valor formateado
+};

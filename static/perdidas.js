@@ -2,15 +2,20 @@ document.addEventListener("DOMContentLoaded", inicioPerdidas)
 let anio_principal = ""
 function inicioPerdidas(){
     anio_principal = new Date().getFullYear()
-    cargarSucursalesEjecucion(document.getElementById("fffff-sucursal"))
+    document.getElementById("form_contenedor").innerHTML = formUpdate('Transferencias')
+    document.querySelector(".baja_opacidad_interior").classList.add("alta_opacidad_interior")
+    document.getElementById("button_contenedor").innerHTML = formButton("Agregar a pre lista", "agregarAtablaModal()", "reseteoFormulario()")
+    document.getElementById("categoria-form").innerHTML = llenarCategoriaProductosEjecucion();
+
     cargarDatosAnio()
     btnPerdidas = 1;
-    cambioSucursalModificacion("fffff-sucursal")
-    llenarCategoriaProductosEjecucion("#categoria-perdidas")
-    llenarCategoriaProductosEjecucion("#categoria_buscador_detalle")
+
+    document.getElementById("categoria_buscador_detalle").innerHTML = llenarCategoriaProductosEjecucion();
+    indice_base = JSON.parse(localStorage.getItem("base_datos_consulta"))
 };
 /////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
+let array_saldos = [];
 const barras_perdidas = [".cg_1_c", ".cg_2_c", ".cg_3_c", ".cg_4_c", ".cg_5_c"]
 function cargarDatosAnio(){
     document.getElementById("cargar_datos_anio").addEventListener("click", async ()=>{
@@ -24,46 +29,51 @@ function cargarDatosAnio(){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////Pérdidas/////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function cambioSucursalModificacion(id){
-    document.getElementById(id).addEventListener("change", ()=>{
-        document.getElementById("buscador-perdidas").value = ""
-        document.getElementById("id-perdidas").value = ""
-        document.getElementById("categoria-perdidas").value = ""
-        document.getElementById("codigo-perdidas").value = ""
-        document.getElementById("descripcion-perdidas").value = ""
-        document.getElementById("buscador-perdidas").focus();
-    });
-};
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 let sucursal_id_perdidas = 0;
 let indice_sucursal_despacho = 0;
-let formularioPerdidas = document.getElementById("formulario-perdidas");
 const base_datos_busqueda = JSON.parse(localStorage.getItem("base_datos_consulta"))
 function reseteoFormulario(){
-    document.getElementById("id-perdidas").value = "";
-    document.getElementById('categoria-perdidas').value = "0";
-    document.getElementById('codigo-perdidas').value = "";
-    document.getElementById('descripcion-perdidas').value = "";
+    document.getElementById("id-form").value = "";
+    document.getElementById('categoria-form').value = "0";
+    document.getElementById('codigo-form').value = "";
+    document.getElementById('descripcion-form').value = "";
 };
 document.addEventListener("keyup", (e) =>{
-    indice_base = JSON.parse(localStorage.getItem("base_datos_consulta"))
-    let almacenCentral = indice_base.find(y => y.codigo.toLowerCase().startsWith(document.getElementById('buscador-perdidas').value.toLocaleLowerCase()))
+    let almacenCentral = indice_base.find(y => y.codigo.toLowerCase().startsWith(document.getElementById('buscador-productos-form').value.toLocaleLowerCase()))
     if(almacenCentral){
-        document.getElementById('id-perdidas').value = almacenCentral.idProd
-
-        sucursal_id_perdidas = document.getElementById("fffff-sucursal").value
-        indice_sucursal_despacho = obtenerIndiceSucursal("#fffff-sucursal")
-        document.getElementById('categoria-perdidas').value = almacenCentral.categoria
-        document.getElementById('codigo-perdidas').value = almacenCentral.codigo
-        document.getElementById('descripcion-perdidas').value = almacenCentral.descripcion
-        if(document.getElementById('buscador-perdidas').value == ""){
-            reseteoFormulario()
-        }
+        document.getElementById('id-form').value = almacenCentral.idProd
+        document.getElementById('categoria-form').value = almacenCentral.categoria
+        document.getElementById('codigo-form').value = almacenCentral.codigo
+        document.getElementById('descripcion-form').value = almacenCentral.descripcion
+        if(document.getElementById('buscador-productos-form').value == ""){
+            reseteoFormulario();
+        };
     }else{
         reseteoFormulario();
     };
 });
-
+function crearHeadDespacho(){
+    let tablaDespacho= document.querySelector("#tabla_modal > thead");
+    let nuevaFilaTablaDespacho = tablaDespacho.insertRow(-1);
+    let fila = `
+                <tr class="tbody_preproforma">
+                    <th style="width: 120px;">Sucursal
+                        <select id="sun_opc" onChange="accionSelectDos()"></select>
+                    </th>
+                    <th style="width: 120px;">Categoría</th>
+                    <th style="width: 120px;">Código</th>
+                    <th style="width: 120px;">Descripción</th>
+                    <th style="width: 70px;">Existencias</th>
+                    <th style="width: 70px;">Cantidad a comprar</th>
+                    <th style="width: 70px;">Saldo existencias</th>
+                    <th style="width: 70px;">CU</th>
+                    <th style="width: 70px;">CT de la compra</th>
+                    <th style="width: 40px;"><span style="font-size:18px;" class="material-symbols-outlined">delete</span></th>
+                </tr>
+                `
+    nuevaFilaTablaDespacho.innerHTML = fila;
+};
 function crearBodyDespacho (codigo, id_prod){
     let tabladespacho= document.querySelector("#tabla-pre-despacho > tbody");
     let nuevaFilaTabladespacho = tabladespacho.insertRow(-1);
@@ -88,8 +98,8 @@ function crearBodyDespacho (codigo, id_prod){
                 `</tr>`
     nuevaFilaTabladespacho.innerHTML = fila;
 };
-agregarATablaPrePerdidas.addEventListener("click", agregarAModal)
-async function agregarAModal(e){
+/* agregarATablaPrePerdidas.addEventListener("click", agregarAModal) */
+async function agregarAtablaModal(e){
     e.preventDefault();
     
     let base = 0;

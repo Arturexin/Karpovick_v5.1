@@ -6,10 +6,10 @@
         <button id="registra-modificacion" class="myButtonAgregarDos">Registrar Nuevo producto</button>
         <button id="editar-modificacion" class="myButtonAgregarDos">Modificar Producto</button>
     </div>
-    <div class="contenedor_compras">
-        <div class="contenedor_compras_dos">
-            <form id="formulario-modificacion">
-            </form>
+    <div class="contenedor_compras_principal">
+        <div>
+            <div class="contenedor_formulario_compras" id="form_contenedor"></div>
+            <div  class="boton-cli" id="button_contenedor"></div>
         </div>
         <div class="contenedor_busqueda_detalle_general">
             <div style="display: grid;">
@@ -36,54 +36,38 @@
         </div>
     </div>
     <div class="contenedor-pre-modificacion">
-        <table id="tabla-pre-modificacion" class="tabla_modal contenido-tabla">
+        <table id="tabla_modal" class="tabla_modal contenido-tabla">
             <thead>
                 <tr>
-                    <th scope="row" colspan="12"><h2>Proforma</h2></th>
-                </tr>
-                <tr>
-                    <th style="width: 120px;">Sucursal</th>
-                    <th style="width: 120px;">Categoría</th>
-                    <th style="width: 100px;">Código</th>
-                    <th>Descripción</th>
-                    <th style="width: 70px;">Medidas</th>
-                    <th>Cantidad</th>
-                    <th style="width: 70px;">Costo de Unitario</th>
-                    <th style="width: 70px;">Costo Total</th>
-                    <th style="width: 70px;">Precio de Venta</th>
-                    <th>Lote</th>
-                    <th>Proveedor</th>
-                    <th>
-                        <span style="font-size:18px;" class="material-symbols-outlined">delete</span>
+                    <th scope="row" colspan="12">
+                        <h2>Pre lista</h2>
                     </th>
                 </tr>
             </thead>
             <tbody>
             </tbody>
             <tfoot>
-                <th scope="row" colspan="12">
+                <th scope="row" colspan="18" id="contenedor_botones_modal"></th>
+                <!-- <th scope="row" colspan="12">
                     <button id="procesar-modificacion-uno" class="myButtonAgregar">Enviar a Lista Productos</button>
                     <button id="procesar-modificacion-dos" class="myButtonAgregar invisible">Enviar a Lista Productos</button>
                     <button id="remover-tabla-modificacion-uno" class="eliminarTablaFila">Cancelar</button>
-                </th>
+                </th> -->
             </tfoot>
         </table>
     </div>
     <div class="contenedor_tabla">
-        <table id="tabla-proforma-modificacion" class="tabla-proforma">
+        <table id="tabla_principal" class="tabla-proforma">
             <thead>
                 <tr>
                     <th scope="row" colspan="12"><h2>Lista de Productos</h2></th>
                 </tr>
                 <tr>
-                    <th>Sucursal</th>
                     <th>Categoría</th>
                     <th>Código</th>
                     <th>Descripción</th>
                     <th>Medidas</th>
-                    <th>Existencias</th>
                     <th>Costo Unitario</th>
-                    <th>Costo Total</th>
                     <th>Precio de Venta</th>
                     <th>Lote</th>
                     <th>Proveedor</th>
@@ -107,4 +91,5 @@
     </div>
 </div>
 <script src="../static/modificacion.js"></script>
+<script src="../static/form.js"></script>
 {% endblock %}

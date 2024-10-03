@@ -16,9 +16,10 @@ productos_actualizar_saldos = Blueprint('productos_actualizar_saldos', __name__)
 productos_individual_stock_id = Blueprint('productos_individual_stock_id', __name__)
 productos_individual_datos_id = Blueprint('productos_individual_datos_id', __name__)
 productos_individual_stock_suc_cod = Blueprint('productos_individual_stock_suc_cod', __name__)
-productos_crud = Blueprint('productos_crud', __name__)
 productos_modificacion = Blueprint('productos_modificacion', __name__)
-productos_remove = Blueprint('productos_remove', __name__)
+productos_registros_post = Blueprint('productos_registros_post', __name__)
+productos_modificacion_post = Blueprint('productos_modificacion_post', __name__)
+productos_remove = Blueprint('productos_remove', __name__) 
 
 
 
@@ -442,60 +443,6 @@ def getProductosTresSucursal(codigo):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 ###------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@productos_crud.route('/api/almacen_central', methods=['POST'])##Compras-Registro
-@cross_origin()
-@login_required
-def saveProductos():
-    if 'idProd' in request.json:
-        upDateProductos()
-    else:
-        createProductos()
-    return "ok"
-
-def createProductos():
-    try:
-        dato_uno = 1
-        usuarioLlave = session.get('usernameDos')
-        with mysql.connection.cursor() as cur:
-            query = ("INSERT INTO `almacen_central` "
-                     "(`idProd`, `categoria`, `codigo`, `descripcion`, `talla`, "
-                     "`costo_unitario`, `precio_venta`, `lote`, `proveedor`, "
-                     "`existencias_ac`, `existencias_su`, `existencias_sd`, "
-                     "`existencias_st`, `identificadorProd`, `estado`) "
-                     "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
-            data = (request.json['categoria'], request.json['codigo'], request.json['descripcion'], request.json['talla'],
-                    request.json['costo_unitario'], request.json['precio_venta'], request.json['lote'], request.json['proveedor'],
-                    request.json['existencias_ac'], request.json['existencias_su'], request.json['existencias_sd'],
-                    request.json['existencias_st'], usuarioLlave, dato_uno)
-            cur.execute(query, data)
-            mysql.connection.commit()
-        return jsonify({"status": "success", "message": "Producto creado correctamente."})
-    except Exception as e:
-        mysql.connection.rollback()
-        return jsonify({"status": "error", "message": str(e)})
-    
-def upDateProductos():
-    try:
-        sucursal_post = request.json['sucursal_post']
-        usuarioLlave = session.get('usernameDos')
-        
-        if sucursal_post not in ['existencias_ac', 'existencias_su', 'existencias_sd', 'existencias_st', 'existencias_sc']:
-            return jsonify({"status": "error", "message": "Sucursal no válida"}), 400
-        
-        with mysql.connection.cursor() as cur:
-            query = (f"UPDATE `almacen_central` SET `categoria` = %s, `codigo` = %s, `descripcion` = %s, `talla` = %s, `costo_unitario` = %s, `precio_venta` = %s, `lote` = %s, `proveedor` = %s, {sucursal_post} = %s "
-                     "WHERE `almacen_central`.`idProd` = %s "
-                     "AND identificadorProd = %s")
-            data = (request.json['categoria'], request.json['codigo'], request.json['descripcion'], request.json['talla'], 
-                    request.json['costo_unitario'], request.json['precio_venta'], request.json['lote'], request.json['proveedor'], 
-                    request.json['existencias_post'], request.json['idProd'], usuarioLlave)
-            cur.execute(query, data)
-            mysql.connection.commit()
-        return jsonify({"status": "success", "message": "Producto actualizado correctamente."})
-    except Exception as e:
-        mysql.connection.rollback()
-        return jsonify({"status": "error", "message": str(e)})
-    
 @productos_modificacion.route('/api/almacen_central_categorias', methods=['POST'])##Configuración
 @cross_origin()
 @login_required
@@ -533,3 +480,99 @@ def removeProductos():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@productos_registros_post.route('/api/gestion_de_registro', methods=['POST'])##Registro
+@cross_origin()
+@login_required
+def gestionDeRegistros():
+    try:
+        array_productos = request.json.get('array_productos', [])
+        usuarioLlave = session.get('usernameDos')
+        dato_uno = 1
+
+        # Validar que los datos necesarios están presentes
+        if not array_productos or not usuarioLlave:
+            return jsonify({"status": "error", "message": "Faltan datos requeridos para procesar el registro"}), 400
+
+        with mysql.connection.cursor() as cur:
+            try:
+                insertar_almacen_central(cur, array_productos, usuarioLlave, dato_uno)
+            except Exception as e:
+                mysql.connection.rollback()  # Hacer rollback si hay un error en actualizar_almacen_central
+                return jsonify({"status": "error", "message": f"Error al insertar en el inventario: {str(e)}"}), 400
+
+            mysql.connection.commit() 
+
+        return jsonify({"status": "success", "message": "Productos registrados correctamente."})
+
+    except Exception as e:
+        mysql.connection.rollback()
+        return jsonify({"status": "error", "message": str(e)})
+    
+@productos_modificacion_post.route('/api/gestion_de_modificacion', methods=['POST'])##Modificación
+@cross_origin()
+@login_required
+def gestionDeModificacion():
+    try:
+        array_productos = request.json.get('array_productos', [])
+        usuarioLlave = session.get('usernameDos')
+
+        # Validar que los datos necesarios están presentes
+        if not array_productos or not usuarioLlave:
+            return jsonify({"status": "error", "message": "Faltan datos requeridos para procesar la modificación"}), 400
+
+        with mysql.connection.cursor() as cur:
+            try:
+                actualizar_almacen_central_data(cur, array_productos, usuarioLlave)
+            except Exception as e:
+                mysql.connection.rollback()  # Hacer rollback si hay un error en actualizar_almacen_central
+                return jsonify({"status": "error", "message": f"Error al modificar: {str(e)}"}), 400
+
+            mysql.connection.commit() 
+
+        return jsonify({"status": "success", "message": "Productos modificados correctamente."})
+
+    except Exception as e:
+        mysql.connection.rollback()
+        return jsonify({"status": "error", "message": str(e)})
+    
+
+def insertar_almacen_central(cur, array_productos, usuarioLlave, dato_uno):
+    query_productos = ( "INSERT INTO `almacen_central` "
+                        "(`categoria`, `codigo`, `descripcion`, `talla`, "
+                        "`costo_unitario`, `precio_venta`, `lote`, `proveedor`, "
+                        "`existencias_ac`, `existencias_su`, `existencias_sd`, "
+                        "`existencias_st`, `existencias_sc`, `identificadorProd`, `estado`) "
+                        "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+        
+    data_productos =    [
+                            (p['categoria'], p['codigo'], p['descripcion'], p['talla'],
+                            p['costo_unitario'], p['precio_venta'], p['lote'], p['proveedor'],
+                            p['existencias_ac'], p['existencias_su'], p['existencias_sd'],
+                            p['existencias_st'], p['existencias_sc'], usuarioLlave, dato_uno) 
+                            for p in array_productos
+                        ]
+    cur.executemany(query_productos, data_productos)
+
+    # Verificar si la cantidad de filas actualizadas es igual a la cantidad de productos
+    if cur.rowcount != len(array_productos):
+        raise Exception("Uno de los productos no se insertó.")
+    
+def actualizar_almacen_central_data(cur, array_productos, usuarioLlave):
+    query_productos = ( "UPDATE `almacen_central` SET `categoria` = %s, `codigo` = %s, `descripcion` = %s, `talla` = %s, "
+                        "`costo_unitario` = %s, `precio_venta` = %s, `lote` = %s, `proveedor` = %s "
+                        "WHERE `almacen_central`.`idProd` = %s "
+                        "AND almacen_central.estado > 0 "
+                        "AND identificadorProd = %s")
+    data_productos =    [   
+                            (p['categoria'], p['codigo'], p['descripcion'], p['talla'], 
+                            p['costo_unitario'], p['precio_venta'], p['lote'], p['proveedor'], 
+                            p['idProd'], usuarioLlave)
+                            for p in array_productos
+                        ]
+    cur.executemany(query_productos, data_productos)
+
+    # Verificar si la cantidad de filas actualizadas es igual a la cantidad de productos
+    if cur.rowcount != len(array_productos):
+        raise Exception("Uno de los productos no se actualizó.")

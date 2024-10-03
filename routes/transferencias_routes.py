@@ -16,35 +16,38 @@ productos_transferencias = Blueprint('productos_transferencias', __name__)
 productos_transferencias_p = Blueprint('productos_transferencias_p', __name__)
 
 
-@transferencias_conteo.route('/api/transferencias_conteo_s')##SALIDAS
+@transferencias_conteo.route('/api/transferencias_conteo')
 @cross_origin()
 @login_required
 def getAllTrasnferenciasConteo():
     try:
         usuarioLlave = session.get('usernameDos')
 
-        categoria_tran = request.args.get('categoria_salidas')
-        codigo_tran = request.args.get('codigo_salidas')
-        comprobante_tran = request.args.get('comprobante_salidas')
-        fecha_inicio_tran_str = request.args.get('fecha_inicio_salidas')
-        fecha_fin_tran_str = request.args.get('fecha_fin_salidas')
+        sucursal_entradas = request.args.get('sucursal_entradas')
+        categoria_entradas = request.args.get('categoria_entradas')
+        codigo_entradas = request.args.get('codigo_entradas')
+        comprobante_entradas = request.args.get('comprobante_entradas')
+        fecha_inicio_entradas_str = request.args.get('fecha_inicio_entradas')
+        fecha_fin_entradas_str = request.args.get('fecha_fin_entradas')
         
-        fecha_inicio_tran = datetime.strptime(fecha_inicio_tran_str, '%Y-%m-%d')
-        fecha_fin_tran = datetime.strptime(fecha_fin_tran_str, '%Y-%m-%d')
+        fecha_inicio_entradas = datetime.strptime(fecha_inicio_entradas_str, '%Y-%m-%d')
+        fecha_fin_entradas = datetime.strptime(fecha_fin_entradas_str, '%Y-%m-%d')
         
         with mysql.connection.cursor() as cur:
             query = (   "SELECT COUNT(*) "
                         "FROM transfrencias "
                         "JOIN almacen_central ON `transfrencias`.`id_prod` = `almacen_central`.`idProd` "
                         "JOIN categorias ON `almacen_central`.`categoria` = `categorias`.`id` "
+                        "JOIN sucursales ON `transfrencias`.`id_suc_destino` = `sucursales`.`id_sucursales` "
                         "WHERE `identificador_tran` = %s "
+                        "AND sucursal_nombre LIKE %s "
                         "AND categoria_nombre LIKE %s "
                         "AND codigo LIKE %s "
                         "AND comprobante LIKE %s "
                         "AND transfrencias.estado > 0 "
                         "AND fecha_tran >= %s AND fecha_tran < %s ")
-            data_params = (usuarioLlave, f"{categoria_tran}%", f"{codigo_tran}%", f"{comprobante_tran}%", 
-                        fecha_inicio_tran, fecha_fin_tran + timedelta(days=1))
+            data_params = (usuarioLlave, f"{sucursal_entradas}%", f"{categoria_entradas}%", f"{codigo_entradas}%", f"{comprobante_entradas}%", 
+                        fecha_inicio_entradas, fecha_fin_entradas + timedelta(days=1))
             cur.execute(query, data_params)
             data = cur.fetchone()[0]
 
@@ -52,28 +55,31 @@ def getAllTrasnferenciasConteo():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@transferencias_tabla.route('/api/transferencias_tabla_s/<int:numero>')
+@transferencias_tabla.route('/api/transferencias_tabla/<int:numero>')
 @cross_origin()
 @login_required
 def getAllTransferencias(numero):
     try:
         usuarioLlave = session.get('usernameDos')
 
-        categoria_tran = request.args.get('categoria_salidas')
-        codigo_tran = request.args.get('codigo_salidas')
-        comprobante_tran = request.args.get('comprobante_salidas')
-        fecha_inicio_tran_str = request.args.get('fecha_inicio_salidas')
-        fecha_fin_tran_str = request.args.get('fecha_fin_salidas')
+        sucursal_entradas = request.args.get('sucursal_entradas')
+        categoria_entradas = request.args.get('categoria_entradas')
+        codigo_entradas = request.args.get('codigo_entradas')
+        comprobante_entradas = request.args.get('comprobante_entradas')
+        fecha_inicio_entradas_str = request.args.get('fecha_inicio_entradas')
+        fecha_fin_entradas_str = request.args.get('fecha_fin_entradas')
        
-        fecha_inicio_tran = datetime.strptime(fecha_inicio_tran_str, '%Y-%m-%d')
-        fecha_fin_tran = datetime.strptime(fecha_fin_tran_str, '%Y-%m-%d')
+        fecha_inicio_entradas = datetime.strptime(fecha_inicio_entradas_str, '%Y-%m-%d')
+        fecha_fin_entradas = datetime.strptime(fecha_fin_entradas_str, '%Y-%m-%d')
        
         with mysql.connection.cursor() as cur:
-            query = (   "SELECT id_tran, categoria_nombre, codigo, q_ac, q_su, q_sd, q_st, comprobante, fecha_tran "
+            query = (   "SELECT id_tran AS idEntr, sucursal_nombre, categoria_nombre, codigo, cantidad AS existencias_entradas, comprobante, fecha_tran AS fecha, costo_unitario "
                         "FROM transfrencias "
                         "JOIN almacen_central ON `transfrencias`.`id_prod` = `almacen_central`.`idProd` "
                         "JOIN categorias ON `almacen_central`.`categoria` = `categorias`.`id` "
+                        "JOIN sucursales ON `transfrencias`.`id_suc_destino` = `sucursales`.`id_sucursales` "
                         "WHERE `identificador_tran` = %s "
+                        "AND sucursal_nombre LIKE %s "
                         "AND categoria_nombre LIKE %s "
                         "AND codigo LIKE %s "
                         "AND comprobante LIKE %s "
@@ -81,101 +87,227 @@ def getAllTransferencias(numero):
                         "AND fecha_tran >= %s AND fecha_tran < %s "
                         "ORDER BY id_tran ASC "
                         "LIMIT 20 OFFSET %s")
-            data_params = (usuarioLlave, f"{categoria_tran}%", f"{codigo_tran}%", f"{comprobante_tran}%", 
-                           fecha_inicio_tran, fecha_fin_tran + timedelta(days=1), numero)
+            data_params = (usuarioLlave, f"{sucursal_entradas}%", f"{categoria_entradas}%", f"{codigo_entradas}%", f"{comprobante_entradas}%", 
+                           fecha_inicio_entradas, fecha_fin_entradas + timedelta(days=1), numero)
             cur.execute(query, data_params)
             data = cur.fetchall()
 
         resultado = []
         for fila in data:
             contenido = { 
-               'id_tran': fila[0],
-               'categoria_nombre': fila[1],
-               'codigo': fila[2],
-               'q_ac': fila[3],
-               'q_su': fila[4],
-               'q_sd':fila[5],
-               'q_st':fila[6],
-               'comprobante': fila[7],
-               'fecha_tran': fila[8].strftime('%d-%m-%Y'),
+               'idEntr': fila[0],
+               'sucursal_nombre': fila[1],
+               'categoria_nombre': fila[2],
+               'codigo': fila[3],
+               'existencias_entradas':fila[4],
+               'comprobante': fila[5],
+               'fecha': fila[6].strftime('%d-%m-%Y'),
+               'existencias_devueltas': 0,
+               'costo_unitario': fila[7]
                }
             resultado.append(contenido)
         return jsonify(resultado)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+@transferencias_conteo_s.route('/api/transferencias_conteo_s')
+@cross_origin()
+@login_required
+def getAllTrasnferenciasConteoS():
+    try:
+        usuarioLlave = session.get('usernameDos')
 
+        sucursal_salidas = request.args.get('sucursal_salidas')
+        categoria_salidas = request.args.get('categoria_salidas')
+        codigo_salidas = request.args.get('codigo_salidas')
+        comprobante_salidas = request.args.get('comprobante_salidas')
+        fecha_inicio_salidas_str = request.args.get('fecha_inicio_salidas')
+        fecha_fin_salidas_str = request.args.get('fecha_fin_salidas')
+        
+        fecha_inicio_salidas = datetime.strptime(fecha_inicio_salidas_str, '%Y-%m-%d')
+        fecha_fin_salidas = datetime.strptime(fecha_fin_salidas_str, '%Y-%m-%d')
+        
+        with mysql.connection.cursor() as cur:
+            query = (   "SELECT COUNT(*) "
+                        "FROM transfrencias "
+                        "JOIN almacen_central ON `transfrencias`.`id_prod` = `almacen_central`.`idProd` "
+                        "JOIN categorias ON `almacen_central`.`categoria` = `categorias`.`id` "
+                        "JOIN sucursales ON `transfrencias`.`id_suc_destino` = `sucursales`.`id_sucursales` "
+                        "WHERE `identificador_tran` = %s "
+                        "AND sucursal_nombre LIKE %s "
+                        "AND categoria_nombre LIKE %s "
+                        "AND codigo LIKE %s "
+                        "AND comprobante LIKE %s "
+                        "AND transfrencias.estado > 0 "
+                        "AND fecha_tran >= %s AND fecha_tran < %s ")
+            data_params = (usuarioLlave, f"{sucursal_salidas}%", f"{categoria_salidas}%", f"{codigo_salidas}%", f"{comprobante_salidas}%", 
+                        fecha_inicio_salidas, fecha_fin_salidas + timedelta(days=1))
+            cur.execute(query, data_params)
+            data = cur.fetchone()[0]
+
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@transferencias_tabla_s.route('/api/transferencias_tabla_s/<int:numero>')
+@cross_origin()
+@login_required
+def getAllTransferenciasS(numero):
+    try:
+        usuarioLlave = session.get('usernameDos')
+
+        sucursal_salidas = request.args.get('sucursal_salidas')
+        categoria_salidas = request.args.get('categoria_salidas')
+        codigo_salidas = request.args.get('codigo_salidas')
+        comprobante_salidas = request.args.get('comprobante_salidas')
+        fecha_inicio_salidas_str = request.args.get('fecha_inicio_salidas')
+        fecha_fin_salidas_str = request.args.get('fecha_fin_salidas')
+       
+        fecha_inicio_salidas = datetime.strptime(fecha_inicio_salidas_str, '%Y-%m-%d')
+        fecha_fin_salidas = datetime.strptime(fecha_fin_salidas_str, '%Y-%m-%d')
+       
+        with mysql.connection.cursor() as cur:
+            query = (   "SELECT id_tran AS idSal, sucursal_nombre, categoria_nombre, codigo, cantidad AS existencias_salidas, comprobante, fecha_tran AS fecha, costo_unitario AS precio_venta_salidas "
+                        "FROM transfrencias "
+                        "JOIN almacen_central ON `transfrencias`.`id_prod` = `almacen_central`.`idProd` "
+                        "JOIN categorias ON `almacen_central`.`categoria` = `categorias`.`id` "
+                        "JOIN sucursales ON `transfrencias`.`id_suc_origen` = `sucursales`.`id_sucursales` "
+                        "WHERE `identificador_tran` = %s "
+                        "AND sucursal_nombre LIKE %s "
+                        "AND categoria_nombre LIKE %s "
+                        "AND codigo LIKE %s "
+                        "AND comprobante LIKE %s "
+                        "AND transfrencias.estado > 0 "
+                        "AND fecha_tran >= %s AND fecha_tran < %s "
+                        "ORDER BY id_tran ASC "
+                        "LIMIT 20 OFFSET %s")
+            data_params = (usuarioLlave, f"{sucursal_salidas}%", f"{categoria_salidas}%", f"{codigo_salidas}%", f"{comprobante_salidas}%", 
+                           fecha_inicio_salidas, fecha_fin_salidas + timedelta(days=1), numero)
+            cur.execute(query, data_params)
+            data = cur.fetchall()
+
+        resultado = []
+        for fila in data:
+            contenido = { 
+               'idSal': fila[0],
+               'sucursal_nombre': fila[1],
+               'categoria_nombre': fila[2],
+               'codigo': fila[3],
+               'existencias_salidas':fila[4],
+               'comprobante': fila[5],
+               'fecha': fila[6].strftime('%d-%m-%Y'),
+               'existencias_devueltas': 0,
+               'precio_venta_salidas': fila[7]
+               }
+            resultado.append(contenido)
+        return jsonify(resultado)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
 @transfrencias_kardex_id.route('/api/transfrencias_codigo_kardex/<int:id_producto>')###Kardex############################################################
 @cross_origin()
 @login_required
 def getTransferenciasCodigoKardex(id_producto):
     try:
-        q_suc = ['q_ac', 'q_su', 'q_sd', 'q_st', 'q_sc']
         usuarioLlave = session.get('usernameDos')
+        transferencias_sucursal = request.args.get('transferencias_sucursal')
         year_actual = request.args.get('year_actual')
-        indice_suc = request.args.get('transferencias_sucursal')
 
         with mysql.connection.cursor() as cur:
-            query = (f"SELECT {q_suc[int(indice_suc)]} AS existencias, comprobante, costo_unitario, fecha_tran AS fecha "
+            query = ("SELECT id_suc_origen, id_suc_destino, cantidad AS existencias, comprobante, costo_unitario, fecha_tran AS fecha, id_prod "
                      "FROM transfrencias "
                      "JOIN almacen_central ON `transfrencias`.`id_prod` = `almacen_central`.`idProd` "
                      "WHERE `identificador_tran` = %s "
+                     "AND (id_suc_origen = %s OR id_suc_destino = %s) "
                      "AND id_prod = %s "
-                     "AND transfrencias.estado > 0 "
                      "AND YEAR(fecha_tran) = %s")
-            data_params = (usuarioLlave, id_producto, year_actual)
+            data_params = (usuarioLlave, transferencias_sucursal, transferencias_sucursal, id_producto, year_actual)
             cur.execute(query, data_params)
             data = cur.fetchall()
 
         resultado = []
         for fila in data:
             contenido = {
-                'existencias': fila[0],
-                'comprobante': fila[1],
-                'costo_unitario': fila[2],
-                'fecha': fila[3].strftime('%d-%m-%Y')
+                'id_suc_origen': fila[0],
+                'id_suc_destino':fila[1],
+                'existencias': fila[2],
+                'comprobante': fila[3],
+                'costo_unitario': fila[4],
+                'fecha': fila[5].strftime('%d-%m-%Y')
                 }
             resultado.append(contenido)
         return jsonify(resultado)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
-@transferencias_suma_total.route('/api/transferencias_suma_total')  # HOME
+@transferencias_suma_total.route('/api/transferencias_suma_total')#HOME
 @cross_origin()
 @login_required
 def getSumaTotalTransferencias():
     try:
         usuarioLlave = session.get('usernameDos')
         year_actual = request.args.get('year_actual')
+        id_sucursal = request.args.get('id_sucursal')
 
         with mysql.connection.cursor() as cur:
-            query = ("SELECT "
-                     "SUM(q_ac * costo_unitario) AS suma_total_ac, "
-                     "SUM(q_su * costo_unitario) AS suma_total_su, "
-                     "SUM(q_sd * costo_unitario) AS suma_total_sd, "
-                     "SUM(q_st * costo_unitario) AS suma_total_st "
-                     "FROM transfrencias "
-                     "JOIN almacen_central ON transfrencias.id_prod = almacen_central.idProd "
-                     "WHERE identificador_tran = %s "
-                     "AND transfrencias.estado > 0 "
-                     "AND YEAR(fecha_tran) = %s")
-            data_params = (usuarioLlave, year_actual)
+            query = ("SELECT %s AS sucursal,"
+                    "SUM(CASE WHEN id_suc_destino = %s THEN cantidad * costo_unitario ELSE 0 END) AS sumar_monto, "
+                    "SUM(CASE WHEN id_suc_origen = %s THEN cantidad * costo_unitario ELSE 0 END) AS restar_monto "
+                    "FROM transfrencias "
+                    "JOIN almacen_central ON `transfrencias`.`id_prod` = `almacen_central`.`idProd` "
+                    "WHERE `identificador_tran` = %s "
+                    "AND YEAR(fecha_tran) = %s ")
+            data_params = (id_sucursal, id_sucursal, id_sucursal, usuarioLlave, year_actual)
             cur.execute(query, data_params)
-            data = cur.fetchone()  # Usamos fetchone ya que esperamos un solo resultado
+            data = cur.fetchall()
 
-        if data:
+        for fila in data:
             contenido = { 
-                'suma_total_ac': data[0],
-                'suma_total_su': data[1],
-                'suma_total_sd': data[2],  
-                'suma_total_st': data[3]   
-            }
-            return jsonify(contenido), 200
-        else:
-            return jsonify({'message': 'No se encontraron transferencias para el año actual.'}), 404
-
+                'sucursal': int(fila[0]),
+                'sumar_monto': fila[1],
+                'restar_monto': fila[2]
+                }
+        return jsonify(contenido)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
+       
+# @transferencias_suma_total.route('/api/transferencias_suma_total')  # HOME
+# @cross_origin()
+# @login_required
+# def getSumaTotalTransferencias():
+#     try:
+#         usuarioLlave = session.get('usernameDos')
+#         year_actual = request.args.get('year_actual')
+
+#         with mysql.connection.cursor() as cur:
+#             query = ("SELECT "
+#                      "SUM(q_ac * costo_unitario) AS suma_total_ac, "
+#                      "SUM(q_su * costo_unitario) AS suma_total_su, "
+#                      "SUM(q_sd * costo_unitario) AS suma_total_sd, "
+#                      "SUM(q_st * costo_unitario) AS suma_total_st "
+#                      "FROM transfrencias "
+#                      "JOIN almacen_central ON transfrencias.id_prod = almacen_central.idProd "
+#                      "WHERE identificador_tran = %s "
+#                      "AND transfrencias.estado > 0 "
+#                      "AND YEAR(fecha_tran) = %s")
+#             data_params = (usuarioLlave, year_actual)
+#             cur.execute(query, data_params)
+#             data = cur.fetchone()  # Usamos fetchone ya que esperamos un solo resultado
+
+#         if data:
+#             contenido = { 
+#                 'suma_total_ac': data[0],
+#                 'suma_total_su': data[1],
+#                 'suma_total_sd': data[2],  
+#                 'suma_total_st': data[3]   
+#             }
+#             return jsonify(contenido), 200
+#         else:
+#             return jsonify({'message': 'No se encontraron transferencias para el año actual.'}), 404
+
+#     except Exception as e:
+#         return jsonify({'error': str(e)}), 500
+
 @transferencias_suma_total_pasado.route('/api/transferencias_suma_total_anio_pasado')#HOME
 @cross_origin()
 @login_required
@@ -183,35 +315,71 @@ def getSumaTotalTransferenciasAnioPasado():
     try:
         usuarioLlave = session.get('usernameDos')
         year_actual = request.args.get('year_actual')
+        id_sucursal = request.args.get('id_sucursal')
 
         with mysql.connection.cursor() as cur:
-            query = ("SELECT "
-                    "SUM(q_ac * costo_unitario) AS suma_total_ac, "
-                    "SUM(q_su * costo_unitario) AS suma_total_su, "
-                    "SUM(q_sd * costo_unitario) AS suma_total_sd, "
-                    "SUM(q_st * costo_unitario) AS suma_total_st "
+            query = ("SELECT %s AS sucursal,"
+                    "SUM(CASE WHEN id_suc_destino = %s THEN cantidad * costo_unitario ELSE 0 END) AS sumar_monto, "
+                    "SUM(CASE WHEN id_suc_origen = %s THEN cantidad * costo_unitario ELSE 0 END) AS restar_monto "
                     "FROM transfrencias "
                     "JOIN almacen_central ON `transfrencias`.`id_prod` = `almacen_central`.`idProd` "
                     "WHERE `identificador_tran` = %s "
-                    "AND transfrencias.estado > 0 "
                     "AND YEAR(fecha_tran) < %s ")
-            data_params = (usuarioLlave, year_actual)
+            data_params = (id_sucursal, id_sucursal, id_sucursal, usuarioLlave, year_actual)
             cur.execute(query, data_params)
-            data = cur.fetchone()
+            data = cur.fetchall()
 
-        if data:
+        for fila in data:
             contenido = { 
-                'suma_total_ac': data[0],
-                'suma_total_su': data[1],
-                'suma_total_sd': data[2],  
-                'suma_total_st': data[3]   
-            }
-            return jsonify(contenido), 200
-        else:
-            return jsonify({'message': 'No se encontraron transferencias para el año actual.'}), 404
-
+                'sucursal': int(fila[0]),
+                'sumar_monto': fila[1],
+                'restar_monto': fila[2]
+                }
+        return jsonify(contenido)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+       
+# @transferencias_suma_total_pasado.route('/api/transferencias_suma_total_anio_pasado')#HOME
+# @cross_origin()
+# @login_required
+# def getSumaTotalTransferenciasAnioPasado():
+#     try:
+#         usuarioLlave = session.get('usernameDos')
+#         year_actual = request.args.get('year_actual')
+
+#         with mysql.connection.cursor() as cur:
+#             query = ("SELECT "
+#                     "SUM(q_ac * costo_unitario) AS suma_total_ac, "
+#                     "SUM(q_su * costo_unitario) AS suma_total_su, "
+#                     "SUM(q_sd * costo_unitario) AS suma_total_sd, "
+#                     "SUM(q_st * costo_unitario) AS suma_total_st "
+#                     "FROM transfrencias "
+#                     "JOIN almacen_central ON `transfrencias`.`id_prod` = `almacen_central`.`idProd` "
+#                     "WHERE `identificador_tran` = %s "
+#                     "AND transfrencias.estado > 0 "
+#                     "AND YEAR(fecha_tran) < %s ")
+#             data_params = (usuarioLlave, year_actual)
+#             cur.execute(query, data_params)
+#             data = cur.fetchone()
+
+#         if data:
+#             contenido = { 
+#                 'suma_total_ac': data[0],
+#                 'suma_total_su': data[1],
+#                 'suma_total_sd': data[2],  
+#                 'suma_total_st': data[3]   
+#             }
+#             return jsonify(contenido), 200
+#         else:
+#             return jsonify({'message': 'No se encontraron transferencias para el año actual.'}), 404
+
+#     except Exception as e:
+#         return jsonify({'error': str(e)}), 500
+
+
+
+
+
 
 @productos_transferencias.route('/api/procesar_transferencia', methods=['POST'])##Transferencias, Productos
 @cross_origin()
@@ -222,80 +390,37 @@ def operarTransferencia():
         usuarioLlave = session.get('usernameDos')
         usuarioId = session.get('identificacion_usuario')
 
-        data_productos = request.json['array_data_prod']
-        data_transferencias = request.json['array_data_tran']
+        array_productos = request.json['array_data_prod']
+        array_transferencias = request.json['array_data_tran']
 
-        # Iniciar la transacción manualmente
-        cur = mysql.connection.cursor()
-        cur.execute("BEGIN")
+        if not array_productos or not array_transferencias or not usuarioLlave or not usuarioId:
+            return jsonify({"status": "error", "message": "Faltan datos requeridos para procesar la modificación"}), 400
 
-        # Numeración
-        numeracion = incrementar_obtener_numeracion(cur, dato_uno, usuarioLlave, 'Transferencia', 'transferencias')
+        with mysql.connection.cursor() as cur:
 
-        # Almacén central - array Actualización del stock
-        actualizar_inventario(cur, data_productos, usuarioLlave)
+            # Numeración
+            numeracion = incrementar_obtener_numeracion(cur, dato_uno, usuarioLlave, 'Transferencia', 'transferencias')
 
-        # Transferencias - arrar
-        procesar_transferencias(cur, data_transferencias, usuarioId, usuarioLlave, numeracion, dato_uno)
+            try:
+                # Almacén central - array Actualización del stock
+                actualizar_almacen_central(cur, array_productos, usuarioLlave)
+            except Exception as e:
+                mysql.connection.rollback()  # Hacer rollback si hay un error en actualizar_almacen_central
+                return jsonify({"status": "error", "message": f"Error al actualizar el inventario: {str(e)}"}), 400
+            
+            try:
+                # Transferencias - array
+                procesar_transferencias(cur, array_transferencias, usuarioId, usuarioLlave, numeracion, dato_uno)
+            except Exception as e:
+                mysql.connection.rollback()  # Hacer rollback si hay un error en actualizar_almacen_central
+                return jsonify({"status": "error", "message": f"Error al insertar transferencia: {str(e)}"}), 400
 
-        mysql.connection.commit()
-
-        return jsonify({"status": "success", "message": f"{numeracion}"}), 200
-    
-    except Exception as e:
-        mysql.connection.rollback()# Hacer rollback en caso de cualquier error
-        return jsonify({"status": "error", "message": str(e)})
-    
-    finally:
-        cur.close()  # Asegurarse de cerrar el cursor
-    
-@productos_transferencias_p.route('/api/procesar_transferencia_p', methods=['POST'])##Transferencias, Productos
-@cross_origin()
-@login_required
-def operarTransferenciaP():
-    try:
-        usuarioLlave = session.get('usernameDos')
-        usuarioId = session.get('identificacion_usuario')
-        dato_uno = 1
-        cur = mysql.connection.cursor()
-        cur.execute("BEGIN")
-
-        # Numeración
-        numeracion = incrementar_obtener_numeracion(cur, dato_uno, usuarioLlave, 'Transferencia', 'transferencias')
-
-        query_productos = ( "UPDATE `almacen_central` SET "
-                            "existencias_ac = existencias_ac + %s, "
-                            "existencias_su = existencias_su + %s, "
-                            "existencias_sd = existencias_sd + %s, "
-                            "existencias_st = existencias_st + %s, "
-                            "existencias_sc = existencias_sc + %s "
-                            "WHERE `almacen_central`.`idProd` = %s "
-                            "AND identificadorProd = %s")
-        data_productos = (  request.json['existencias_ac'],request.json['existencias_su'], request.json['existencias_sd'], 
-                            request.json['existencias_st'], request.json['existencias_sc'],  request.json['idProd'], usuarioLlave)
-        cur.execute(query_productos, data_productos)
-
-        query_transferencias = ("INSERT INTO `transfrencias` "
-                                "(`id_tran`, `id_prod`, `q_ac`, `q_su`, `q_sd`, `q_st`, `q_sc`, `comprobante`, `id_usuario`, `fecha_tran`, `identificador_tran`, `estado`) "
-                                "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
-
-        data_transferencias = (request.json['idProd'], request.json['existencias_ac'], request.json['existencias_su'], 
-                               request.json['existencias_sd'], request.json['existencias_st'], request.json['existencias_sc'], 
-                               numeracion, usuarioId, request.json['fecha'], usuarioLlave, dato_uno)
-
-        cur.execute(query_transferencias, data_transferencias)
-
-        mysql.connection.commit()
+            mysql.connection.commit()
 
         return jsonify({"status": "success", "message": f"{numeracion}"}), 200
-    
     except Exception as e:
-        mysql.connection.rollback()# Hacer rollback en caso de cualquier error
-        return jsonify({"status": "error", "message": str(e)})
-    
-    finally:
-        cur.close()  # Asegurarse de cerrar el cursor
-    
+        mysql.connection.rollback()
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 def incrementar_obtener_numeracion(cur, dato_uno, usuarioLlave, nombre, concepto):
     # Actualizar la numeración
@@ -323,34 +448,46 @@ def incrementar_obtener_numeracion(cur, dato_uno, usuarioLlave, nombre, concepto
 
     return f"{nombre}-{contenido[concepto]}"
 
-def actualizar_inventario(cur, data, usuarioLlave):
-    # Definir la consulta para actualizar el stock en `almacen_central`
-    query_productos = ("UPDATE `almacen_central` SET existencias_ac = existencias_ac + %s, existencias_su = existencias_su + %s, "
-                       "existencias_sd = existencias_sd + %s, existencias_st = existencias_st + %s "
-                       "WHERE `almacen_central`.`idProd` = %s "
-                       "AND identificadorProd = %s "
-                       "AND existencias_ac >= 0 "
-                       "AND existencias_su >= 0 "
-                       "AND existencias_sd >= 0 "
-                       "AND existencias_st >= 0")
+def actualizar_almacen_central(cur, array_productos, usuarioLlave):
+    query = (   "UPDATE `almacen_central` SET "
+                "existencias_ac = existencias_ac + %s, "
+                "existencias_su = existencias_su + %s, "
+                "existencias_sd = existencias_sd + %s, "
+                "existencias_st = existencias_st + %s, "
+                "existencias_sc = existencias_sc + %s "
+                "WHERE `almacen_central`.`idProd` = %s "
+                "AND `almacen_central`.`estado` > 0 "
+                "AND identificadorProd = %s "
+                # Validación: asegurarse de que las existencias no queden negativas
+                "AND (existencias_ac + %s) >= 0 "
+                "AND (existencias_su + %s) >= 0 "
+                "AND (existencias_sd + %s) >= 0 "
+                "AND (existencias_st + %s) >= 0 "
+                "AND (existencias_sc + %s) >= 0")
+    data_productos =    [
+                            (p['existencias_ac'], p['existencias_su'], p['existencias_sd'],
+                            p['existencias_st'], p['existencias_sc'], p['idProd'], usuarioLlave,
+                            p['existencias_ac'], p['existencias_su'], p['existencias_sd'],
+                            p['existencias_st'], p['existencias_sc']) 
+                            for p in array_productos
+                        ]
+    cur.executemany(query, data_productos)
 
-    # Preparar los datos para la actualización
-    data_productos = [(p['saldo_ac'], p['saldo_su'], p['saldo_sd'], p['saldo_st'], 
-                       (p['idProd']), usuarioLlave) for p in data]
-
-    # Ejecutar la actualización
-    cur.executemany(query_productos, data_productos)
-
-    # Verificar si todas las filas fueron afectadas
-    if cur.rowcount != len(data_productos):
+    # Verificar si la cantidad de filas actualizadas es igual a la cantidad de productos
+    if cur.rowcount != len(array_productos):
         raise Exception("Uno de los productos no cuenta con unidades suficientes, actualice los saldos.")
 
-def procesar_transferencias(cur, data_transferencias, usuarioId, usuarioLlave, numeracion, dato_uno):
-    query_transferencias = ("INSERT INTO `transfrencias` "
-                            "(`id_tran`, `id_prod`, `q_ac`, `q_su`, `q_sd`, `q_st`, `q_sc`, `comprobante`, `id_usuario`, `fecha_tran`, `identificador_tran`, `estado`) "
-                            "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
-
-    data_transferencias = [(p['idProd'], p['q_ac'], p['q_su'], p['q_sd'], p['q_st'], p['q_sc'], numeracion, 
-                            usuarioId, request.json['fecha'], usuarioLlave, dato_uno) for p in data_transferencias]
+def procesar_transferencias(cur, array_transferecnias, usuarioId, usuarioLlave, numeracion, dato_uno):
+    query_transferencias =  ("INSERT INTO `transfrencias` "
+                            "(`id_tran`, `id_suc_origen`, `id_suc_destino`, `id_prod`, `cantidad`, "
+                            "`comprobante`, `id_usuario`, `fecha_tran`, `identificador_tran`, `estado`) "
+                            "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s)");
+    data_transferencias =   [
+                                (p['id_suc_origen'], p['id_suc_destino'], p['idProd'], p['cantidad'], numeracion, 
+                                usuarioId, request.json['fecha'], usuarioLlave, dato_uno) for p in array_transferecnias
+                            ]
 
     cur.executemany(query_transferencias, data_transferencias)
+
+    if cur.rowcount != len(array_transferecnias):
+        raise Exception("Una de las transferencias no se procesó.")

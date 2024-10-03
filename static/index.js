@@ -242,16 +242,16 @@ function cargarSucursalesEjecucion(elemento_id){// SE LLAMA AL CARGAR LA PAGINA 
     }
     elemento_id.innerHTML = html_sucursal
 };
-function llenarCategoriaProductosEjecucion(cate){
+function llenarCategoriaProductosEjecucion(){
     
     let html_cat = `<option value="0" selected>-- Categorías --</option>`;
     for(categoria of cat_db) {
         let fila = `<option value="${categoria.id}">${categoria.categoria_nombre}</option>`
         html_cat = html_cat + fila;
     };
-    document.querySelector(cate).innerHTML = html_cat
+    return html_cat;
 };
-function baseProv(cate){
+function baseProv(){
     prov_con = JSON.parse(localStorage.getItem("base_datos_prov"))
    let html = ''
     for(prov of prov_con) {
@@ -259,7 +259,7 @@ function baseProv(cate){
             fila = `<option value="${prov.id_cli}">${prov.nombre_cli}</option>`
         html = html + fila;
     };
-    document.querySelector(cate).innerHTML = html 
+    return html;
 }
 function categoriaProductosCreacion(categoria){
     let array = [];
@@ -350,7 +350,7 @@ function sidebarMarcadito(){
     }else if(btnKardex == 1){
         document.getElementById("button-kardex").classList.add("marcadito")
         document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
-        document.getElementById("buscador-productos-detalle-movimientos").focus();
+        document.getElementById("buscador-productos-form").focus();
     }else if(btnDetalleVentas == 1){
         document.getElementById("button-detalle-ventas").classList.add("marcadito")
         document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
@@ -368,7 +368,7 @@ function sidebarMarcadito(){
     }else if(btnPerdidas == 1){
         document.getElementById("button-perdidas").classList.add("marcadito")
         document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
-        document.getElementById("buscador-perdidas").focus();
+        document.getElementById("buscador-productos-form").focus();
     }else if(btnProductos == 1){
         document.getElementById("button-productos").classList.add("marcadito")
         document.querySelector(".baja_opacidad").classList.add("alta_opacidad")

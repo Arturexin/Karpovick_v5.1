@@ -5,18 +5,16 @@ function inicioTransferencias(){
     document.getElementById("form_contenedor").innerHTML = formUpdate('Transferencias')
     document.querySelector(".baja_opacidad_interior").classList.add("alta_opacidad_interior")
     document.getElementById("button_contenedor").innerHTML = formButton("Agregar a pre lista", "agregarAtablaModal()", "reseteoFormulario()")
-    llenarCategoriaProductosEjecucion("#categoria-form")
+    document.getElementById("categoria-form").innerHTML = llenarCategoriaProductosEjecucion();
  
     cargarDatosAnio()
     btnTransferencias = 1;
-    llenarCategoriaProductosEjecucion("#categoria-form")
 
     busquedaStock()
-    llenarCategoriaProductosEjecucion("#categoria_buscador_detalle")
+    document.getElementById("categoria_buscador_detalle").innerHTML = llenarCategoriaProductosEjecucion();
     indice_base = JSON.parse(localStorage.getItem("base_datos_consulta"))
 };
 let array_saldos = [];
-let suc_tra = [];
 const in_existencias = ["in_ac", "in_su", "in_sd", "in_st", "in_sc"];
 let datos_usuario = JSON.parse(localStorage.getItem("datos_usuario"))
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -31,66 +29,6 @@ function cargarDatosAnio(){
     })
     
 };
-class ObjTransferencia {
-    constructor(categoria, codigo, descripcion, talla, existencias_ac, existencias_su, 
-                existencias_sd, existencias_st, existencias_sc, costo, precio, lote, 
-                proveedor, idProd, in_ac, in_su, in_sd, in_st, in_sc) {
-        this.categoria = categoria;
-        this.codigo = codigo;
-        this.descripcion = descripcion;
-        this.talla = talla;
-        this.existencias_ac = existencias_ac;
-        this.existencias_su = existencias_su;
-        this.existencias_sd = existencias_sd;
-        this.existencias_st = existencias_st;
-        this.existencias_sc = existencias_sc;
-        this.costo = costo;
-        this.precio = precio;
-        this.lote = lote;
-        this.proveedor = proveedor;
-        this.idProd = idProd;
-        this.in_ac = in_ac;
-        this.in_su = in_su;
-        this.in_sd = in_sd;
-        this.in_st = in_st;
-        this.in_sc = in_sc;
-    };
-
-    in_q(input, indice_destino){
-        if(Number(input.value) < 0 || isNaN(Number(input.value))){
-            input.style.background = "var(--fondo-marca-uno)";
-        }else{
-            this[sucursales_activas[indice_destino]] = Number(input.value);
-            input.style.background = "";
-        };
-    };
-    in_t(indice_origen){
-        let suma = 0;
-        sucursales_activas.forEach((e)=>{
-            if(e !== sucursales_activas[indice_origen]){
-                suma+=this[e]
-            }
-        })
-        this[sucursales_activas[indice_origen]] = -suma
-        return suma;
-    };
-    in_r(){//reset
-        this.existencias_ac = 0; 
-        this.existencias_su = 0; 
-        this.existencias_sd = 0; 
-        this.existencias_st = 0; 
-        this.existencias_sc = 0;
-    };
-    condicion(){//verifica si algun saldo de existencias en la sucursal de origen es negativo
-        let resultado = true
-        sucursales_activas.forEach((e, i)=>{
-            if(this[in_existencias[i]] + this[e] < 0){
-                resultado = false
-            }
-        })
-        return resultado
-    }
-};
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////TRANSFERENCIAS//////////////////////////////////////////////////////////////
@@ -101,9 +39,6 @@ const r_suc = ["r_trans_AC", "r_trans_SU", "r_trans_SD", "r_trans_ST", "r_trans_
 
 const formularioTransferencias = document.getElementById("formulario-transferencias");
 ///////////////////BUSCADOR DE PRODUCTOS EN FORMULARIO TRANSFERENCIAS/////////////////////////
-let sucursal_transferencias = 0;
-let indice_sucursal_transferencias = 0;
-
 function reseteoFormulario(){
     document.getElementById("id-form").value = "";
     document.getElementById('categoria-form').value = "0";
@@ -130,34 +65,6 @@ document.addEventListener("keyup", () =>{
 /////////////////////////////////TRANSFERENCIAS PLUS////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //MODAL
-function marcarProductoRepetidoTransferencias(){//verificamos que el nuevo producto no tenga el mismo código en la tabla transferencias comparando id
-    const rows_proforma = document.querySelectorAll(".id_proforma");
-    const rows_modal = document.querySelectorAll(".id_modal");
-    let mensaje = ""
-    let pro_repetido = [];
-    let suc_repetido = "";
-    rows_proforma.forEach((e_p) => {
-        let row_p = e_p.closest("tr");
-        rows_modal.forEach((e_m) => {
-            let row_m = e_m.closest("tr");
-            if(row_p.children[0].textContent === row_m.children[0].textContent &&
-            row_p.children[9].textContent === row_m.children[15].textContent){
-                pro_repetido.push(row_p.children[3].textContent);
-                suc_repetido = row_p.children[1].textContent;
-
-                row_m.remove();
-            };
-        });
-    });
-    if(pro_repetido.length > 0){
-        mensaje += `El producto con código`;
-        pro_repetido.forEach((event)=>{
-            mensaje += ` "${event}",`
-        })
-        mensaje += ` de la sucursal de origen "${suc_repetido}" ya está en proceso, no se agregarán a la lista.`;
-        confirm(mensaje)
-    };
-};
 function crearHeadTransferencias(){
     let tablaCompras= document.querySelector("#tabla_modal > thead");
     let nuevaFilaTablaCompras = tablaCompras.insertRow(-1);
@@ -272,7 +179,7 @@ function accionSelectDos(){// cambios al efectuar un cambio en select de sucursa
             row_.children[8].textContent = document.getElementById("sun_opc_dos")[obtenerIndiceSucursal("#sun_opc_dos")].textContent;
             row_.children[9].textContent = obj_[in_existencias[row_.children[13].textContent]]// existencias sucursal origen
             row_.children[10].textContent = Number(obj_[in_existencias[row_.children[13].textContent]]) +
-                                            obj_[sucursales_activas[row_.children[12].textContent]]// saldo sucursal origen
+                                            obj_[sucursales_activas[row_.children[13].textContent]]// saldo sucursal origen
             row_.children[7].children[0].value = obj_[sucursales_activas[row_.children[13].textContent]]// cantidad ingresada segun la sucursal
         };
     });
@@ -344,7 +251,7 @@ function op_cantidad(e){
     row_.children[10].textContent = obj_[in_existencias[indice_destino]] + Number(e.value);
     row_.children[11].textContent = obj_.in_t(indice_origen);
     Number(row_.children[6].textContent) < 0 ?  row_.children[6].style.background = "var(--fondo-marca-uno)":
-                                                row_.children[6].style.background = "";
+                                                row_.children[6].style.background = "var(--boton-tres)";
 };
 
 async function buscarCodigo(){//Busca el producto por ID
@@ -394,7 +301,7 @@ async function buscarCodigo(){//Busca el producto por ID
                 id_t.style.background = "var(--boton-tres)"
                 id_t.style.color = "var(--color-secundario)"
             };
-            array_saldos.push(new ObjTransferencia(fila_res.categoria,
+            array_saldos.push(new ObjGeneral(fila_res.categoria,
                                             fila_res.codigo,
                                             fila_res.descripcion,
                                             fila_res.talla,
@@ -479,15 +386,15 @@ procesarTransferenciaPlus.addEventListener("click", procesamientoTransferencias)
 async function procesamientoTransferencias(e){
     e.preventDefault();
     try{
-        if(document.querySelector("#tabla-proforma-transferencias > tbody").children.length > 0){
+        if(document.querySelector("#tabla_principal > tbody").children.length > 0){
         modal_proceso_abrir("Procesando la transferencia!!!.", "")
             
             await realizarTransferencia()
             if(document.querySelector("#check_comprobante").checked){
                 imprimirListaTabla()//Lista de transferencias
             };
-            document.querySelector("#tabla-proforma-transferencias > tbody").remove();
-            document.querySelector("#tabla-proforma-transferencias").createTBody();
+            document.querySelector("#tabla_principal > tbody").remove();
+            document.querySelector("#tabla_principal").createTBody();
             array_saldos = [];// Eliminamos el contenido del array_saldos
             
         }
@@ -500,34 +407,38 @@ async function procesamientoTransferencias(e){
 async function realizarTransferencia(){
     let array_data_prod = [];
     let array_data_tran = [];
-    const numFilas = document.querySelector("#tabla-proforma-transferencias > tbody").children
-    function DataProductos(i){
-        this.idProd = array_saldos[i].idProd;
-        this.saldo_ac = array_saldos[i].r_trans_AC;
-        this.saldo_su = array_saldos[i].r_trans_SU;
-        this.saldo_sd = array_saldos[i].r_trans_SD;
-        this.saldo_st = array_saldos[i].r_trans_ST;
-        this.saldo_sc = array_saldos[i].r_trans_SC;
-    };
-    for(let i = 0 ; i < array_saldos.length; i++ ){
-        if(array_saldos[i].r_trans_AC !== 0 || array_saldos[i].r_trans_SU !== 0 ||
-        array_saldos[i].r_trans_SD !== 0 || array_saldos[i].r_trans_ST !== 0 ||
-        array_saldos[i].r_trans_SC !== 0){
-            array_data_prod.push(new DataProductos(i));
-        };
-    };
-    function DataTransferencia(a){
-        this.idProd = a.children[0].textContent;
-        this.q_ac = a.children[5].textContent;
-        this.q_su = a.children[6].textContent;
-        this.q_sd = a.children[7].textContent;
-        this.q_st = a.children[8].textContent;
-        this.q_sc = a.children[9].textContent;
-    }
-    for(let i = 0 ; i < numFilas.length; i++ ){
-        array_data_tran.push(new DataTransferencia(numFilas[i]));
+    function DataProductos(a){
+        this.idProd = a.idProd;
+        this.existencias_ac = a.existencias_ac;
+        this.existencias_su = a.existencias_su;
+        this.existencias_sd = a.existencias_sd;
+        this.existencias_st = a.existencias_st;
+        this.existencias_sc = a.existencias_sc;
     };
 
+    function DataTransferencia(a, sucursal_origen, sucursal_destino, i){
+        this.idProd = a.idProd;
+        this.cantidad = a[sucursales_activas[i]];
+        this.id_suc_origen = sucursal_origen;
+        this.id_suc_destino = sucursal_destino;
+    };
+
+    array_saldos.forEach((event)=>{
+        let suc_o = 0;
+        array_data_prod.push(new DataProductos(event))
+        suc_add.forEach((nom_suc, i)=>{//encuentra la sucursal de origen
+            let sucursal_ = suc_db.find(x=> x.sucursal_nombre === nom_suc);
+            if(sucursal_){
+                event[sucursales_activas[i]] < 0 ? suc_o = sucursal_.id_sucursales: "";
+            };
+        });
+        suc_add.forEach((nom_suc, i)=>{//inserta las transferencias al array
+            let sucursal_ = suc_db.find(x=> x.sucursal_nombre === nom_suc);
+            if(sucursal_){
+                event[sucursales_activas[i]] > 0 ? array_data_tran.push(new DataTransferencia(event, suc_o, sucursal_.id_sucursales, i)): "";
+            };
+        });
+    });
 
     function DataTransferencias(){
         this.array_data_prod = array_data_prod;
@@ -536,7 +447,7 @@ async function realizarTransferencia(){
         this.fecha = generarFecha();
     }
     let fila = new DataTransferencias();
-    console.log(fila)
+
     let filaTransferencia = URL_API_almacen_central + 'procesar_transferencia'
     let response = await funcionFetchDos(filaTransferencia, fila)
 

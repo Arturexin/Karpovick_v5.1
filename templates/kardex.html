@@ -2,41 +2,14 @@
 
 {% block content %}
 <div class="kardex-form baja_opacidad">
-    <div class="contenedor_kardex_analisis">
-        <form id="formularioDetalleMovimientos" class="contenedor_kardex" style="margin: 10px;">
-            <h2>Movimiento de Productos</h2>
-            <label>Sucursal 
-                <select name="fffff-sucursal" id="fffff-sucursal" class="input-select-ventas">
-                </select>
-                <div class="tooltip_ayuda">
-                    <span class="material-symbols-outlined">help</span>
-                    <span class="tooltiptext_ayuda">Seleccione la sucursal del producto a buscar.</span>
-                </div>
-            </label>
-            <div style="display: flex;">
-                <input id="buscador-productos-detalle-movimientos" type="text" class=" input-compras fondo-importante" placeholder="Buscar Código"> 
-                <div class="tooltip_ayuda">
-                    <span class="material-symbols-outlined">find_in_page</span>
-                    <span class="tooltiptext_ayuda">Digite caracteres clave del código a buscar.</span>
-                </div>
-            </div>
-            <div class="contenedor-label-input-compras">
-                <div class="label">
-                    <input type="hidden" id="id_producto">
-                    <label class="label-general">Categoría
-                        <select name="categoria-detalle-movimientos" id="categoria-detalle-movimientos" class="input-general fondo" disabled>
-                        </select>
-                    </label>
-                    <label class="label-general">Código<input class="input-general fondo" type="text" id="codigo-detalle-movimientos" name="codigo-detalle-movimientos" disabled/></label>
-                    <label class="label-general">Descripción<input class="input-general fondo" type="text" id="descripcion-detalle-movimientos" name="descripcion-detalle-movimientos" disabled/></label>
-                    <input class="input-general fondo" type="hidden" id="costo-unitario-detalle-movimientos" name="costo-unitario-detalle-movimientos" disabled/>
-                </div>
-            </div>     
-            <div class="boton-cli">
-                <button id="agregar-detalle-movimientos" href="#" class="myButtonAgregar">Consultar</button>
-                <input id="reset_form" type="reset" class="myButtonEliminar">
-            </div> 
-        </form>
+    <div class="contenedor_compras">
+        <div>
+            <select name="fffff-sucursal" id="fffff-sucursal" class="input-select-ventas">
+            </select>
+            <div class="contenedor_formulario_compras" id="form_contenedor"></div>
+            <div  class="boton-cli" id="button_contenedor"></div>
+        </div>
+
         <div class="grafico_interno">
             <div class="titulo_graficos_dos">
                 <div><h3>Ventas Mensuales</h3></div>
@@ -234,4 +207,5 @@
     </div>
 </div>
 <script src="../static/kardex.js"></script>
+<script src="../static/form.js"></script>
 {% endblock %}

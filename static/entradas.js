@@ -6,8 +6,8 @@ function inicioEntradas(){
     inicioTablasEntradas()
     btnEntradasP = 1;
 };
-const url_array_conteo = ["entradas_conteo", "perdidas_conteo"]
-const url_array_tabla = ["entradas_tabla", "perdidas_tabla"]
+const url_array_conteo = ["entradas_conteo", "transferencias_conteo", "perdidas_conteo"]
+const url_array_tabla = ["entradas_tabla", "transferencias_tabla", "perdidas_tabla"]
 let url_conteo = url_array_conteo[Number(document.getElementById("filtro_tabla").value)]
 let url_tabla = url_array_tabla[Number(document.getElementById("filtro_tabla").value)]
 let sucursal_id_entradas = 0;
