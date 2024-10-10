@@ -1,0 +1,190 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="devolucionSalidas-form baja_opacidad">
+    <div>
+        <div class="botones-compras">
+            <button class="suc_estad myButtonAgregarDos">Almacén Central</button>
+            <button class="suc_estad myButtonAgregarDos">Sucursal Uno</button>
+            <button class="suc_estad myButtonAgregarDos">Sucursal Dos</button>
+            <button class="suc_estad myButtonAgregarDos">Sucursal Tres</button>
+        </div>
+        <br>
+        <table id="tabla_ticket_promedio" class="tabla_mapa_calor">
+            <thead>
+                <tr>
+                <th scope="row" colspan="16"><h2>Ticket promedio</h2></th>
+                </tr>
+                <tr>
+                    <th>Ene</th>
+                    <th>Feb</th>
+                    <th>Mar</th>
+                    <th>Abr</th>
+                    <th>May</th>
+                    <th>Jun</th>
+                    <th>Jul</th>
+                    <th>Ago</th>
+                    <th>Set</th>
+                    <th>Oct</th>
+                    <th>Nov</th>
+                    <th>Dic</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <br>
+        
+        <table id="tabla_categorias_venta" class="tabla_mapa_calor">
+            <thead>
+                <tr>
+                    <th scope="row" colspan="16"><h2>Desempeño por categoría<span id="sucu_categoria"></span></h2></th>
+                </tr>
+                <tr>
+                    <th scope="row" colspan="16">
+                        <select name="" id="opciones_categorias" class="input-select-ventas">
+                            <option value=0>--Selección--</option>
+                            <option value=1>Ventas absolutas</option>
+                            <option value=2>Ventas relativas</option>
+                            <option value=3>Ganancias absolutas</option>
+                            <option value=4>Ganancias relativas</option>
+                            <option value=5>Unidades absolutas</option>
+                            <option value=6>Unidades relativas</option>
+                            <option value=7>Recurrencias absolutas</option>
+                            <option value=8>Recurrencias relativas</option>
+                        </select>
+                    </th>
+                </tr>
+                <tr>
+                    <th display="grid" justify-items="center" width="45px">Categoría <input id="buscador_categoria_" type="text" class="input-filtro" placeholder="Buscar ..."></th>
+                    <th>Ene</th>
+                    <th>Feb</th>
+                    <th>Mar</th>
+                    <th>Abr</th>
+                    <th>May</th>
+                    <th>Jun</th>
+                    <th>Jul</th>
+                    <th>Ago</th>
+                    <th>Set</th>
+                    <th>Oct</th>
+                    <th>Nov</th>
+                    <th>Dic</th>
+                    <th>Total</th>
+                    <th>Detalle</th>
+                </tr>
+            </thead>
+            <tbody style="font-size: 15px;"></tbody>
+            <tfoot>
+                <th>Total</th>
+                <th class="total_mes_sucursal" style="text-align: right;font-size: 14px;"></th>
+                <th class="total_mes_sucursal" style="text-align: right;font-size: 14px;"></th>
+                <th class="total_mes_sucursal" style="text-align: right;font-size: 14px;"></th>
+                <th class="total_mes_sucursal" style="text-align: right;font-size: 14px;"></th>
+                <th class="total_mes_sucursal" style="text-align: right;font-size: 14px;"></th>
+                <th class="total_mes_sucursal" style="text-align: right;font-size: 14px;"></th>
+                <th class="total_mes_sucursal" style="text-align: right;font-size: 14px;"></th>
+                <th class="total_mes_sucursal" style="text-align: right;font-size: 14px;"></th>
+                <th class="total_mes_sucursal" style="text-align: right;font-size: 14px;"></th>
+                <th class="total_mes_sucursal" style="text-align: right;font-size: 14px;"></th>
+                <th class="total_mes_sucursal" style="text-align: right;font-size: 14px;"></th>
+                <th class="total_mes_sucursal" style="text-align: right;font-size: 14px;"></th>
+                <th class="total_mes_sucursal" style="text-align: right;"></th>
+                <th><button id="imprimir_cat">Imprimir</button></th>
+            </tfoot>
+        </table>
+        <br>
+        <table id="tabla_codigos_venta" class="tabla_mapa_calor">
+            <thead>
+                <tr>
+                    <th scope="row" colspan="16"><h2>Desempeño por producto por categoria <span id="tit_monto"></span></h2></th>
+                </tr>
+                <tr>
+                    <th scope="row" colspan="16">
+                        <select name="" id="opciones_codigos" class="input-select-ventas">
+                            <option value=0>--Selección--</option>
+                            <option value=1>Ventas absolutas</option>
+                            <option value=2>Ventas relativas</option>
+                            <option value=3>Ganancias absolutas</option>
+                            <option value=4>Ganancias relativas</option>
+                            <option value=5>Unidades absolutas</option>
+                            <option value=6>Unidades relativas</option>
+                            <option value=7>Recurrencias absolutas</option>
+                            <option value=8>Recurrencias relativas</option>
+                            <option value=9>Devoluciones absolutas</option>
+                            <option value=10>Devoluciones relativas</option>
+                        </select>
+                    </th>
+                </tr>
+                <tr>
+                    <th display="grid" justify-items="center" width="45px">Producto <input id="buscador_producto_" type="text" class="input-filtro" placeholder="Buscar ..."></th>
+                    <th>Ene</th>
+                    <th>Feb</th>
+                    <th>Mar</th>
+                    <th>Abr</th>
+                    <th>May</th>
+                    <th>Jun</th>
+                    <th>Jul</th>
+                    <th>Ago</th>
+                    <th>Set</th>
+                    <th>Oct</th>
+                    <th>Nov</th>
+                    <th>Dic</th>
+                    <th>Total</th>
+                    <th>Acciones</th>
+                </tr>
+                
+            </thead>
+            <tbody style="font-size: 15px;"></tbody>
+            <tfoot>
+                <th>Total</th>
+                <th class="total_mes_categoria" style="text-align: right;font-size: 14px;"></th>
+                <th class="total_mes_categoria" style="text-align: right;font-size: 14px;"></th>
+                <th class="total_mes_categoria" style="text-align: right;font-size: 14px;"></th>
+                <th class="total_mes_categoria" style="text-align: right;font-size: 14px;"></th>
+                <th class="total_mes_categoria" style="text-align: right;font-size: 14px;"></th>
+                <th class="total_mes_categoria" style="text-align: right;font-size: 14px;"></th>
+                <th class="total_mes_categoria" style="text-align: right;font-size: 14px;"></th>
+                <th class="total_mes_categoria" style="text-align: right;font-size: 14px;"></th>
+                <th class="total_mes_categoria" style="text-align: right;font-size: 14px;"></th>
+                <th class="total_mes_categoria" style="text-align: right;font-size: 14px;"></th>
+                <th class="total_mes_categoria" style="text-align: right;font-size: 14px;"></th>
+                <th class="total_mes_categoria" style="text-align: right;font-size: 14px;"></th>
+                <th class="total_mes_categoria" style="text-align: right;font-size: 14px;"></th>
+                <th><button id="imprimir_prod">Imprimir</button></th>
+            </tfoot>
+        </table>
+        <br>
+        <br>
+        
+        <div>
+            <details>
+                <summary>Mapa de calor</summary>
+                <div>
+                    <div style="display: flex;gap: 10px;"><div style="width: 40px;height: 20px;background: #91ff85;"></div><span>Muy Bueno</span></div>
+                    <div style="display: flex;gap: 10px;"><div style="width: 40px;height: 20px;background: #C6F556;"></div><span>Bueno</span></div>
+                    <div style="display: flex;gap: 10px;"><div style="width: 40px;height: 20px;background: #F5CF6F;"></div><span>Regular</span></div>
+                    <div style="display: flex;gap: 10px;"><div style="width: 40px;height: 20px;background: #DE8B59;"></div><span>Malo</span></div>
+                    <div style="display: flex;gap: 10px;"><div style="width: 40px;height: 20px;background: #FF666D;"></div><span>Muy Malo</span></div>
+                </div>
+            </details>
+            
+            <details>
+                <summary>Detalle de opciones</summary>
+                <div>
+                    <div style="display: flex;gap: 10px;"><h4>*Ventas absolutas:</h4> Total de ingreso bruto por ventas.</div>
+                    <div style="display: flex;gap: 10px;"><h4>*Ventas relativas:</h4> Cuanto de participación tiene sobre las "Ventas absolutas" de la sucursal.</div>
+                    <div style="display: flex;gap: 10px;"><h4>*Ganancias absolutas:</h4> Total de "Ventas absolutas" descontando el costo de compra.</div>
+                    <div style="display: flex;gap: 10px;"><h4>*Ganancias relativas:</h4> Cuanto de participación tiene sobre las "Ganancias absolutas" de la sucursal.</div>
+                    <div style="display: flex;gap: 10px;"><h4>*Unidades absolutas:</h4> Total de unidades vendidas.</div>
+                    <div style="display: flex;gap: 10px;"><h4>*Unidades relativas:</h4> Cuanto de participación tiene sobre las "Unidades absolutas" de la sucursal.</div>
+                    <div style="display: flex;gap: 10px;"><h4>*Recurrencias absolutas:</h4> Total de número de ventas.</div>
+                    <div style="display: flex;gap: 10px;"><h4>*Recurrencias relativas:</h4> Cuanto de participación tiene sobre las "Recurrencias absolutas" de la sucursal.</div>
+                    <div style="display: flex;gap: 10px;"><h4>*Devoluciones absolutas:</h4> Total unidades devueltas.</div>
+                    <div style="display: flex;gap: 10px;"><h4>*Devoluciones relativas:</h4> Tasa de devoluciones del producto.</div>
+                </div>
+            </details>
+            
+        </div>
+    </div>
+</div>
+<script src="../static/analisis.js"></script>
+{% endblock %}

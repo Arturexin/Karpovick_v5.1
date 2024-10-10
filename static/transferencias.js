@@ -221,8 +221,12 @@ async function agregarAtablaModal(){
         };
         contenedorBotonesModal("agregarAtablaTransferenciasPrincipal()", "Enviar a la lista")
         if(array_id_a_s.length > 0){
-            modal_proceso_abrir(`Él o los códigos: [${array_id_a_s}] ya `+
-                                `existen en la Lista de Compras, no podrá continuar con la compra de estos.`, "")
+            let cabecera =  `<ul>Los códigos: `
+            for(let event of array_id_a_s){
+                cabecera += `<li class="diseno_li">${event},</li>`;
+            }
+            cabecera +=`</ul> Ya se encuentran en la lista de transferencias.`;
+            modal_proceso_abrir("", "", cabecera)
             modal_proceso_salir_botones()
         };
         document.querySelectorAll(".insertar").forEach((event)=>{// marcamos el código de busqueda en la tabla proforma
@@ -261,33 +265,6 @@ async function buscarCodigo(){//Busca el producto por ID
     let response = await cargarDatos(   `almacen_central_codigo_transferencias?`+
                                         `ids=${ids.join(",")}`);
 
-    /* for( res of response){
-        if(array_saldos.length !== 0){ // verificamos si el array_saldos contiene datos
-            let buscar = array_saldos.find(x => x.idProd === res.idProd) // si econtramos coincidencias actualizamos el stock por sucursal
-            if(buscar){
-                sucursales_activas.forEach((e)=>{
-                    buscar[e] = res[e]; 
-                })
-            }else{ //si no hay coincidencias solo se inserta cada producto nuevo
-                r_suc.forEach((e)=>{
-                    res[e] = 0;
-                });
-                array_saldos.push(res);// se inserta el objeto response en el array
-            };
-        }else{
-            r_suc.forEach((e)=>{
-                res[e] = 0;
-            });
-            array_saldos.push(res);// se inserta el objeto response en el array
-        };
-    }; */
-    /* let elementos = document.querySelectorAll(`.${in_suc[indice_sucursal_transferencias]}`);//inhabilitamos el input de la sucursal donante
-    elementos.forEach(elemento => {
-        elemento.setAttribute('disabled', '');
-        
-    }); */
-    
-    
     for(id_t of id_trans){
         let row_ = id_t.closest("tr");
         let fila_res = response.find(x=> x.idProd === Number(row_.children[0].textContent))
@@ -481,37 +458,3 @@ removerTablaTransferenciasDos.addEventListener("click", () =>{
     document.getElementById("buscador-productos-form").focus();
     array_saldos = [];//limpiamos el array
 });
-
-////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////
-document.getElementById("boton_buscar_codigo").addEventListener("click", ()=>{
-    busquedaDetalle(0, document.getElementById("buscador_descripcion").value)
-    document.getElementById("buscador_descripcion").focus()
-});
-document.getElementById("boton_buscar_descripcion").addEventListener("click", ()=>{
-    busquedaDetalle(1, document.getElementById("buscador_descripcion").value)
-    document.getElementById("buscador_descripcion").focus()
-});
-document.getElementById("boton_borrar_").addEventListener("click", ()=>{
-
-    document.getElementById("categoria_buscador_detalle").value = "0";
-    document.getElementById("periodo_tiempo").value = "0";
-    document.getElementById("buscador_descripcion").value = ""
-    document.getElementById("buscador_descripcion").focus()
-    removerMarcaBotonDos()
-});
-function agregarBusquedaDetalleUno(button){
-    let linea = button.closest("li");
-    document.getElementById('id-form').value = linea.children[0].textContent;
-    document.getElementById('categoria-form').value = linea.children[1].textContent;
-    document.getElementById('codigo-form').value = linea.children[2].textContent;
-    document.getElementById('descripcion-form').value = linea.children[3].textContent;
-};
-function agregarBusquedaDetalleDos(button){
-    let linea = button.closest("li");
-    document.getElementById('id-form').value = linea.children[0].textContent;
-    document.getElementById('categoria-form').value = linea.children[2].textContent;
-    document.getElementById('codigo-form').value = linea.children[3].textContent;
-    document.getElementById('descripcion-form').value = linea.children[4].textContent;
-};
-

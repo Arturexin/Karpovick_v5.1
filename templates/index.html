@@ -74,9 +74,27 @@
                 </a>
             </li>
             <li>
+                <a id="button-perdidas" class="sub-lista" href="{{ url_for('perdidas')}}">
+                    <div class="tooltip_index">
+                        <span class="material-symbols-outlined" style="color: rgb(189, 137, 78);">money_off</span>
+                        <span class="tooltiptext_index">Despacho</span>
+                    </div>
+                    <p>Despacho</p>
+                </a>
+            </li>
+            <li>
+                <a id="button-modificacion" class="sub-lista" href="{{ url_for('modificacion')}}">
+                    <div class="tooltip_index">
+                        <span class="material-symbols-outlined" style="color: rgb(189, 137, 78);">contract_edit</span>
+                        <span class="tooltiptext_index">Modificación</span>
+                    </div>
+                    <p>Modificación</p>
+                </a>
+            </li>
+            <li>
                 <a id="button-kardex" class="sub-lista" href="{{ url_for('kardex')}}">
                     <div class="tooltip_index">
-                        <span class="material-symbols-outlined" style="color: rgb(189, 137, 78);">sync_alt</span>
+                        <span class="material-symbols-outlined" style="color: rgb(55, 115, 204);">sync_alt</span>
                         <span class="tooltiptext_index">Kardex</span>
                     </div>
                     <p>Kardex</p>
@@ -85,49 +103,33 @@
             <li>
                 <a id="button-detalle-ventas" class="sub-lista" href="{{ url_for('detalle_ventas')}}">
                     <div class="tooltip_index">
-                        <span class="material-symbols-outlined" style="color: rgb(189, 137, 78);">storefront</span>
+                        <span class="material-symbols-outlined" style="color: rgb(55, 115, 204);">storefront</span>
                         <span class="tooltiptext_index">Detalle de ventas</span>
                     </div>
                     <p>Detalle de ventas</p>
                 </a>
             </li>
             <!-- <hr style="border: 1px solid var(--fondo-marca-uno);"> -->
-            <li>
-                <a id="button-modificacion" class="sub-lista" href="{{ url_for('modificacion')}}">
-                    <div class="tooltip_index">
-                        <span class="material-symbols-outlined" style="color: rgb(55, 115, 204);">contract_edit</span>
-                        <span class="tooltiptext_index">Modificación</span>
-                    </div>
-                    <p>Modificación</p>
-                </a>
-            </li>
+            
             <li>
                 <a id="button-devolucion-compras" class="sub-lista" href="{{ url_for('devolucion_compras')}}">
                     <div class="tooltip_index">
                         <span class="material-symbols-outlined" style="color: rgb(55, 115, 204);">switch_right</span>
-                        <span class="tooltiptext_index">Devolución de compras</span>
+                        <span class="tooltiptext_index">Devoluciones</span>
                     </div>
-                    <p>Devolución de compras</p>
+                    <p>Devoluciones</p>
                 </a>
             </li>
             <li>
-                <a id="button-devolucion-salidas" class="sub-lista" href="{{ url_for('devolucion_salidas')}}">
+                <a id="button-devolucion-salidas" class="sub-lista" href="{{ url_for('analisis')}}">
                     <div class="tooltip_index">
-                        <span class="material-symbols-outlined" style="color: rgb(55, 115, 204);">switch_left</span>
-                        <span class="tooltiptext_index">Devolución de ventas</span>
+                        <span class="material-symbols-outlined" style="color: rgb(55, 115, 204);">monitoring</span>
+                        <span class="tooltiptext_index">Análisis</span>
                     </div>
-                    <p>Devolución de ventas</p>
+                    <p>Análisis</p>
                 </a>
             </li>
-            <li>
-                <a id="button-perdidas" class="sub-lista" href="{{ url_for('perdidas')}}">
-                    <div class="tooltip_index">
-                        <span class="material-symbols-outlined" style="color: rgb(55, 115, 204);">money_off</span>
-                        <span class="tooltiptext_index">Despacho</span>
-                    </div>
-                    <p>Despacho</p>
-                </a>
-            </li>
+            
             <!-- <hr style="border: 1px solid var(--fondo-marca-uno);"> -->
             <li>
                 <a id="button-productos" class="sub-lista" href="{{ url_for('productos')}}">

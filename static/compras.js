@@ -11,7 +11,7 @@ async function inicioCompras(){
     busquedaStock()
     document.getElementById("categoria_buscador_detalle").innerHTML = llenarCategoriaProductosEjecucion();
 };
-let comprasNumerador = 0;
+
 let datos_usuario = JSON.parse(localStorage.getItem("datos_usuario"))
 let array_saldos = [];
 /////////////////////////////////////////////////////////////////////
@@ -48,7 +48,7 @@ function mostrarFormNuevoProducto(){
     document.querySelector("#tabla_modal").createTBody()
     document.querySelector("#tabla_principal > tbody").remove()
     document.querySelector("#tabla_principal").createTBody()
-    comprasNumerador = 0;
+    clave_form = 0;
     array_saldos = [];
 };
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -138,17 +138,12 @@ function accionSelect(){// cambios al efectuar un cambio en select de sucursales
 
 function agregarAtablaModal(){
     ///////////////////////////Para nuevos productos/////////////////////////////////////////////////////////////////
-    if(expregul.codigo.test(document.getElementById("codigo-form").value) &&
-    expregul.descripcion.test(document.getElementById("descripcion-form").value) &&
-    expregul.cantidad.test(document.getElementById("lote-form").value) &&
-    expregul.precios.test(document.getElementById("costo-form").value) &&
-    expregul.precios.test(document.getElementById("precio-form").value)){
+    if(validarFormulario()){
         let array_cod_db = [];
         let array_cod_a_s = [];
         let db_ = JSON.parse(localStorage.getItem("base_datos_consulta"))
         document.querySelector(".contenedor-pre-recompra").classList.add("modal-show")
         let arrayCreacionCategoriaTallas = categoriaProductosCreacion(document.getElementById("categoria-form"));
-        compararCodigosNuevos(".codigo_compras_proforma", codigoComprobacionCompra);
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
         crearHeadCompra();
         contenedorBotonesModal(`mandarATablaPrincipalCompras()`, "Enviar a la lista")
@@ -188,22 +183,8 @@ function agregarAtablaModal(){
                                 `existen en la Lista de Compras, no podrá continuar con la compra de estos.`, "")
             modal_proceso_salir_botones()
         };
-        document.querySelectorAll('.contenedor-label-input-compras input').forEach(input => {
-            input.style.background = ""
-        });
         arrayCreacionCategoriaTallas = [];
         document.querySelector("#tabla_modal > tbody > tr:nth-child(1) > td:nth-child(6) > input").focus()
-
-    }else if(expregul.codigo.test(document.getElementById("codigo-form").value) == false){
-        document.getElementById("codigo-form").style.background ="#b36659"
-    }else if(expregul.descripcion.test(document.getElementById("descripcion-form").value) == false){
-        document.getElementById("descripcion-form").style.background ="#b36659"
-    }else if(expregul.precios.test(document.getElementById("costo-form").value) == false){
-        document.getElementById("costo-form").style.background ="#b36659"
-    }else if(expregul.precios.test(document.getElementById("precio-form").value) == false){
-        document.getElementById("precio-form").style.background ="#b36659"
-    }else if(expregul.cantidad.test(document.getElementById("lote-form").value) == false){
-        document.getElementById("lote-form").style.background ="#b36659"
     };
 };
 function op_cantidad(e){
@@ -408,7 +389,7 @@ function mostrarFormrecompraProductoPlus(){
     document.querySelector("#tabla_modal").createTBody()
     document.querySelector("#tabla_principal > tbody").remove()
     document.querySelector("#tabla_principal").createTBody()
-    comprasNumerador = 1;
+    clave_form = 1;
     array_saldos = [];
 }
 ///////////////////BUSCADOR DE PRODUCTOS EN FORMULARIO COMPRAS/////////////////////////
@@ -417,18 +398,18 @@ function reseteoFormulario(){
     document.getElementById('categoria-form').value = "0";
     document.getElementById('codigo-form').value = "";
     document.getElementById('descripcion-form').value = "";
-    if(comprasNumerador == 0){
+    if(clave_form == 0){
         document.getElementById('costo-form').value = "";
         document.getElementById('precio-form').value = "";
         document.getElementById('lote-form').value = "";
         document.getElementById('proveedor-form').value = document.getElementById('proveedor-form')[0].value;
         document.getElementById("codigo-form").focus();
-    }else if(comprasNumerador == 1){
+    }else if(clave_form == 1){
         document.getElementById("buscador-productos-form").focus();
     };
 };
 document.addEventListener("keyup", () =>{
-    if(comprasNumerador == 0){
+    if(clave_form == 0){
         return;
     }else{
         let almacenCentral = indice_base.find(y => y.codigo.toLowerCase().startsWith(document.getElementById('buscador-productos-form').value.toLowerCase()))
@@ -504,7 +485,7 @@ function accionSelectDos(){// cambios al efectuar un cambio en select de sucursa
             row_.children[1].textContent = document.getElementById("sun_opc")[obtenerIndiceSucursal("#sun_opc")].textContent;
             row_.children[6].textContent = obj_[in_existencias[row_.children[11].textContent]]// existencias según sucursal
             row_.children[7].children[0].value = obj_[sucursales_activas[row_.children[11].textContent]]// cantidad ingresada segun la sucursal
-            row_.children[8].textContent = obj_[in_existencias[row_.children[11].textContent]]
+            row_.children[8].textContent = obj_[in_existencias[row_.children[11].textContent]] + Number(row_.children[7].children[0].value)
             row_.children[10].textContent = formatoMoneda(obj_[sucursales_activas[row_.children[11].textContent]] * obj_.costo)
         };
     });
@@ -512,7 +493,7 @@ function accionSelectDos(){// cambios al efectuar un cambio en select de sucursa
 async function agregarATablaPreRecompras(){
     if(document.getElementById("id-form").value > 0){
         let db_ = JSON.parse(localStorage.getItem("base_datos_consulta"))
-        let array_id_a_s = [];
+        let array_id_a_s = [];//array de códigos repetidos
         crearHeadRecompra()
         cargarSucursalesEjecucion(document.getElementById("sun_opc"))
         let arrayCreacionCategoriaTallas = categoriaProductosCreacion(document.getElementById("categoria-form"));
@@ -537,8 +518,12 @@ async function agregarATablaPreRecompras(){
         };
         contenedorBotonesModal("mandarATablaPrincipalRecompras()", "Enviar a la lista")
         if(array_id_a_s.length > 0){
-            modal_proceso_abrir(`Él o los códigos: [${array_id_a_s}] ya `+
-                                `existen en la Lista de Compras, no podrá continuar con la compra de estos.`, "")
+            let cabecera =  `<ul>Los códigos: `
+            for(let event of array_id_a_s){
+                cabecera += `<li class="diseno_li">${event},</li>`;
+            }
+            cabecera +=`</ul> Ya se encuentran en la lista de compras.`;
+            modal_proceso_abrir("", "", cabecera)
             modal_proceso_salir_botones()
         };
         document.querySelectorAll(".codigo_modal").forEach((event)=>{//Pinta el código form que coincide en la tabla pre lista
@@ -724,7 +709,7 @@ async function funcionGeneralRecompras(){
         this.array_productos_dos = array_productos_dos;
         this.array_entradas_dos = array_entradas_dos;
     };
-    console.log(new DatosRecompra())
+
     let url_recompra = URL_API_almacen_central + 'gestion_de_recompras'
     let objeto_recompra = new DatosRecompra();
 
@@ -740,9 +725,9 @@ function removerModal(){
     document.querySelector("#tabla_modal > thead > tr:nth-child(2)").remove()
     document.querySelector("#tabla_modal > tbody").remove();
     document.querySelector("#tabla_modal").createTBody();
-    if(comprasNumerador == 0){
+    if(clave_form == 0){
         document.getElementById("codigo-form").focus();
-    }else if(comprasNumerador == 1){
+    }else if(clave_form == 1){
         document.getElementById("buscador-productos-form").focus();
     };
 }
@@ -758,9 +743,9 @@ const removerTablaComprasDos = document.getElementById("remover-tabla-compras-do
 removerTablaComprasDos.addEventListener("click", () =>{
     document.querySelector("#tabla_principal > tbody").remove();
     document.querySelector("#tabla_principal").createTBody();
-    if(comprasNumerador == 0){
+    if(clave_form == 0){
         document.getElementById("codigo-form").focus();
-    }else if(comprasNumerador == 1){
+    }else if(clave_form == 1){
         document.getElementById("buscador-productos-form").focus();
     };
     array_saldos = [];
@@ -768,46 +753,6 @@ removerTablaComprasDos.addEventListener("click", () =>{
 });
 ////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
-document.getElementById("boton_buscar_codigo").addEventListener("click", ()=>{
-    busquedaDetalle(0, document.getElementById("buscador_descripcion").value)
-    document.getElementById("buscador_descripcion").focus()
-});
-document.getElementById("boton_buscar_descripcion").addEventListener("click", ()=>{
-    busquedaDetalle(1, document.getElementById("buscador_descripcion").value)
-    document.getElementById("buscador_descripcion").focus()
-});
-document.getElementById("boton_borrar_").addEventListener("click", ()=>{
-
-    document.getElementById("categoria_buscador_detalle").value = "0";
-    document.getElementById("periodo_tiempo").value = "0";
-    document.getElementById("buscador_descripcion").value = ""
-    document.getElementById("buscador_descripcion").focus()
-    removerMarcaBotonDos()
-});
-function agregarBusquedaDetalleUno(button){
-    if(document.getElementById("recompra-producto-plus").classList.contains('marcaBoton')){
-        let linea = button.closest("li");
-        document.getElementById('id-form').value = linea.children[0].textContent;
-        document.getElementById('categoria-form').value = linea.children[1].textContent;
-        document.getElementById('codigo-form').value = linea.children[2].textContent;
-        document.getElementById('descripcion-form').value = linea.children[3].textContent;
-    }else{
-        modal_proceso_abrir(`Esta acción solo procederá en "Recomprar Producto".`, ``)
-        modal_proceso_salir_botones()
-    };
-};
-function agregarBusquedaDetalleDos(button){
-    if(document.getElementById("recompra-producto-plus").classList.contains('marcaBoton')){
-        let linea = button.closest("li");
-        document.getElementById('id-form').value = linea.children[0].textContent;
-        document.getElementById('categoria-form').value = linea.children[2].textContent;
-        document.getElementById('codigo-form').value = linea.children[3].textContent;
-        document.getElementById('descripcion-form').value = linea.children[4].textContent;
-    }else{
-        modal_proceso_abrir(`Esta acción solo procederá en "Recomprar Producto".`, ``)
-        modal_proceso_salir_botones()
-    };
-};
 function clicKEliminarFila(e, indice_codigo) {
     const fila = e.closest("tr");
     array_saldos.forEach((e, i)=>{//Buscamos una coincidencia de código

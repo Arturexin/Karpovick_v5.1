@@ -76,8 +76,10 @@ function cuerpoFilaTabla(e){
                 <td>${e.codigo}</td>
                 <td style="text-align: end;">${e.existencias_entradas}</td>
                 <td style="text-align: end;">${e.existencias_devueltas}</td>
-                <td style="text-align: end;">${e.costo_unitario.toFixed(2)}</td>
-                <td style="text-align: end;">${((e.existencias_entradas - e.existencias_devueltas) * e.costo_unitario).toFixed(2)}</td>
+                <td style="text-align: end;">${formatoMoneda(e.costo_unitario)}</td>
+                <td style="text-align: end;">${e.existencias_entradas === 0 
+                    ? formatoMoneda(0.00) 
+                    : formatoMoneda((e.existencias_entradas - e.existencias_devueltas) * e.costo_unitario)}</td>
                 <td>${e.comprobante}</td>
                 <td>${e.fecha}</td>
                 <td style="text-align: center;width: 80px">
@@ -127,7 +129,7 @@ async function accionRemove(id) {
     contenedor_tab.children[0].remove();
     
     contenedorBotonesProducto(`procesarRemove(${entradas.idEntr})`, "Eliminar entrada")
-    document.getElementById("acciones_rapidas_entradas").classList.add("modal-show-entrada")
+    document.getElementById("acciones_rapidas_entradas").classList.add("modal_show")
 };
 
 async function procesarRemove(idEntr){
@@ -163,7 +165,7 @@ function accionDevoluciones(id) {
             }
         });
         contenedorBotonesProducto(`procesarDevolucion()`, "Procesar Devolución")
-        document.getElementById("acciones_rapidas_entradas").classList.add("modal-show-entrada")
+        document.getElementById("acciones_rapidas_entradas").classList.add("modal_show")
     }else{
         modal_proceso_abrir("No es una Compra o Recompra.", "")
         modal_proceso_salir_botones()
@@ -263,7 +265,7 @@ function contenedorBotonesProducto(funcion, titulo){
 function removerContenido(){
     let contenido = document.getElementById("form_accion_rapida")
     contenido.remove();
-    document.getElementById("acciones_rapidas_entradas").classList.remove("modal-show-entrada")
+    document.getElementById("acciones_rapidas_entradas").classList.remove("modal_show")
 };
 //////////////////BUSCA PRODUCTOS EN TABLA ALMACÉN CENTRAL////////////////////////////////////////////
 
@@ -297,7 +299,7 @@ async function realizarDevolucion(){
         this.sucursal_post = sucursales_activas[a.children[9].textContent];
         this.existencias_post = Number(a.children[5].children[0].value);
 
-        this.idEntr = a.children[0].textContent;
+        this.id_op = a.children[0].textContent;
 
         this.comprobante = "Dev-" + a.children[1].textContent;
         this.causa_devolucion = a.children[7].children[0].value;
@@ -323,7 +325,7 @@ async function realizarDevolucion(){
         modal_proceso_salir_botones()
         removerContenido()
     };
-    document.getElementById("acciones_rapidas_entradas").classList.remove("modal-show-entrada")
+    document.getElementById("acciones_rapidas_entradas").classList.remove("modal_show")
 };
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Volcado de datos/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -620,3 +622,17 @@ extraccion_.addEventListener("click", async ()=>{
     console.log(csvContent)
     downloadCSV(csvContent, 'dataEntradas.csv');
 })
+function formatoMoneda(valor_numerico){
+    let value = valor_numerico.toString();
+    value = value.replace(/[^0-9.]/g, '');// Eliminar todo lo que no sea un número o un punto decimal
+    if (value.includes('.')) {// Verificar si el valor contiene un punto decimal
+        let parts = value.split('.');
+        let integerPart = parts[0].padStart(1, '0');// Asegurar que la parte entera tenga al menos un caracter (añadir 0 si es necesario)
+        let decimalPart = parts[1] ? parts[1].substring(0, 2) : '';// Limitar la parte decimal a dos dígitos
+        decimalPart = decimalPart.padEnd(2, '0');// Si la parte decimal tiene menos de dos dígitos, añadir ceros
+        value = `${integerPart}.${decimalPart}`;// Formatear el valor final
+    } else {
+        value = value.padStart(1, '0') + '.00';// Si no hay punto decimal, añadir ".00" al final y asegurar que la parte entera tiene un dígitos
+    }
+    return value;// Ajustar el valor del input al valor formateado
+};

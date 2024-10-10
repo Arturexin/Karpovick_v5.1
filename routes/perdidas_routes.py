@@ -210,73 +210,78 @@ def getSumaTotalPerdidasAnioPasado():
 @login_required
 def operarPerdida():
     try:
-        dato_uno = 1
-        despacho_data = request.json
         usuarioLlave = session.get('usernameDos')
         usuarioId = session.get('identificacion_usuario')
-        data_des = request.json.get('array_despacho', [])
+        array_productos = request.json.get('array_productos', [])
+        array_despacho = request.json.get('array_despacho', [])
+        fecha = request.json['fecha']
+        dato_uno = 1
         
-        # Iniciar la transacción manualmente
-        cur = mysql.connection.cursor()
-        cur.execute("BEGIN")
+        # Validar que los datos necesarios están presentes
+        if not array_productos or not array_despacho or not fecha or not usuarioLlave:
+            return jsonify({"status": "error", "message": "Faltan datos requeridos para procesar el despacho"}), 400
 
-        error_message = actualizar_almacen_central_resta(cur, despacho_data, usuarioLlave, 'array_despacho')
-        if error_message:
-            return error_message
-        
-        # Insertar en pérdidas
-        query_despacho_insert = (   "INSERT INTO `perdidas` "
-                                    "(`id_perdidas`, `suc_perdidas`, `id_productos`, `cantidad`, `causa`, `id_usuario`, "
-                                    "`fecha_perdidas`, `identificador_per`, `estado`) "
-                                    "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s)")
-        data_despacho_insert = [
-                                (s['suc_perdidas'], s['idProd'], s['existencias_post'], s['causa'], 
-                                 usuarioId, request.json['fecha'], usuarioLlave, dato_uno) 
-                                for s in data_des
-                                ]
-        cur.executemany(query_despacho_insert, data_despacho_insert)
+        with mysql.connection.cursor() as cur:
+            try:
+                actualizar_almacen_central(cur, array_productos, usuarioLlave)
+            except Exception as e:
+                mysql.connection.rollback()  # Hacer rollback si hay un error en actualizar_almacen_central
+                return jsonify({"status": "error", "message": f"Error al actualizar existencias: {str(e)}"}), 400
+
+            try:
+                insertar_despacho(cur, array_despacho, usuarioId, usuarioLlave, dato_uno, fecha)
+            except Exception as e:
+                mysql.connection.rollback()
+                return jsonify({"status": "error", "message": f"Error al insertar despacho: {str(e)}"}), 400
 
         mysql.connection.commit()
         return jsonify({"status": "success", "message": "Despacho procesado correctamente."}), 200
     except Exception as e:
         mysql.connection.rollback()
         return jsonify({"status": "error", "message": str(e)})
-    
-    finally:
-        cur.close()
 
 
-def actualizar_almacen_central_resta(cur, recompra_data, usuarioLlave, nombre_array):
-    """
-    Procesa los productos, agrupa los datos por sucursal y actualiza el inventario en la tabla 'almacen_central'.
-    """
-    # Diccionario para almacenar los datos de actualización agrupados por sucursal_post
-    data_productos_por_sucursal = {'existencias_ac': [], 'existencias_su': [], 'existencias_sd': [], 'existencias_st': [],
-                                   'existencias_sc':[]}
-    data_len = 0
-    # Procesar los productos
-    for producto in recompra_data[nombre_array]:
-        idProd = producto['idProd']
-        sucursal_post = producto['sucursal_post']
-        existencias_post = producto['existencias_post']
+def actualizar_almacen_central(cur, array_productos, usuarioLlave):
+    query = (   "UPDATE `almacen_central` SET "
+                "existencias_ac = existencias_ac + %s, "
+                "existencias_su = existencias_su + %s, "
+                "existencias_sd = existencias_sd + %s, "
+                "existencias_st = existencias_st + %s, "
+                "existencias_sc = existencias_sc + %s "
+                "WHERE `almacen_central`.`idProd` = %s "
+                "AND `almacen_central`.`estado` > 0 "
+                "AND identificadorProd = %s "
+                # Validación: asegurarse de que las existencias no queden negativas
+                "AND (existencias_ac + %s) >= 0 "
+                "AND (existencias_su + %s) >= 0 "
+                "AND (existencias_sd + %s) >= 0 "
+                "AND (existencias_st + %s) >= 0 "
+                "AND (existencias_sc + %s) >= 0")
+    data_productos =    [
+                            (p['existencias_ac'], p['existencias_su'], p['existencias_sd'],
+                            p['existencias_st'], p['existencias_sc'], p['idProd'], usuarioLlave,
+                            p['existencias_ac'], p['existencias_su'], p['existencias_sd'],
+                            p['existencias_st'], p['existencias_sc']) 
+                            for p in array_productos
+                        ]
+    cur.executemany(query, data_productos)
 
-        # Validar la sucursal
-        if sucursal_post not in data_productos_por_sucursal:
-            return jsonify({"status": "error", "message": f"Sucursal no válida: {sucursal_post}"}), 400
-
-        # Agregar los datos al grupo correspondiente
-        data_productos_por_sucursal[sucursal_post].append((existencias_post, idProd, usuarioLlave, existencias_post))
-
-    # Ejecutar las actualizaciones agrupadas por sucursal_post
-    for sucursal_post, data_productos in data_productos_por_sucursal.items():
-        if data_productos:  # Verificar si hay datos para esta sucursal_post
-            data_len = len(data_productos)
-            query = (f"UPDATE `almacen_central` SET {sucursal_post} = {sucursal_post} - %s "
-                     "WHERE `almacen_central`.`idProd` = %s "
-                     "AND identificadorProd = %s "
-                     "AND almacen_central.estado > 0 "
-                     f"AND {sucursal_post} >= %s")
-            cur.executemany(query, data_productos)
- 
-    if cur.rowcount != data_len:
+    # Verificar si la cantidad de filas actualizadas es igual a la cantidad de productos
+    if cur.rowcount != len(array_productos):
         raise Exception("Uno de los productos no cuenta con unidades suficientes, actualice los saldos.")
+    
+def insertar_despacho(cur, array_despacho, usuarioId, usuarioLlave, dato_uno, fecha):
+    query_despacho_insert = (   "INSERT INTO `perdidas` "
+                                "(`id_perdidas`, `suc_perdidas`, `id_productos`, `cantidad`, `causa`, "
+                                "`id_usuario`, `fecha_perdidas`, `identificador_per`, `estado`) "
+                                "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s)")
+    data_despacho_insert = [
+                            (s['suc_perdidas'], s['idProd'], s['existencias_post'], s['causa'], 
+                            usuarioId, fecha, usuarioLlave, dato_uno) 
+                            for s in array_despacho
+                            ]
+    cur.executemany(query_despacho_insert, data_despacho_insert)
+
+    # Comprobar si la inserción se realizó correctamente
+    if cur.rowcount != len(array_despacho):
+        raise Exception("No se pudieron insertar todos los despachos correctamente.")

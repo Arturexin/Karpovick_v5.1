@@ -6,18 +6,27 @@
         <div class="contenedor_compras_dos">
             <form>
                 <div class="into_form">
-                    <h2>Buscar por operación de entradas
+                    <h2>Devoluciones
                         <div class="tooltip_ayuda">
                             <span class="material-symbols-outlined">help</span>
                             <span class="tooltiptext_ayuda">Devuelve unidades de productos que entraron a su respectivo proveedor.</span>
                         </div>
                     </h2>
+                    <select name="" id="tipo_devolucion">
+                        <option value="0" selected>Seleccione la operación</option>
+                        <option value="1">Ventas</option>
+                        <option value="2">Compras</option>
+                        <option value="3">Recompras</option>
+                    </select>
                     <div>
-                        <input id="buscador_operacion" class="input-general-importante fondo-importante" type="text" placeholder="Ingresar operación de Compra o Recompra">
-                        <div class="tooltip_ayuda">
-                            <span class="material-symbols-outlined">find_in_page</span>
-                            <span class="tooltiptext_ayuda">Digite caracteres clave de la operación a buscar.</span>
-                        </div>
+                        <label style="display: flex;">
+                            <p id="t_op"></p>
+                            <input id="buscador_operacion" class="input-general-importante fondo-importante" type="text" placeholder="Ingresar el número de operación">
+                            <div class="tooltip_ayuda">
+                                <span class="material-symbols-outlined">find_in_page</span>
+                                <span class="tooltiptext_ayuda">Digite caracteres clave de la operación a buscar.</span>
+                            </div>
+                        </label>
                     </div>
                     <div class="boton-cli">
                         <button id="mandar-tabla-devoluciones" href="#" class="myButtonAgregar">Agregar Devoluciones</button>
@@ -52,7 +61,7 @@
         </div>
     </div>
     <div class="contenedor-devolucion-compras">
-        <table id="tabla-devolucion-compras" class="tabla_modal contenido-tabla">
+        <table id="tabla_modal" class="tabla_modal contenido-tabla">
             <thead>
                 <tr>
                     <th scope="row" colspan="8"><h2>Proforma</h2></th>
@@ -75,7 +84,7 @@
             <tfoot>
                 <tr>
                     <th scope="row" colspan="8">
-                        <select id="causaDevolucionCompras" class="fondo-importante input-compras">
+                        <select id="causa_devolucion" class="fondo-importante input-compras">
                             <option value="0" selected="">-- Causa de devolución --</option>
                             <option value = "1">Producto defectuoso</option>
                             <option value = "2">Producto dañado durante el envío</option>
@@ -98,7 +107,7 @@
         </table>
     </div>
     <div class="contenedor_tabla">
-        <table id="tabla-devolucion-compras-final" class="tabla-proforma">
+        <table id="tabla_principal" class="tabla-proforma">
             <thead>
                 <tr>
                     <th scope="row" colspan="8"><h2>Lista de devoluciones</h2></th>
@@ -106,6 +115,7 @@
                 <tr>
                     <th>Sucursal</th>
                     <th>Código</th>
+                    <th>Descripción</th>
                     <th>Cantidad Comprada</th>
                     <th>Cantidad a Devolver</th>
                     <th>Comprobante</th>

@@ -331,7 +331,7 @@ def getEntradasComprobante(comprobante):
     try:
         usuarioLlave = session.get('usernameDos')
         with mysql.connection.cursor() as cur:
-            query = ("SELECT idEntr, sucursal_nombre, codigo, existencias_entradas, comprobante, existencias_devueltas, id_sucursales, `entradas`.`idProd` AS id_prod "
+            query = ("SELECT idEntr AS id, sucursal_nombre, codigo, descripcion, existencias_entradas AS existencias, comprobante, existencias_devueltas, id_sucursales, `entradas`.`idProd` AS id_prod "
                      "FROM entradas "
                      "JOIN almacen_central ON `entradas`.`idProd` = `almacen_central`.`idProd` "
                      "JOIN sucursales ON `entradas`.`sucursal` = `sucursales`.`id_sucursales` "
@@ -345,14 +345,15 @@ def getEntradasComprobante(comprobante):
         resultado = []
         for fila in data:
             contenido = {
-                'idEntr': fila[0],
+                'id': fila[0],
                 'sucursal_nombre': fila[1],
                 'codigo': fila[2],
-                'existencias_entradas':fila[3],
-                'comprobante': fila[4],
-                'existencias_devueltas': fila[5],
-                'id_sucursales': fila[6],
-                'id_prod': fila[7]
+                'descripcion': fila[3],
+                'existencias':fila[4],
+                'comprobante': fila[5],
+                'existencias_devueltas': fila[6],
+                'id_sucursales': fila[7],
+                'id_prod': fila[8]
                 }
             resultado.append(contenido)
         return jsonify(resultado)
@@ -418,7 +419,7 @@ def operarDevolucionCompra():
                                 "AND `entradas`.`estado` = 1 "
                                 "AND existencias_devueltas >= 0")
         data_entradas_update = [
-                                (s['existencias_post'], s['idEntr'], usuarioLlave) 
+                                (s['existencias_post'], s['id_op'], usuarioLlave) 
                                 for s in data_dev
                                 ]
         cur.executemany(query_entradas_update, data_entradas_update)
@@ -679,27 +680,6 @@ def actualizar_almacen_central_resta(cur, recompra_data, usuarioLlave, nombre_ar
     if cur.rowcount != data_len:
         raise Exception("Uno de los productos no cuenta con unidades suficientes, actualice los saldos.")
 
-def procesar_e_insertar_entradas(cur, recompra_data, numeracion, usuarioId, usuarioLlave, nombre_array):
-    """
-    Inserta los datos de las entradas en la tabla 'entradas' de una sola vez.
-    """
-    dato_cero = 0
-    dato_uno = 1
-    # Preparar los datos para la inserción en 'entradas'
-    data_entradas = [(entrada['idProd'], entrada['sucursal'], entrada['existencias_entradas'],
-                    numeracion, dato_cero, usuarioId, recompra_data['fecha'], 
-                    dato_cero, usuarioLlave, dato_uno)
-                    for entrada in recompra_data[nombre_array]]
-
-    # Insertar los datos procesados en la tabla 'entradas'
-    query_entradas = ("INSERT INTO `entradas` "
-                      "(`idEntr`, `idProd`, `sucursal`, `existencias_entradas`, "
-                      "`comprobante`, `causa_devolucion`, `usuario`, `fecha`, "
-                      "`existencias_devueltas`, `identificadorEntr`, `estado`) "
-                      "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
-    
-    # Ejecutar la inserción con `executemany`
-    cur.executemany(query_entradas, data_entradas)
 
 def insertar_entradas(cur, array_entradas, numeracion, usuarioId, usuarioLlave, dato_cero, dato_uno, fecha):
     query_entradas = ("INSERT INTO `entradas` "
@@ -751,3 +731,25 @@ def insertar_entradas_new(cur, array_entradas, array_productos, numeracion, usua
     # Comprobar si la inserción se realizó correctamente
     if cur.rowcount != len(array_entradas):
         raise Exception("No se pudieron insertar todas las entradas correctamente.")
+    
+
+
+
+# @estadisticas_producto.route('/estadisticas_producto', methods=['POST'])
+# def ingresar_datos():
+#     data = request.get_json()
+#     cursor = mysql.cursor()
+    
+#     for year, records in data.items():
+#         for id_prod, values in records.items():
+#             # Aquí se asume que el formato de los valores es [ene, feb, mar, may, ...]
+#             ene, feb, mar, may, jun, jul, ago, set, oct, nov, dic = values
+#             sql = """
+#             INSERT INTO tu_tabla (
+#                 id_prod, ene_, feb_, mar_, may_, jun_, jul_, ago_, set_, oct_, nov_, dic_, identificador_estd, estado
+#             ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+#             """
+#             cursor.execute(sql, (id_prod, ene, feb, mar, may, jun, jul, ago, set, oct, nov, dic, year, 'activo'))
+    
+#     mysql.commit()
+#     return jsonify({"status": "success"})

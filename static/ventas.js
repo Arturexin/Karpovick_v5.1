@@ -6,11 +6,11 @@ function inicioVentas(){
     cargarSucursalesEjecucion(document.getElementById("fffff-sucursal"))
     document.getElementById("buscador-productos-ventas").focus()
     cambioSucursal();
-    llenarCategoriaProductosEjecucion("#categoria-ventas")
 
     modosVenta();
     agregarMoneda(document.querySelectorAll(".moneda_ventas"));
-    llenarCategoriaProductosEjecucion("#categoria_buscador_detalle")
+    document.getElementById("categoria-ventas").innerHTML = llenarCategoriaProductosEjecucion();
+    document.getElementById("categoria_buscador_detalle").innerHTML = llenarCategoriaProductosEjecucion();
 };
 //BOTONES SUPERIORES 
 let array_saldos = [];// Aquí se guardan saldos de productos consultados
@@ -163,7 +163,7 @@ document.getElementById("boton_restablecer_form_clientes_ventas").addEventListen
 ///////////////////BUSCADOR DE PRODUCTOS EN FORMULARIO VENTAS/////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////
 let sucursal_ventas = 0;
-let indice_sucursal_ventas = 0;
+let idx_suc = 0;
 buscador_codigo.addEventListener("keyup", async () =>{
     let almacenCentral = indice_base.find(y => y.codigo.toLowerCase().startsWith(buscador_codigo.value.toLowerCase()))
     if(almacenCentral){
@@ -172,11 +172,11 @@ buscador_codigo.addEventListener("keyup", async () =>{
 
         sucursal_ventas = select_sucursal.value;
         if(document.getElementById("puesto_usuario").textContent == obtenerIndiceSucursal("#fffff-sucursal")){
-            indice_sucursal_ventas = obtenerIndiceSucursal("#fffff-sucursal");
+            idx_suc = obtenerIndiceSucursal("#fffff-sucursal");
         }else{
-            indice_sucursal_ventas = obtenerIndiceSucursal("#fffff-sucursal");
+            idx_suc = obtenerIndiceSucursal("#fffff-sucursal");
         };
-        input_sucursal.value = select_sucursal.children[indice_sucursal_ventas].textContent
+        input_sucursal.value = select_sucursal.children[idx_suc].textContent
 
         categoria_ventas.value = almacenCentral.categoria 
         codigo_ventas.value = almacenCentral.codigo
@@ -191,63 +191,78 @@ buscador_codigo.addEventListener("keyup", async () =>{
         resetDetalleVentas();
     };
 });
-async function busquedaProductoPorId(id){//Busca productos por id condicionado por su stock
-    let objeto_producto = await cargarDatos(`almacen_central_id_sucursal_datos/${id}?`+
-                                            `sucursal_get=${sucursales_activas[indice_sucursal_ventas]}`);
-    if(objeto_producto.idProd){
-        if(objeto_producto.sucursal_get > 0){// Si tiene existencias mayores a cero se agrega al array_saldos
-            let consolidado_stock = array_saldos.find(x => x.idProd === objeto_producto.idProd)
-            if(consolidado_stock){// Si existe en el array se actualiza sucursal_get con las nuevas cantidades
-                consolidado_stock.sucursal_get = objeto_producto.sucursal_get
-            }else{
-                objeto_producto.sucursal = Number(select_sucursal.value);//agregamos la sucursal del producto
-                objeto_producto.precio_mod = objeto_producto.precio_venta;//agregamos el precio de venta modificable
-                objeto_producto.cantidad_venta = 0;
-                array_saldos.push(objeto_producto)
-            }
+const in_existencias = ["in_ac", "in_su", "in_sd", "in_st", "in_sc"];
+async function busquedaProductoPorId(){//Busca productos por id condicionado por su stock
+    const id_ven = document.getElementById("id-ventas").value
+    let ids = [id_ven];
+    let response = await cargarDatos(   `almacen_central_codigo_transferencias?`+
+                                        `ids=${ids.join(",")}`);
+    let fila_res = array_saldos.find(x => response[0].idProd === x.idProd)
+    if(fila_res === undefined){
+        if(response[0][sucursales_activas[idx_suc]] > 0){
+            array_saldos.push(new ObjGeneral(response[0].categoria,
+                                            response[0].codigo,
+                                            response[0].descripcion,
+                                            response[0].talla,
+                                            0, 0, 0, 0, 0,
+                                            response[0].costo_unitario,
+                                            response[0].precio_venta,
+                                            response[0].lote,
+                                            response[0].proveedor,
+                                            response[0].idProd,
+                                            response[0].existencias_ac,
+                                            response[0].existencias_su,
+                                            response[0].existencias_sd,
+                                            response[0].existencias_st,
+                                            response[0].existencias_sc,
+            ));
         }else{
             modal_proceso_abrir("Existencias insuficientes. Este producto no se podrá agregar a la lista.", "")
             modal_proceso_salir_botones_focus("buscador-productos-ventas")
-        };
+        }
+    }else{
+        if(response[0][sucursales_activas[idx_suc]] - 
+        fila_res[sucursales_activas[idx_suc]] > 0){
+            sucursales_activas.forEach((e)=>{
+                fila_res[sucursales_activas[e]] = response[0][e];
+                fila_res.costo = response[0].costo_unitario;
+                fila_res.precio = response[0].precio_venta;
+            });
+        }else{
+            modal_proceso_abrir("Existencias insuficientes.", "")
+            modal_proceso_salir_botones_focus("buscador-productos-ventas")
+        }
     };
 };
-function agregarAListaProductos(cantidad, precio){// Busca coincidencias el tabla lista de productos y agrega nuevas filas
-    if(array_saldos.length > 0){
-        array_saldos.forEach((event)=>{
-            if(event.idProd == id_ventas.value){
-                
-                const id_lista = document.querySelectorAll(".id-ventas-comprobacion")
-                const idArray = Array.from(id_lista);// id_lista se convierte en un array
-                let coincidencia_lista = idArray.find(x => x.textContent == id_ventas.value)// buscamos la existencia de una coincidencia_lista
-                if(coincidencia_lista !== undefined && (event.sucursal_get - Number(event.cantidad_venta)) > 0){
-                    if(precio !== undefined){// si ingresamos un precio se tomará 
-                        coincidencia_lista.parentNode.children[7].textContent = precio;
-                    }
-                    coincidencia_lista.parentNode.children[5].textContent = Number(event.sucursal_get);
-                    coincidencia_lista.parentNode.children[6].children[1].value = Number(coincidencia_lista.parentNode.children[6].children[1].value) + Number(cantidad);
-                    coincidencia_lista.parentNode.children[8].textContent = (Number(coincidencia_lista.parentNode.children[6].children[1].value) * 
-                                                                            Number(coincidencia_lista.parentNode.children[7].textContent)).toFixed(2);
-                    coincidencia_lista.parentNode.children[9].textContent = Number(event.sucursal_get) - 
-                                                                            Number(coincidencia_lista.parentNode.children[6].children[1].value);// saldo de stock
-                    calcularSaldos(document.getElementById("id-ventas").value, "suma", cantidad);
-                }else if(coincidencia_lista === undefined){
-                    if(precio === undefined){// Si no ingresamos un precio se tomará el dato del array_saldos
-                        precio = (event.precio_venta).toFixed(2);
-                    }
-                    crearBodyVentas (event.sucursal_get, cantidad, precio, event.talla)
-                    calcularSaldos(id_ventas.value, "suma", cantidad)
-                }else if((event.sucursal_get - Number(event.cantidad_venta)) <= 0){
-                    modal_proceso_abrir("Cantidad a vender mayor a existencias.", "")
-                    modal_proceso_salir_botones_focus("buscador-productos-ventas")
-                }
-            };
-        });
-    };
+function agregarAListaProductos(cantidAdAVender, precioAdAVender){// Busca coincidencias el tabla lista de productos y agrega nuevas filas
+    let array_ = array_saldos.find(x=> x.idProd === Number(id_ventas.value))//buscamos una coincidencia en array_saldos
+    if((array_[sucursales_activas[idx_suc]] + Number(cantidAdAVender)) <= array_[in_existencias[idx_suc]]){
+        const id_lista = document.querySelectorAll(".id_proforma")
+        const idArray = Array.from(id_lista);// id_lista se convierte en un array
+        let fila_ = idArray.find(x => Number(x.textContent) === Number(id_ventas.value))// buscamos una coincidencia en la lista de ventas
+        let p_v = precioAdAVender === undefined ? array_.precio : array_.in_p_v(precioAdAVender);
+        let t_q_v = array_.in_q_q(cantidAdAVender, idx_suc)
+        if(fila_ !== undefined){
+            fila_.parentNode.children[5].textContent = array_[in_existencias[idx_suc]];
+            fila_.parentNode.children[6].children[1].value = t_q_v;
+            fila_.parentNode.children[8].textContent = (t_q_v * p_v).toFixed(2);
+            fila_.parentNode.children[9].textContent = array_[in_existencias[idx_suc]] - t_q_v;// saldo de stock
+            modal_proceso_abrir(`Se incrementó las unidades a vender del producto ${array_.descripcion}, `+
+                                `con código ${array_.codigo}, a ${t_q_v} unidades.`, "")
+            modal_proceso_salir_botones_focus("buscador-productos-ventas")
+
+        }else if(fila_ === undefined){
+            crearBodyVentas (array_[in_existencias[idx_suc]], array_[sucursales_activas[idx_suc]], p_v, array_.talla)
+        };
+    }else{
+        modal_proceso_abrir("Cantidad a vender mayor a existencias.", "")
+        modal_proceso_salir_botones_focus("cantidad-vendida-ventas");
+    }
 };
 async function ventaRapida(){
     if(buscador_codigo.value !== "" && 
         id_ventas.value !== ""){
-        await busquedaProductoPorId(id_ventas.value)
+        await busquedaProductoPorId()
         agregarAListaProductos(1)//agrega nueva fila
 
         resetFormularioVentas()
@@ -258,16 +273,16 @@ async function ventaRapida(){
 
 async function ventaDetallada_uno() {
     if(buscador_codigo.value !== ""){
-        await busquedaProductoPorId(id_ventas.value)
+        await busquedaProductoPorId()
         if(array_saldos.length > 0){
             array_saldos.forEach((event)=>{
-                if(event.idProd == id_ventas.value){
-                    costo_unitario_ventas.value = event.costo_unitario;
-                    precio_venta_formulario.value = event.precio_venta;
-                    existencias_almacen_ventas.value = event.sucursal_get - event.cantidad_venta;
-                    saldo_existencias_almacen_ventas.value = event.sucursal_get - event.cantidad_venta;
+                if(event.idProd === Number(id_ventas.value)){
+                    costo_unitario_ventas.value = event.costo;
+                    precio_venta_formulario.value = event.precio;
+                    existencias_almacen_ventas.value = event[in_existencias[idx_suc]] - event[sucursales_activas[idx_suc]];
+                    saldo_existencias_almacen_ventas.value = event[in_existencias[idx_suc]] - event[sucursales_activas[idx_suc]];
                     talla_ventas.value = event.talla;
-                    precioAdAVender.value = event.precio_venta.toFixed(2);
+                    precioAdAVender.value = event.precio.toFixed(2);
                 };
             });
         };
@@ -278,18 +293,7 @@ async function ventaDetallada_uno() {
         saldo_existencias_almacen_ventas.value > 0 ? cantidAdAVender.select() : "";
     };
 };
-function calcularSaldos(id, operacion, tabla_cantidad){
-    array_saldos.forEach((event)=>{
-        if(event.idProd == id && operacion == "resta"){
-            event.cantidad_venta = Number(event.cantidad_venta) - Number(tabla_cantidad)
-        }
-    });
-    array_saldos.forEach((event)=>{
-        if(event.idProd == id && operacion == "suma"){
-            event.cantidad_venta = Number(event.cantidad_venta) + Number(tabla_cantidad)
-        }
-    });
-};
+
 
 //////PASAR DATOS DE FORMULARIO A LISTA DE PRODUCTOS///////////////////////////
 
@@ -302,7 +306,7 @@ function crearBodyVentas (existencias, cantidad, precio_venta, talla){
     let tablaVentas= document.querySelector("#tabla-ventas > tbody");
     let nuevaFilaTablaVentas = tablaVentas.insertRow(-1);
     let fila = `<tr>`+
-                    `<td class="id-ventas-comprobacion invisible">${id_ventas.value}</td>`+// Columna 0 > id
+                    `<td class="id_proforma invisible">${id_ventas.value}</td>`+// Columna 0 > id
                     `<td class="invisible">${sucursal_ventas}</td>`+// Columna 1 > sucursal
                     `<td>${codigo_ventas.value}</td>`+// Columna 2 > código
                     `<td>${descripcion_ventas.value}</td>`+// Columna 3 > descripción
@@ -315,10 +319,9 @@ function crearBodyVentas (existencias, cantidad, precio_venta, talla){
                         <p class="suma_cantidad button_mas_menos" onclick="incrementarCantidad(this)">+</p>
                         
                     </td>`+// Columna 6 > cantidad a vender
-                    `<td style="text-align: right">${precio_venta}</td>`+// Columna 7 > Precio de venta
+                    `<td style="text-align: right">${precio_venta.toFixed(2)}</td>`+// Columna 7 > Precio de venta
                     `<td style="text-align: right">${(cantidad * precio_venta).toFixed(2)}</td>`+// Columna 8 > Total venta
-                    `<td class="invisible">${Number(existencias) -
-                                            Number(cantidad)}</td>`+// Columna 9 > saldo de existencias en sucursal origen
+                    `<td class="invisible">${Number(existencias) - Number(cantidad)}</td>`+// Columna 9 > saldo de existencias en sucursal origen
                     `<td class="invisible">${document.getElementById('txtIdv').value}</td>`+// Columna 10 > cliente
 
                     `<td style="text-align: center">
@@ -346,25 +349,16 @@ function clicEnEliminarFila(e) {
 
 function ventaDetallada_dos(e){
     e.preventDefault();
-    /////////////////////ESTO ES PARA NO AUMENTAR UNA FILA MAS DE UN PRODUCTO QUE YA EXISTE EN LA TABLA VENTAS/////////////////////////////////////
-    document.querySelectorAll(".id-ventas-comprobacion").forEach((e) => {// SE TOMA LOS ID PARA OPERAR Y NO SUMAR UNA NUEVA FILA CON EL MISMO PRODUCTO
-        if(e.textContent == id_ventas.value && saldo_existencias_almacen_ventas.value >= 0 &&
-        id_ventas.value !== "" && document.querySelector("#tabla-ventas > thead").children.length > 0){ 
-            modal_proceso_abrir(`Se incrementó las unidades a vender del producto ${e.parentNode.children[3].textContent}, `+
-                                `con código ${e.parentNode.children[2].textContent}, a ${Number(e.parentNode.children[6].children[1].value) + Number(cantidAdAVender.value)} unidades.`, "")
-            modal_proceso_salir_botones_focus("buscador-productos-ventas")
-        }
-    });
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    if ((Number(existencias_almacen_ventas.value) - Number(cantidAdAVender.value)) >= 0 && 
-    id_ventas.value != "" && cantidAdAVender.value > 0){
+    if (id_ventas.value != "" && cantidAdAVender.value > 0 &&
+    (Number(existencias_almacen_ventas.value) -
+    Number(cantidAdAVender.value)) >= 0){
         if(Number(precioAdAVender.value) < Number(costo_unitario_ventas.value)){
             modal_proceso_abrir(`El precio de venta de ${codigo_ventas.value}, es menor a su costo de compra. 
-                                Si desea corregir el precio de venta elimine el producto de la lista de productos y vuelva a ingresar.`, "")
-            modal_proceso_salir_botones_focus("buscador-productos-ventas")
+                                Si desea corregir el precio de venta elimine el producto de la 
+                                lista de productos y vuelva a ingresar.`, "")
+                                modal_proceso_salir_botones_focus("cantidad-vendida-ventas");
         }
-        agregarAListaProductos(cantidAdAVender.value, Number(precioAdAVender.value).toFixed(2));//agrega nueva fila
-        modificarPrecioVenta(id_ventas.value, precioAdAVender.value);
+        agregarAListaProductos(cantidAdAVender.value, precioAdAVender.value);//agrega nueva fila
 
         resetFormularioVentas();
         resetDetalleVentas();
@@ -381,7 +375,7 @@ function ventaDetallada_dos(e){
         saldo_existencias_almacen_ventas.value = existencias_almacen_ventas.value
         saldo_existencias_almacen_ventas.style.background = ""
         total_ventas.value = "00.00"
-    }else if(cantidAdAVender.value == 0 || cantidAdAVender.value == " "){
+    }else if(cantidAdAVender.value == 0 || cantidAdAVender.value == ""){
         modal_proceso_abrir("Digite una cantidad a vender válida.", "")
         modal_proceso_salir_botones_focus("cantidad-vendida-ventas")
     };
@@ -399,13 +393,7 @@ function totalesTabla(){
     document.querySelector("#radio-efectivo").checked = true;
     document.getElementById("efectivo-ventas").value = Number(document.getElementById("total-importe-tabla-ventas").textContent).toFixed(2);
 };
-///////////////////OPERACION DE RESTA EN FORMULARIO VENTAS ///////////////////////////////////
-cantidAdAVender.addEventListener("focusout", () =>{
-    variacionCantidad(cantidAdAVender)
-});
-precioAdAVender.addEventListener("focusout", () =>{
-    variacionMonto(precioAdAVender);
-});
+
 //////////////////////////////////////////////////////////////////////////////////////////////
 function modosVenta(){
     // Escuchar la tecla Enter en toda la página
@@ -437,6 +425,13 @@ async function procesamientoVentas(e){
             modal_proceso_abrir("Procesando la venta!!!.", "")
 
             await funcionGeneralVentas();
+            if(document.querySelector("#check_comprobante").checked){
+                NuevaVentanaComprobanteDePago(response.message[0], response.message[1])//comprobante
+            };
+            array_saldos = [];
+            resetClientes();
+            resetTablaVentas();
+            resetMetodoPago();
 
         }else if(document.querySelector("#tabla-ventas > tbody").rows.length === 0){
             modal_proceso_abrir("Imposible procesar, la lista está vacía.", "")
@@ -458,31 +453,44 @@ async function realizarCredito(sucursal_ventas, numeracion_comprobante_venta){
         "saldo_interes": Number(document.getElementById("credito-interes").textContent),
         "saldo_total": Number(document.getElementById("credito-ventas").value) + Number(document.getElementById("credito-interes").textContent),
         "fecha_cre": generarFecha()
-    }
+    };
 
     let urlCredito = URL_API_almacen_central + 'aperturar_creditos'
     let response_credito = Number(credito.saldo_monto) > 0 ? await funcionFetch(urlCredito, credito) : "";
     if(response_credito.status === 200){
         modal_proceso_abrir("Venta procesada!!!.", `Crédito aperturado`)
-        console.log("Respuesta apertura de crédito "+response_credito.status)
-    }
-}
+    };
+};
 async function funcionGeneralVentas(){
-    let array_data = [];
-    function DataProdSal(a){
-        this.idProd = array_saldos[a].idProd;
-        this.existencias_post = array_saldos[a].cantidad_venta;
-        this.precio_venta_salidas = array_saldos[a].precio_mod;
-        this.cliente = document.getElementById('txtIdv').value != "" ? 
-                        document.getElementById('txtIdv').value : 
-                        indice_cli[0].id_cli;
+    let array_productos = [];
+    let array_salidas = [];
+    let suc__ = ""
+    function DatosProductos(a){
+        this.idProd = a.idProd;
+        this.existencias_ac = -a.existencias_ac;
+        this.existencias_su = -a.existencias_su;
+        this.existencias_sd = -a.existencias_sd;
+        this.existencias_st = -a.existencias_st;
+        this.existencias_sc = -a.existencias_sc;
     };
-    for(let i = 0 ; i < array_saldos.length; i++ ){
-        array_saldos[i].cantidad_venta > 0 ? array_data.push(new DataProdSal(i)) : "";
+    function DatosSalidas(a, sucursal, i){
+        this.idProd = a.idProd;
+        this.sucursal = sucursal;
+        this.existencias_salidas = a[sucursales_activas[i]];
+        this.precio_venta_salidas = a.precio;
     };
+    array_saldos.forEach((event)=>{
+        array_productos.push(new DatosProductos(event))
+        suc_add.forEach((e, i)=>{
+            let sucursal_ = suc_db.find(x=> x.sucursal_nombre === e);
+            if(sucursal_){
+                event[sucursales_activas[i]] > 0 ? array_salidas.push(new DatosSalidas(event, sucursal_.id_sucursales, i)): "";
+                suc__ = sucursal_.id_sucursales;
+            };
+        });
+    });
     function DatosDeVenta(){
-        this.sucursal_post = sucursales_activas[indice_sucursal_ventas];
-        this.sucursal = array_saldos[0].sucursal;
+        this.sucursal_v = suc__;
         this.id_num = datos_usuario[0].id;
         this.item_ticket = input_tipo_comprobante.value;
         this.modo_efectivo = Number(document.getElementById("efectivo-ventas").value);
@@ -494,25 +502,17 @@ async function funcionGeneralVentas(){
         this.dni_cliente = document.getElementById('txtIdv').value != "" ? 
                             document.getElementById('txtIdv').value : 
                             indice_cli[0].id_cli;
-        this.array_data = array_data;
         this.fecha = generarFecha();
+        this.array_productos = array_productos;
+        this.array_salidas = array_salidas;
     };
 
     let url_venta = URL_API_almacen_central + 'gestion_de_venta'
     let objeto_venta = new DatosDeVenta();
 
     let response = await funcionFetchDos(url_venta, objeto_venta);
-
     if(response.status === "success"){
-        
         await realizarCredito(array_saldos[0].sucursal, response.message[1]);
-        if(document.querySelector("#check_comprobante").checked){
-            NuevaVentanaComprobanteDePago(response.message[0], response.message[1])//comprobante
-        };
-        resetClientes();
-        resetTablaVentas();
-        resetMetodoPago();
-        array_saldos = [];
         modal_proceso_abrir(`La venta ${response.message[1]} fue procesada satisfactoriamente!!!.`, ``)
         modal_proceso_salir_botones_focus("buscador-productos-ventas")
     }else{
@@ -799,6 +799,7 @@ function cambioSucursal(){
         
     });
 };
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////Reporte de Ventas///////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -929,7 +930,7 @@ function incrementarCantidad(p){
         p.parentNode.children[1].value = Number(p.parentNode.children[1].value) + 1;
         fila.children[8].textContent = (Number(fila.children[7].textContent) * Number(p.parentNode.children[1].value)).toFixed(2);
         fila.children[9].textContent = Number(fila.children[9].textContent) - 1;
-        calcularSaldos(fila.children[0].textContent, "suma", 1)
+        calcularSaldos(fila.children[0].textContent, true, 1)
         resetMetodoPago()
         totalesTabla()
     }
@@ -940,10 +941,14 @@ function decrementarCantidad(p){
         p.parentNode.children[1].value = Number(p.parentNode.children[1].value) - 1;
         fila.children[8].textContent = (Number(fila.children[7].textContent) * Number(p.parentNode.children[1].value)).toFixed(2);
         fila.children[9].textContent = Number(fila.children[9].textContent) + 1;
-        calcularSaldos(fila.children[0].textContent, "resta", 1)
+        calcularSaldos(fila.children[0].textContent, false, 1)
         resetMetodoPago()
         totalesTabla()
     };
+};
+function calcularSaldos(id, operacion, tabla_cantidad){
+    let array_ = array_saldos.find(x=> x.idProd === Number(id))
+    operacion === true ? array_.in_q_q(tabla_cantidad, idx_suc) : array_.in_q_q(-tabla_cantidad, idx_suc);
 };
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 function incrementarNumero(input, num){// si num > 0 el formato de la celda será en monedas "00.00"
@@ -957,50 +962,45 @@ function decrementarNumero(input, num){// si num > 0 el formato de la celda ser�
                 input.closest("div").children[1].value = 0;
     num > 0 ? variacionMonto(input.closest("div").children[1]): variacionCantidad(input.closest("div").children[1]);
 };
-function formatoMoneda(input){
-    let value = input.value;
-    value = value.replace(/[^0-9.]/g, '');// Eliminar todo lo que no sea un número o un punto decimal
-    if (value.includes('.')) {// Verificar si el valor contiene un punto decimal
-        let parts = value.split('.');
-        let integerPart = parts[0].padStart(2, '0');// Asegurar que la parte entera tenga al menos dos caracteres (añadir 0 si es necesario)
-        let decimalPart = parts[1] ? parts[1].substring(0, 2) : '';// Limitar la parte decimal a dos dígitos
-        decimalPart = decimalPart.padEnd(2, '0');// Si la parte decimal tiene menos de dos dígitos, añadir ceros
-        value = `${integerPart}.${decimalPart}`;// Formatear el valor final
-    } else {
-        value = value.padStart(2, '0') + '.00';// Si no hay punto decimal, añadir ".00" al final y asegurar que la parte entera tiene dos dígitos
-    }
-    input.value = value;// Ajustar el valor del input al valor formateado
-};
 function variacionCantidad(input){
-    let _existencias = existencias_almacen_ventas.value;
-    let suma = _existencias - input.value;
-    saldo_existencias_almacen_ventas.value = suma;
-    total_ventas.value = input.value * Number(precioAdAVender.value);
-    formatoMoneda(total_ventas);
-
-    saldo_existencias_almacen_ventas.style.background = ""                                            
-    if(saldo_existencias_almacen_ventas.value < 0){
-        saldo_existencias_almacen_ventas.style.background = "rgb(240, 69, 69)"
-    }
+    if(Number(input.value) < 0 || isNaN(Number(input.value))){
+        input.style.background = "var(--fondo-marca-uno)";
+    }else{
+        let _existencias = existencias_almacen_ventas.value;
+        let suma = _existencias - input.value;
+        saldo_existencias_almacen_ventas.value = suma;
+        total_ventas.value = formatoMoneda(input.value * Number(precioAdAVender.value));
+    
+        saldo_existencias_almacen_ventas.style.background = ""                                            
+        if(saldo_existencias_almacen_ventas.value < 0){
+            saldo_existencias_almacen_ventas.style.background = "var(--fondo-marca-uno)"
+        }
+        input.style.background = "";
+    };
 };
 function variacionMonto(input){
-    total_ventas.value = input.closest("div").children[1].value * Number(cantidAdAVender.value);
-    formatoMoneda(input.closest("div").children[1]);
-    formatoMoneda(total_ventas);
+    if(Number(input.value) < 0 || isNaN(Number(input.value))){
+        input.style.background = "var(--fondo-marca-uno)";
+    }else{
+        total_ventas.value = formatoMoneda(input.closest("div").children[1].value * Number(cantidAdAVender.value));
+        precioAdAVender.style.background = "" 
     
-    precioAdAVender.style.background = "" 
-
-    if(Number(input.closest("div").children[1].value) < Number(costo_unitario_ventas.value)){
-        precioAdAVender.style.background = "rgb(240, 69, 69)"
-    }
-};
-function modificarPrecioVenta(id, monto){// Actualiza precio_mod
-    array_saldos.forEach((event)=>{
-        if(event.idProd === Number(id)){
-            event.precio_mod = Number(monto)
+        if(Number(input.closest("div").children[1].value) < Number(costo_unitario_ventas.value)){
+            precioAdAVender.style.background = "var(--fondo-marca-uno)"
         }
-    })
-}
+        precioAdAVender.addEventListener("blur", () =>{
+            precioAdAVender.value = formatoMoneda(precioAdAVender.value);
+        });
+        input.style.background = "";
+    };
+};
+///////////////////OPERACION DE RESTA EN FORMULARIO VENTAS ///////////////////////////////////
+cantidAdAVender.addEventListener("keyup", () =>{
+    variacionCantidad(cantidAdAVender)
+});
+precioAdAVender.addEventListener("keyup", () =>{
+    variacionMonto(precioAdAVender);
+});
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -1008,11 +1008,11 @@ async function actualizarSaldos(){//Esto se usa cuando el producto ya está en l
     indice_base = JSON.parse(localStorage.getItem("base_datos_consulta"))
     indice_cli = JSON.parse(localStorage.getItem("base_datos_cli"))
     modal_proceso_abrir("Inspeccionando stock.", "")
-    const id_rev = document.querySelectorAll(".id-ventas-comprobacion");
+    const id_rev = document.querySelectorAll(".id_proforma");
     let ids = Array.from(id_rev).map(element => element.textContent);// buscamos todos los códigos (id) de la tabla
 
     let response = await cargarDatos(   `almacen_central_datos?`+
-                                        `sucursal_get=${sucursales_activas[indice_sucursal_ventas]}&`+
+                                        `sucursal_get=${sucursales_activas[idx_suc]}&`+
                                         `ids=${ids.join(",")}`);
 
     for(id_v of id_rev){
@@ -1080,11 +1080,11 @@ function agregarBusquedaDetalleUno(button){
     id_ventas.value = linea.children[0].textContent;
     sucursal_ventas = select_sucursal.value;
     if(document.getElementById("puesto_usuario").textContent == obtenerIndiceSucursal("#fffff-sucursal")){
-        indice_sucursal_ventas = obtenerIndiceSucursal("#fffff-sucursal");
+        idx_suc = obtenerIndiceSucursal("#fffff-sucursal");
     }else{
-        indice_sucursal_ventas = obtenerIndiceSucursal("#fffff-sucursal");
+        idx_suc = obtenerIndiceSucursal("#fffff-sucursal");
     };
-    input_sucursal.value = document.querySelector("#fffff-sucursal").children[indice_sucursal_ventas].textContent
+    input_sucursal.value = document.querySelector("#fffff-sucursal").children[idx_suc].textContent
     categoria_ventas.value = Number(linea.children[1].textContent); 
     buscador_codigo.value = linea.children[2].textContent;
     codigo_ventas.value = linea.children[2].textContent;
@@ -1092,3 +1092,39 @@ function agregarBusquedaDetalleUno(button){
     buscador_codigo.focus()
 };
 ////////////////////////////////////////////////////////////////////////////////////////
+function busquedaDetalle(indice, termino){
+    // Obtén la referencia al elemento <ul>
+    let miUl_cabecera = document.getElementById("lista_cabecera");
+    let miUl_detalle = document.getElementById("lista_detalle");
+    let terminoBusqueda = termino;
+    let nuevoLi = "";
+    let cabecera =  `<li class="diseno_li">`+
+                        `<span style="width: 80px;"><h3>Código</h3></span> `+
+                        `<span style="width: 80px;"><h3>Descripción</h3></span> `+
+                        `<span style="width: 80px;"><h3>Mandar a formulario</h3></span>`+
+                    `</li>`;
+    
+    for (let event of indice_base){
+        let parametro = [event.codigo, event.descripcion, ""]
+        if (parametro[indice].toLowerCase().includes(terminoBusqueda.toLowerCase()) && terminoBusqueda !== "" &&
+        (Number(document.getElementById("categoria_buscador_detalle").value) === event.categoria ||
+        document.getElementById("categoria_buscador_detalle").value === "0")){
+            // Crea un nuevo elemento <li> con contenido
+            nuevoLi += `<li class="diseno_li">`+
+                                `<span class="invisible id_detalle">${event.idProd}</span> `+
+                                `<span class="invisible categoria_detalle">${event.categoria}</span> `+
+                                `<span class="codigo_detalle">${event.codigo}</span> `+
+                                `<span class="descripcion_detalle">${event.descripcion}</span> `+
+                                `<button style="cursor:pointer;" onclick="agregarBusquedaDetalleUno(this)">Usar</button>`+
+                            `</li>`;
+        };
+    };
+    
+    if(nuevoLi !== ""){
+        miUl_cabecera.innerHTML = cabecera;
+        miUl_detalle.innerHTML = nuevoLi;
+    }else{
+        miUl_cabecera.innerHTML = `<span>No se encontraron coincidencias.</span>`;
+        miUl_detalle.innerHTML = "";
+    }
+};

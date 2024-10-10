@@ -23,93 +23,7 @@ function cargarDatosAnio(){
     })
 };
 /////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-class ObjMod {
-    constructor(categoria, codigo, descripcion, talla, existencias_ac, existencias_su, 
-                existencias_sd, existencias_st, existencias_sc, costo, precio, lote, 
-                proveedor, idProd, in_ac, in_su, in_sd, in_st, in_sc) {
-        this.categoria = categoria;
-        this.codigo = codigo;
-        this.descripcion = descripcion;
-        this.talla = talla;
-        this.existencias_ac = existencias_ac;
-        this.existencias_su = existencias_su;
-        this.existencias_sd = existencias_sd;
-        this.existencias_st = existencias_st;
-        this.existencias_sc = existencias_sc;
-        this.costo = costo;
-        this.precio = precio;
-        this.lote = lote;
-        this.proveedor = proveedor;
-        this.idProd = idProd;
-        this.in_ac = in_ac;
-        this.in_su = in_su;
-        this.in_sd = in_sd;
-        this.in_st = in_st;
-        this.in_sc = in_sc;
-    };
-
-    total_costo(indice) {
-        if (indice >= 0 && indice < sucursales_activas.length) {
-            return this[sucursales_activas[indice]] * this.costo;
-        } else {
-            throw new Error('Índice fuera de rango');
-        };
-    };
-    in_q(input, indice){
-        if(Number(input.value) < 0 || isNaN(Number(input.value))){
-            input.style.background = "var(--fondo-marca-uno)";
-        }else{
-            this[sucursales_activas[indice]] = Number(input.value);
-            input.style.background = "";
-        };
-    };
-    in_c(input){
-        if(Number(input.value) < 0 || isNaN(Number(input.value))){
-            input.style.background = "var(--fondo-marca-uno)";
-        }else{
-            this.costo = Number(input.value);
-            blurInputMoneda(input);
-            input.style.background = "";
-        };
-    };
-    in_p(input){
-        if(Number(input.value) < 0 || isNaN(Number(input.value))){
-            input.style.background = "var(--fondo-marca-uno)";
-        }else{
-            this.precio = Number(input.value);
-            blurInputMoneda(input);
-            input.style.background = "";
-        };
-    };
-    in_l(input){
-        if(Number(input.value) < 0 || isNaN(Number(input.value))){
-            input.style.background = "var(--fondo-marca-uno)";
-        }else{
-            this.lote = Number(input.value);
-            input.style.background = "";
-        };
-    };
-    in_d(input){
-        if(expregul.descripcion.test(input.value) || input.value !== ""){
-            this.descripcion = input.value;
-            input.style.background = "";
-        } else {
-            input.style.background = "var(--fondo-marca-uno)";
-        };
-    };
-    in_cod(input){
-        if(expregul.codigo.test(input.value) || input.value !== ""){
-            this.codigo = input.value;
-            input.style.background = "";
-        } else {
-            input.style.background = "var(--fondo-marca-uno)";
-        };
-    };
-};
-/////////////////////////////////////////////////////////////////////
 ///////////////////////////sucursal/////////////////////////////////
-let modificacionNumerador = 0;
 const botonRegistrarRegistro = document.getElementById("registra-modificacion");
 botonRegistrarRegistro.addEventListener("click", (e)=>{
     e.preventDefault();
@@ -135,7 +49,7 @@ function mostrarFormRegistro(){
     document.querySelector("#tabla_principal > tbody").remove()
     document.querySelector("#tabla_principal").createTBody()
 
-    modificacionNumerador = 0;
+    clave_form = 0;
     array_saldos = [];
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -198,11 +112,7 @@ function contenedorBotonesModal(funcion, titulo){
 //////PASAR DATOS DE FORMULARIO A TABLA DE MODIFICACIÓN///////////////////////////////////////////////
 
 function agregarAtablaModal(){
-    if(expregul.codigo.test(document.getElementById("codigo-form").value) &&
-    expregul.descripcion.test(document.getElementById("descripcion-form").value) &&
-    expregul.cantidad.test(document.getElementById("lote-form").value) &&
-    expregul.precios.test(document.getElementById("costo-form").value) &&
-    expregul.precios.test(document.getElementById("precio-form").value)){
+    if(validarFormulario()){
         let array_cod_db = [];
         let array_cod_a_s = [];
         let db_ = JSON.parse(localStorage.getItem("base_datos_consulta"))
@@ -224,7 +134,7 @@ function agregarAtablaModal(){
                 array_cod_a_s.push(cod_a_s.codigo)// recolectamos los codigos que se repiten en la Lista de registro
             }else{
                 crearBodyRegistro(event, document.getElementById("lote-form").value)
-                array_saldos.push(new ObjMod(
+                array_saldos.push(new ObjGeneral(
                     document.getElementById("categoria-form").value,
                     `${document.getElementById("codigo-form").value}-${event}-${document.getElementById("lote-form").value}`,
                     document.getElementById("descripcion-form").value,
@@ -253,16 +163,6 @@ function agregarAtablaModal(){
         arrayCreacionCategoriaTallas = [];
         document.querySelector("#tabla_modal > tbody > tr:nth-child(1) > td:nth-child(3) > input").focus()
 
-    }else if(expregul.codigo.test(document.getElementById("codigo-form").value) == false){
-        document.getElementById("codigo-form").style.background ="#b36659"
-    }else if(expregul.descripcion.test(document.getElementById("descripcion-form").value) == false){
-        document.getElementById("descripcion-form").style.background ="#b36659"
-    }else if(expregul.precios.test(document.getElementById("costo-form").value) == false){
-        document.getElementById("costo-form").style.background ="#b36659"
-    }else if(expregul.precios.test(document.getElementById("precio-form").value) == false){
-        document.getElementById("precio-form").style.background ="#b36659"
-    }else if(expregul.cantidad.test(document.getElementById("lote-form").value) == false){
-        document.getElementById("lote-form").style.background ="#b36659"
     };
 };
 
@@ -405,7 +305,7 @@ botonEditarProducto.addEventListener("click", () =>{
     document.querySelector("#tabla_principal > tbody").remove()
     document.querySelector("#tabla_principal").createTBody()
 
-    modificacionNumerador = 1;
+    clave_form = 1;
     array_saldos = [];
 });
 
@@ -414,18 +314,18 @@ function reseteoFormulario(){
     document.getElementById('categoria-form').value = "0";
     document.getElementById('codigo-form').value = "";
     document.getElementById('descripcion-form').value = "";
-    if(modificacionNumerador == 0){
+    if(clave_form == 0){
         document.getElementById('costo-form').value = "";
         document.getElementById('precio-form').value = "";
         document.getElementById('lote-form').value = "";
         document.getElementById('proveedor-form').value = document.getElementById('proveedor-form')[0].value;
         document.getElementById("codigo-form").focus();
-    }else if(modificacionNumerador == 1){
+    }else if(clave_form == 1){
         document.getElementById("buscador-productos-form").focus();
     };
 };
 document.addEventListener("keyup", () =>{
-    if(modificacionNumerador == 0){
+    if(clave_form == 0){
         return;
     }else{
         let almacenCentral = indice_base.find(y => y.codigo.toLowerCase().startsWith(document.getElementById('buscador-productos-form').value.toLowerCase()))
@@ -490,8 +390,6 @@ function crearBodyModificacion(codigoModificacion, id_prod){
                     </td>`+// Columna 9 > botón eliminar fila
                 `</tr>`
     nuevaFilaTablaModificacion.innerHTML = fila;
-    /* rellenarCategoria()
-    rellenarProveedor() */
 };
 
 /////AQUI MANDAMOS A TABLA PREMODIFICACION PARA EDITAR VALORES/////////////////////////////////////////////////////////////
@@ -525,8 +423,12 @@ async function agregarATablaPreModificacion(){
     rellenarProveedor();
     contenedorBotonesModal("mandarATablaPrincipalModificacion()", "Enviar a la lista")
     if(array_id_a_s.length > 0){
-        modal_proceso_abrir(`Él o los códigos: [${array_id_a_s}] ya `+
-                            `existen en la Lista de modificación, no podrá continuar con la compra de estos.`, "")
+        let cabecera =  `<ul>Los códigos: `
+            for(let event of array_id_a_s){
+                cabecera += `<li class="diseno_li">${event},</li>`;
+            }
+            cabecera +=`</ul> Ya se encuentran en la lista de modificación.`;
+            modal_proceso_abrir("", "", cabecera)
         modal_proceso_salir_botones()
     };
     document.querySelectorAll(".codigo_modal").forEach((event)=>{
@@ -623,7 +525,7 @@ async function buscarPorCodidoModificacionOrigen(){
             rellenarMedidasCategoria(fila_res.categoria, suma)
             row_.children[4].children[0].value = fila_res.talla
             suma+=1;
-            array_saldos.push(new ObjMod(   fila_res.categoria,
+            array_saldos.push(new ObjGeneral(   fila_res.categoria,
                                             fila_res.codigo,
                                             fila_res.descripcion,
                                             fila_res.talla,
@@ -750,45 +652,15 @@ removerTablaModificacionDos.addEventListener("click", () =>{
     document.querySelector(".contenedor-pre-modificacion").classList.remove("modal-show-modificacion");
     document.querySelector("#tabla_principal > tbody").remove();
     document.querySelector("#tabla_principal").createTBody();
-    if(modificacionNumerador == 0){
+    if(clave_form == 0){
         document.getElementById("codigo-form").focus();
-    }else if(modificacionNumerador == 1){
+    }else if(clave_form == 1){
         document.getElementById("buscador-productos-form").focus();
     };
     array_saldos = [];
 });
 ////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
-document.getElementById("boton_buscar_codigo").addEventListener("click", ()=>{
-    busquedaDetalle(0, document.getElementById("buscador_descripcion").value)
-    document.getElementById("buscador_descripcion").focus()
-});
-document.getElementById("boton_buscar_descripcion").addEventListener("click", ()=>{
-    busquedaDetalle(1, document.getElementById("buscador_descripcion").value)
-    document.getElementById("buscador_descripcion").focus()
-});
-document.getElementById("boton_borrar_").addEventListener("click", ()=>{
-    let miUl_cabecera = document.getElementById("lista_cabecera");
-    let miUl_detalle = document.getElementById("lista_detalle");
-    miUl_cabecera.innerHTML = "";
-    miUl_detalle.innerHTML = "";
-    document.getElementById("categoria_buscador_detalle").value = "0";
-    document.getElementById("buscador_descripcion").value = ""
-    document.getElementById("buscador_descripcion").focus();
-});
-function agregarBusquedaDetalleUno(button){
-    if(document.getElementById("editar-modificacion").classList.contains('marcaBoton')){
-        let linea = button.closest("li");
-        document.getElementById('id-form').value = linea.children[0].textContent;
-        document.getElementById('categoria-form').value = linea.children[1].textContent;
-        document.getElementById('codigo-form').value = linea.children[2].textContent;
-        document.getElementById('descripcion-form').value = linea.children[3].textContent;
-    }else{
-        modal_proceso_abrir(`Esta acción solo procederá en "Modificar Producto".`, ``)
-        modal_proceso_salir_botones()
-    };
-};
-
 function clicKEliminarFila(e, indice_codigo) {
     const fila = e.closest("tr");
     array_saldos.forEach((e, i)=>{//Buscamos una coincidencia de código
@@ -819,10 +691,10 @@ function clicKEliminarFilaDosId(e) {
 };
 
 function removerModal(){
-    if(modificacionNumerador == 0){
+    if(clave_form == 0){
         removerListaModal()
         document.getElementById("codigo-form").focus();
-    }else if(modificacionNumerador == 1){
+    }else if(clave_form == 1){
         removerListaModalId()
         document.getElementById("buscador-productos-form").focus();
     };

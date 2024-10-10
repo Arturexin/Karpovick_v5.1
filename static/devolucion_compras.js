@@ -7,8 +7,11 @@ function inicioDevolucionCompras(){
     graficoDevolucionesCompras();
     btnDevolucionCompras = 1;
 };
-let array_comprobante= []
+let array_comprobante= [];
+let operacion_n = '';
+let indice_causa = 0;
 const barras_dev_compras = [".cg_1_c", ".cg_2_c", ".cg_3_c", ".cg_4_c", ".cg_5_c"]
+const op_ = ["", "Venta", "Compra", "Recompra"]
 /////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
 function cargarDatosAnio(){
@@ -25,145 +28,183 @@ function cargarDatosAnio(){
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////DEVOLUCION POR COMPRAS////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-let sucursal_indice_dev_compras = 0;
-function eliminarFilaCompras(){
-    document.querySelectorAll(".eliminar_fila_compras").forEach((event)=>{
-        event.addEventListener("click", ()=>{
-            event.parentNode.parentNode.parentNode.remove()
-        })
-    });
-};
-async function crearBodyDevoluciones(){
-    array_comprobante = await cargarDatos(`entradas_comprobante/${document.getElementById("buscador_operacion").value}`)
-
-    array_comprobante.forEach((event) => {
-        if(event.comprobante.toLowerCase() === document.getElementById('buscador_operacion').value.toLowerCase()){
-            console.log(event.id_prod)
-            suc_add.forEach((e, i)=>{
-                if(e === event.sucursal_nombre){
-                    sucursal_indice_dev_compras = i;
-                };
-            });
-            let tablaDevolucionesCompras= document.querySelector("#tabla-devolucion-compras > tbody");
-            let nuevaFilaTablaDevolucionesCompras = tablaDevolucionesCompras.insertRow(-1);
-            let fila = `<tr>`+
-                            `<td class="invisible">${event.idEntr}</td>`+//Columna 0 > id entradas
-                            `<td>${event.sucursal_nombre}</td>`+//Columna 1 > sucursal
-                            `<td class="codigoDevoluciones" style="background: rgb(105, 211, 35); border-radius: 5px">${event.codigo}</td>`+//Columna 2 >código
-                            `<td style="text-align: right">${event.existencias_entradas}</td>`+//Columna 3 > existencias compradas
-                            `<td><input class="cantidadADevolver input-tablas-dos-largo" onkeyup = "operarQDevolucion(this)"></td>`+//Columna 4 > cantidad a devolver
-                            `<td>${event.comprobante}</td>`+//Columna 5 > comprobante de compra
-                            `<td class="invisible">${event.id_prod}</td>`+//Columna 6 > id producto
-                            `<td style="text-align: right">${event.existencias_devueltas}</td>`+//Columna 7 > cantidad devuelta
-                            `<td style="text-align: right"></td>`+//Columna 8 > existencias compradas - (cantidad a devolver + cantidad devuelta)
-                            `<td class="invisible">${event.id_sucursales}</td>`+//Columna 9 > id sucursal
-                            `<td class="invisible">${sucursal_indice_dev_compras}</td>`+//Columna 10 > índice sucursal
-                            `<td style="text-align: center">
-                                <div class="tooltip">
-                                    <span style="font-size:18px;" class="material-symbols-outlined eliminarTablaFila eliminar_fila_compras">delete</span></a>
-                                    <span class="tooltiptext">Eliminar producto</span>
-                                </div>
-                            </td>`+//Columna 11 >
-                        `</tr>`
-            nuevaFilaTablaDevolucionesCompras.innerHTML = fila;
-            eliminarFilaCompras()
+class obj_dev{
+    constructor(codigo, comprobante, descripcion, existencias, existencias_devueltas, id, id_prod, id_sucursales, sucursal_nombre, precio_venta_salidas, cliente, causa, c_d ){
+            this.codigo = codigo;
+            this.comprobante = comprobante;
+            this.descripcion = descripcion;
+            this.existencias = existencias;
+            this.existencias_devueltas = existencias_devueltas;
+            this.id = id;
+            this.id_prod = id_prod;
+            this.id_sucursales = id_sucursales;
+            this.sucursal_nombre = sucursal_nombre;
+            this.precio_venta_salidas = precio_venta_salidas;
+            this.cliente = cliente;
+            this.causa = causa;
+            this.c_d = c_d;
+    }
+    in_q(input){
+        if(Number(input.value) < 0 || isNaN(Number(input.value))){
+            input.style.background = "var(--fondo-marca-uno)";
+        }else{
+            this.c_d = Number(input.value);
+            input.style.background = "";
         };
-    });
-};
+    };
+}
+function ingresar(e){
+    let coin_ = array_comprobante.find(x=> x.id === e.id)
+    if(coin_ === undefined){
+        array_comprobante.push(new obj_dev( e.codigo, 
+                                            e.comprobante, 
+                                            e.descripcion, 
+                                            e.existencias, 
+                                            e.existencias_devueltas, 
+                                            e.id, 
+                                            e.id_prod, 
+                                            e.id_sucursales, 
+                                            e.sucursal_nombre, 
+                                            e.precio_venta_salidas,
+                                            e.cliente
+        ));
+    }
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function crearBodyDevoluciones(){
 
+}
+async function crearBodyDevoluciones(){
+    let response = [];
+    let operacion = `${document.getElementById("t_op").textContent}-${document.getElementById("buscador_operacion").value}`
+    if(Number(document.getElementById("tipo_devolucion").value) > 1 && (operacion_n === "" || operacion_n === operacion)){
+        response = await cargarDatos(`entradas_comprobante/${operacion}`)
+        if(response.length > 0){
+            response.forEach((e)=>{
+                ingresar(e)
+            })
+            operacion_n = operacion;
+        };
+    }else if(Number(document.getElementById("tipo_devolucion").value) > 0 && (operacion_n === "" || operacion_n === operacion)){
+        response = await cargarDatos(`salidas_comprobante/${operacion}`)
+        if(response.length > 0){
+            response.forEach((e)=>{
+                ingresar(e)
+            })
+            operacion_n = operacion;
+        };
+    }else if(Number(document.getElementById("tipo_devolucion").value) === 0){
+        modal_proceso_abrir("Seleciones un tipo de operación", "")
+        modal_proceso_salir_botones()
+    }else if(operacion_n !== operacion){
+        modal_proceso_abrir("Solo puede procesar una operación por vez", "")
+        modal_proceso_salir_botones()
+    };
+    let array_id_a_s = [];
+    let tabla= document.querySelector("#tabla_modal > tbody");
+    let ids = Array.from(document.querySelectorAll(".id_proforma")).map(element => element.textContent);
+
+    response.forEach((event) => {
+        let base = ids.find(x=> Number(x) === event.id)
+        if(base !== undefined){
+            array_id_a_s.push(`${event.comprobante}, ${event.codigo} en ${event.sucursal_nombre}`);
+        }else{
+            let nueva_fila = tabla.insertRow(-1);
+            let fila = `<tr>`+
+                `<td class="id_modal invisible">${event.id}</td>`+//Columna 0 > id entradas
+                `<td>${event.sucursal_nombre}</td>`+//Columna 1 > sucursal
+                `<td class="codigoDevoluciones" style="background: rgb(105, 211, 35); border-radius: 5px">${event.codigo}</td>`+//Columna 2 >código
+                `<td style="text-align: right">${event.existencias}</td>`+//Columna 3 > existencias compradas
+                `<td><input class="cantidadADevolver input-tablas-dos-largo" onkeyup = "operarQDevolucion(this)"></td>`+//Columna 4 > cantidad a devolver
+                `<td>${event.comprobante}</td>`+//Columna 5 > comprobante de compra
+                `<td class="invisible">${event.id_prod}</td>`+//Columna 6 > id producto
+                `<td style="text-align: right">${event.existencias_devueltas}</td>`+//Columna 7 > cantidad devuelta
+                `<td style="text-align: right"></td>`+//Columna 8 > existencias compradas - (cantidad a devolver + cantidad devuelta)
+                `<td style="text-align: center">
+                                <div class="tooltip">
+                                <span style="font-size:18px;" class="material-symbols-outlined eliminarTablaFila eliminar_fila_compras" onClick="clicKEliminarFila(this)">delete</span></a>
+                                <span class="tooltiptext">Eliminar producto</span>
+                                </div>
+                                </td>`+//Columna 11 >
+                        `</tr>`
+            nueva_fila.innerHTML = fila;
+        }
+    });
+    if(array_id_a_s.length > 0){
+        let cabecera =  `<ul>Las operaciones: `
+        for(let event of array_id_a_s){
+            cabecera += `<li class="diseno_li">${event},</li>`;
+        }
+        cabecera +=`</ul> Ya se encuentran en la lista de devoluciones.`;
+        modal_proceso_abrir("", "", cabecera)
+        modal_proceso_salir_botones()
+    };
+};
+function clicKEliminarFila(e) {
+    const fila = e.closest("tr");
+    array_comprobante.forEach((e, i)=>{//Buscamos una coincidencia de código
+        e.id === Number(fila.children[0].textContent) ? array_comprobante.splice(i, 1): "";//elimina el objeto con el índice i
+    });
+    fila.remove();
+};
 const mandarATablaDevoluciones = document.getElementById("mandar-tabla-devoluciones");
 mandarATablaDevoluciones.addEventListener("click",manadarDevoluciones)
 async function manadarDevoluciones(e){
     e.preventDefault();
-    if(document.getElementById("buscador_operacion").value.startsWith("Compra") ||
-    document.getElementById("buscador_operacion").value.startsWith("Recompra")){
+    if(Number(document.getElementById("buscador_operacion").value) > 0){
         document.querySelector(".contenedor-devolucion-compras").classList.add("modal-show-devolucion-compras");
+
         await crearBodyDevoluciones();
-        /* operarQDevolucion(); */
-        /* await buscarPorCodidoDevolucionesEnProductos(); */
-        document.querySelectorAll(".id_proforma").forEach((e) => {
-            if(e.parentNode.children[5].textContent == document.getElementById("buscador_operacion").value){
-                modal_proceso_abrir("Esta compra ya existe en tabla devoluciones, si continua se sobreescribirá por esta nueva.", "")
-                modal_proceso_salir_botones()
-                e.parentNode.style.background = "#b36659"
-            }
-        });
-        document.querySelector("#tabla-devolucion-compras > tbody > tr:nth-child(1) > td:nth-child(5) > input").focus()
+
+        document.querySelector("#tabla_modal > tbody > tr:nth-child(1) > td:nth-child(5) > input").focus()
     }else{
-        modal_proceso_abrir(`Ingrese un formato válido, ejemplo: Compra-10 o Recompra-20`, "")
+        modal_proceso_abrir(`Digite un número de operación`, "")
         modal_proceso_salir_botones()
     };
 };
 function operarQDevolucion(e){
     let row_ = e.closest("tr");
-    ////saldo de la compra///////  
+    let fila = array_comprobante.find(x=> x.id === Number(row_.children[0].textContent));
+    fila.in_q(e)
     row_.children[8].textContent = Number(row_.children[3].textContent) - 
                                     (Number(row_.children[4].children[0].value) + Number(row_.children[7].textContent));
-
-    if(Number(row_.children[8].textContent) < 0){
-        row_.children[8].style.background = "#b36659"
-        row_.children[4].children[0].style.background = "#b36659"
-    }else{
-        row_.children[8].style.background = ""
-        row_.children[4].children[0].style.background = ""
-    };
-};
-
-async function buscarPorCodidoDevolucionesEnProductos(){
-    const insertarBuscarMovimientos = document.querySelectorAll(".codigoDevoluciones");
-    let datoCodigoUnitario = [];
-    for(let i = 0; i < insertarBuscarMovimientos.length; i++){
-        datoCodigoUnitario = await cargarDatos(`almacen_central_codigo_sucursal/${insertarBuscarMovimientos[i].textContent}?`+
-                                            `sucursal_get=${sucursales_activas[insertarBuscarMovimientos[i].parentNode.children[14].textContent]}`)
-        if(datoCodigoUnitario.idProd){
-            insertarBuscarMovimientos[i].parentNode.children[7].textContent = datoCodigoUnitario.idProd
-            insertarBuscarMovimientos[i].parentNode.children[8].textContent = datoCodigoUnitario.sucursal_get
-        };
-    };
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 async function crearBodyDevolucionesFinal(){
+    const fila_principal = document.querySelector("#tabla_principal > tbody");
+    let idd = document.querySelectorAll(".id_proforma");
+    let id_prof = Array.from(idd).map(x => Number(x.textContent));
+    const id_remove = document.querySelectorAll(".id_modal");
+    array_comprobante.forEach((obj_dev)=>{
+        let coincidencia_id = id_prof.find(x=> x === obj_dev.id)
+        if(coincidencia_id === undefined){
+            
+            if(obj_dev.c_d > 0){
+                let nueva_fila = fila_principal.insertRow(-1);
+                let fila = `<tr>`+
+                                `<td class="id_proforma invisible">${obj_dev.id}</td>`+// Columna 0 > id entradas
+                                `<td>${obj_dev.sucursal_nombre}</td>`+// Columna 1 > sucursal
+                                `<td>${obj_dev.codigo}</td>`+// Columna 2 > código
+                                `<td>${obj_dev.descripcion}</td>`+// Columna 2 > código
+                                `<td>${obj_dev.existencias}</td>`+// Columna 3 > existencias compradas
+                                `<td>${obj_dev.c_d}</td>`+// Columna 4 > cantidad a devolver
+                                `<td class="comp_p">${obj_dev.comprobante}</td>`+// Columna 5 > comprobante de compra
+                                `<td>${document.getElementById("causa_devolucion")[indice_causa].textContent}</td>`+// Columna 6 > causa
+                                `<td style="text-align: center">
+                                    <div class="tooltip">
+                                        <span style="font-size:18px;" class="material-symbols-outlined eliminarTablaFila eliminar_fila_compras" onClick="clicKEliminarFila(this)">delete</span></a>
+                                        <span class="tooltiptext">Eliminar producto</span>
+                                    </div>
+                                </td>`+// Columna 14 > 
+                            `</tr>`
+                nueva_fila.innerHTML = fila;
+                id_remove.forEach((e)=>{//Eliminamos la fila en tabla modal
 
-    let fila_modal = document.querySelectorAll(".codigoDevoluciones")
-    fila_modal.forEach((event)=>{
-        let row_ = event.closest("tr");
-        document.querySelectorAll(".id_proforma").forEach((e) => {
-            if(row_.children[0].textContent == e.textContent && 
-            row_.children[4].children[0].value > 0){
-                e.parentElement.remove()
-                modal_proceso_abrir("Este producto ya se encuentra en la tabla devoluciones, se reempazará con estos datos recientes.", "")
-                modal_proceso_salir_botones()
+                    Number(e.textContent) === obj_dev.id ? e.parentNode.remove(): "";
+                })
             }
-        });
-        if(row_.children[4].children[0].value > 0 &&
-        row_.children[8].textContent >= 0 ){
-            let tablaDevolucionesComprasFinal= document.querySelector("#tabla-devolucion-compras-final > tbody");
-            let nuevaFilaTablaDevolucionesComprasFinal = tablaDevolucionesComprasFinal.insertRow(-1);
-            let fila = `<tr>`+
-                            `<td class="id_proforma invisible">${row_.children[0].textContent}</td>`+// Columna 0 > id entradas
-                            `<td>${row_.children[1].textContent}</td>`+// Columna 1 > sucursal
-                            `<td>${event.textContent}</td>`+// Columna 2 > código
-                            `<td>${row_.children[3].textContent}</td>`+// Columna 3 > existencias compradas
-                            `<td>${row_.children[4].children[0].value}</td>`+// Columna 4 > cantidad a devolver
-                            `<td>${row_.children[5].textContent}</td>`+// Columna 5 > comprobante de compra
-                            `<td class="invisible">${row_.children[6].textContent}</td>`+// Columna 6 > id producto
-                            `<td class="invisible">${row_.children[7].textContent}</td>`+// Columna 7 > cantidad devuelta
-                            `<td class="invisible">${row_.children[9].textContent}</td>`+// Columna 8 > id sucursal
-                            `<td class="invisible">${row_.children[10].textContent}</td>`+// Columna 9 > índice sucursal
-                            `<td>${document.getElementById("causaDevolucionCompras").value}</td>`+// Columna 10 > causa de devolución
-                            `<td style="text-align: center">
-                                <div class="tooltip">
-                                    <span style="font-size:18px;" class="material-symbols-outlined eliminarTablaFila eliminar_fila_compras">delete</span></a>
-                                    <span class="tooltiptext">Eliminar producto</span>
-                                </div>
-                            </td>`+// Columna 14 > 
-                        `</tr>`
-            nuevaFilaTablaDevolucionesComprasFinal.innerHTML = fila;
-            eliminarFilaCompras()
-        };
+        }
     });
 };
 
@@ -172,19 +213,12 @@ mandarATablaDevolucion.addEventListener("click", (e)=>{
     e.preventDefault();
 
     crearBodyDevolucionesFinal();
-    const borrar = document.querySelectorAll(".cantidadADevolver");//eliminamos las filas que si pasaron a la tabla principal
-    borrar.forEach((e)=>{
-        if(e.value > 0 && e.parentNode.parentNode.children[8].textContent >= 0){
-            e.parentNode.parentNode.remove()
-        }else if(e.parentNode.parentNode.children[8].textContent < 0){
-            modal_proceso_abrir("Ya no cuenta con unidades para devolver.", "")
-            modal_proceso_salir_botones()
-        };
-    });
-    if(document.querySelector("#tabla-devolucion-compras > tbody").children.length == 0){
+
+    if(document.querySelector("#tabla_modal > tbody").children.length == 0){
         document.querySelector(".contenedor-devolucion-compras").classList.remove("modal-show-devolucion-compras");
     };
-    document.getElementById("causaDevolucionCompras").value = 0
+    indice_causa = 0;
+    document.getElementById("causa_devolucion").value = 0
     document.getElementById("buscador_operacion").value = ""
     document.getElementById("buscador_operacion").focus();
 });
@@ -193,9 +227,15 @@ procesarDevolucionCompras.addEventListener("click", procesamientoDevolucionCompr
 async function procesamientoDevolucionCompras(e){
     e.preventDefault();
     try{
-        if(document.querySelector("#tabla-devolucion-compras-final > tbody").children.length > 0){
+        if(document.querySelector("#tabla_principal > tbody").children.length > 0){
             modal_proceso_abrir("Procesando la devolución de la compra!!!.", "")
+
             await realizarDevolucionCompras()
+
+            document.querySelector("#tabla_principal > tbody").remove();
+            document.querySelector("#tabla_principal").createTBody();
+            array_comprobante = [];
+            operacion_n = "";
         }
     }catch(error){
         modal_proceso_abrir("Ocurrió un error. " + error, "")
@@ -205,68 +245,80 @@ async function procesamientoDevolucionCompras(e){
 };
 async function realizarDevolucionCompras(){
     let array_devolucion = [];
-    function DatosDeDevolucionCompras(a){
-        this.idProd = a.children[6].textContent;
-        this.sucursal_post = sucursales_activas[a.children[9].textContent];
-        this.existencias_post = Number(a.children[4].textContent);
 
-        this.idEntr = a.children[0].textContent;
-        /* this.existencias_entradas_update = a.children[3].textContent; */
-        /* this.existencias_devueltas_update = a.children[11].textContent; */
+    function DatosDeDevolucion(a, idx){
+        this.idProd = a.id_prod;
+        this.sucursal_post = sucursales_activas[idx];
+        this.existencias_post = a.c_d;
 
-        this.comprobante = "Dev-" + a.children[5].textContent;
-        this.causa_devolucion = a.children[10].textContent;
-        this.sucursal = a.children[8].textContent;
-        /* this.existencias_devueltas_insert = a.children[4].textContent; */
-        
+        this.id_op = a.id;
+
+        this.comprobante = "Dev-" + a.comprobante;
+        this.causa_devolucion = a.causa;
+        this.sucursal = a.id_sucursales;
+
+        this.precio_venta_salidas = a.precio_venta_salidas;
+        this.cliente = a.cliente;
     };
-    const numFilas = document.querySelector("#tabla-devolucion-compras-final > tbody").children
-    for(let i = 0 ; i < numFilas.length; i++){
-        if(numFilas[i]){
-            array_devolucion.push(new DatosDeDevolucionCompras(numFilas[i]));
-            /* let filaPlus = new DatosDeDevolucionCompras(numFilas[i]);
-            let urlDevolucionProductosUnoC = URL_API_almacen_central + 'procesar_devolucion_compras'
-            let response = await funcionFetch(urlDevolucionProductosUnoC, filaPlus)
-            console.log("Respuesta Productos "+response.status)
-            if(response.status === 200){
-                suma_productos +=1;
-                modal_proceso_abrir("Procesando la devolución de la compra!!!.", `Producto ejecutado: ${suma_productos} de ${numFilas.length}`)
-                console.log(`Producto ejecutado: ${suma_productos} de ${numFilas.length}`)
-            } */
-        };
-    };
+    let suma_monto_dev = 0;
+    array_comprobante.forEach((event)=>{
+        let idx = 0;
+        suc_add.forEach((e, i)=>{
+            if(e === event.sucursal_nombre){
+                idx = i;
+            };
+        });
+        array_devolucion.push(new DatosDeDevolucion(event, idx))
+        if(event.comprobante.startsWith('Venta')){
+            suma_monto_dev += event.precio_venta_salidas * event.c_d
+        }
+    });
+    let url = "";
+    let det_venta = ""
+    if(Number(document.getElementById("tipo_devolucion").value) > 1){
+        url = URL_API_almacen_central + 'procesar_devolucion_compras'
+    }else if(Number(document.getElementById("tipo_devolucion").value) > 0){
+        url = URL_API_almacen_central + 'procesar_devolucion_salidas'
+        det_venta = await cargarDatos(`ventas_comprobante/${operacion_n}`)
+    }
+
     function DataDevoluciones(){
         this.array_devolucion = array_devolucion;
+        this.id_det_ventas = det_venta[0].id_det_ventas;
+        this.modo_perdida = Number(suma_monto_dev);
         this.fecha = generarFecha();
     }
-    let url = URL_API_almacen_central + 'procesar_devolucion_compras'
     let fila = new DataDevoluciones()
-    console.log(fila)
-    let response = await funcionFetch(url, fila)
-    console.log(response)
-    /* if(suma_productos === numFilas.length){
-        modal_proceso_abrir("Operación completada exitosamente.", "")
+
+    let response = await funcionFetchDos(url, fila)
+    if(response.status === "success"){
+        modal_proceso_abrir(`${response.message}`)
         modal_proceso_salir_botones()
-        document.getElementById("buscador_operacion").value="";
-        document.querySelector("#tabla-devolucion-compras-final > tbody").remove();
-        document.querySelector("#tabla-devolucion-compras-final").createTBody();
-    }else{
-        modal_proceso_abrir(`Ocurrió un problema en la fila ${suma_productos + 1}`, "")
-        modal_proceso_salir_botones()
-    }; */
+    };
 };
 
 const removerTablaDevolucionesUno = document.getElementById("remover-tabla-devoluciones-compras-uno");
 removerTablaDevolucionesUno.addEventListener("click", () =>{
+    removerListaModal()
     document.querySelector(".contenedor-devolucion-compras").classList.remove("modal-show-devolucion-compras");
-    document.querySelector("#tabla-devolucion-compras > tbody").remove();
-    document.querySelector("#tabla-devolucion-compras").createTBody();
+    document.querySelector("#tabla_modal > tbody").remove();
+    document.querySelector("#tabla_modal").createTBody();
     document.getElementById("buscador_operacion").focus();
 });
+function removerListaModal(){// Elimina los elementos del array_saldos que coincidan con los elementos de la tabla modal
+    let filas = document.querySelectorAll(".id_modal")
+    filas.forEach((e) =>{
+        array_comprobante.forEach((event, i)=>{
+            event.id === Number(e.textContent) ? array_comprobante.splice(i, 1): "";
+        })
+    })
+}
 const removerTablaDevolucionesDos = document.getElementById("remover-tabla-devoluciones-compras-dos");
 removerTablaDevolucionesDos.addEventListener("click", () =>{
-    document.querySelector("#tabla-devolucion-compras-final > tbody").remove();
-    document.querySelector("#tabla-devolucion-compras-final").createTBody();
+    document.querySelector("#tabla_principal > tbody").remove();
+    document.querySelector("#tabla_principal").createTBody();
+    array_comprobante = [];
+    operacion_n = "";
 });
 
 async function graficoDevolucionesCompras(){
@@ -293,3 +345,21 @@ async function graficoDevolucionesCompras(){
     });
     pintarGraficoPositivo(document.querySelectorAll(".cg_1_c"), arrayDevolucionCompras, masAlto, colorFondoBarra[0], document.querySelectorAll(".sg_1_c"), 8, moneda())
 };
+
+document.getElementById("tipo_devolucion").addEventListener("change",()=>{
+    document.getElementById("t_op").textContent = op_[document.getElementById("tipo_devolucion").value]
+    document.getElementById("buscador_operacion").focus();
+    if(document.querySelector("#tabla_principal > tbody").children.length > 0){
+        document.querySelector("#tabla_principal > tbody").remove();
+        document.querySelector("#tabla_principal").createTBody();
+        array_comprobante = [];
+        operacion_n = "";
+    };
+});
+document.getElementById("causa_devolucion").addEventListener("change",()=>{
+    indice_causa = document.getElementById("causa_devolucion").selectedIndex
+    document.querySelectorAll(".id_modal").forEach((e)=>{
+        let fila = array_comprobante.find(x => x.id === Number(e.textContent));
+        fila ? fila.causa = document.getElementById("causa_devolucion").value : "";
+    });
+});

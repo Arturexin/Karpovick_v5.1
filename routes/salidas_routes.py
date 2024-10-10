@@ -27,7 +27,6 @@ salidas_cod_kardex_id = Blueprint('salidas_cod_kardex_id', __name__)
 entradas_suma_mes_kardex = Blueprint('entradas_suma_mes_kardex', __name__)
 salidas_extraccion_csv = Blueprint('salidas_extraccion_csv', __name__)
 salidas_comprobante = Blueprint('salidas_comprobante', __name__)
-salidas_post = Blueprint('salidas_post', __name__)
 salidas_delete = Blueprint('salidas_delete', __name__)
 procesar_devolucion_salidas_post = Blueprint('procesar_devolucion_salidas_post', __name__)
 salidas_gestion_ventas_post = Blueprint('salidas_gestion_ventas_post', __name__)
@@ -882,7 +881,7 @@ def getSalidasComprobante(comprobante):
     try:
         usuarioLlave = session.get('usernameDos')
         with mysql.connection.cursor() as cur:
-            query = ("SELECT idSal, sucursal_nombre, codigo, descripcion, existencias_salidas, precio_venta_salidas, comprobante, cliente, existencias_devueltas, id_sucursales "
+            query = ("SELECT idSal AS id, sucursal_nombre, codigo, descripcion, existencias_salidas AS existencias, comprobante, existencias_devueltas, id_sucursales, `salidas`.`idProd` AS id_prod, precio_venta_salidas, cliente "
                      "FROM salidas "
                      "JOIN almacen_central ON `salidas`.`idProd` = `almacen_central`.`idProd` "
                      "JOIN sucursales ON `salidas`.`sucursal` = `sucursales`.`id_sucursales` "
@@ -894,66 +893,23 @@ def getSalidasComprobante(comprobante):
         resultado = []
         for fila in data:
             contenido = {
-                'idSal': fila[0],
+                'id': fila[0],
                 'sucursal_nombre': fila[1],
                 'codigo': fila[2],
                 'descripcion': fila[3],
-                'existencias_salidas':fila[4],
-                'precio_venta_salidas':fila[5],
-                'comprobante': fila[6],
-                'cliente': fila[7],
-                'existencias_devueltas': fila[8],
-                'id_sucursales': fila[9]
+                'existencias':fila[4],
+                'comprobante': fila[5],
+                'existencias_devueltas': fila[6],
+                'id_sucursales': fila[7],
+                'id_prod': fila[8],
+                'precio_venta_salidas':fila[9],
+                'cliente':fila[10],
                 }
             resultado.append(contenido)
         return jsonify(resultado)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 ###------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@salidas_post.route('/api/salidas', methods=['POST'])
-@cross_origin()
-@login_required
-def saveSalidas():
-    if 'idSal' in request.json:
-        editSalidas()
-    else:
-        createSalidas()
-    return "ok"
-
-def createSalidas():
-    try:
-        dato_uno = 1
-        usuarioLlave = session.get('usernameDos')
-        with mysql.connection.cursor() as cur:
-            query = ("INSERT INTO `salidas` "
-                     "(`idSal`, `idProd`, `sucursal`, `existencias_salidas`, `precio_venta_salidas`, "
-                     "`comprobante`, `causa_devolucion`, `cliente`, `usuario`, `fecha`, `existencias_devueltas`, "
-                     "`identificadorSal`, `estado`) "
-                     "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
-            data = (request.json['idProd'], request.json['sucursal'], request.json['existencias_salidas'], request.json['precio_venta_salidas'], 
-                    request.json['comprobante'], request.json['causa_devolucion'], request.json['cliente'], request.json['usuario'], 
-                    request.json['fecha'], request.json['existencias_devueltas'], usuarioLlave, dato_uno)
-            cur.execute(query, data)
-            mysql.connection.commit()
-        return jsonify({"status": "success", "message": "Salida creada correctamente."})
-    except Exception as e:
-        mysql.connection.rollback()
-        return jsonify({"status": "error", "message": str(e)})
-
-def editSalidas():
-    try:
-        usuarioLlave = session.get('usernameDos')
-        with mysql.connection.cursor() as cur:
-            query = ("UPDATE `salidas` SET `existencias_salidas` = %s, `precio_venta_salidas` = %s, `existencias_devueltas` = %s "
-                     "WHERE `salidas`.`idSal` = %s "
-                     "AND identificadorSal = %s")
-            data = (request.json['existencias_salidas'], request.json['precio_venta_salidas'], request.json['existencias_devueltas'], request.json['idSal'], usuarioLlave)
-            cur.execute(query, data)
-            mysql.connection.commit()
-        return jsonify({"status": "success", "message": "Salida actualizada correctamente."})
-    except Exception as e:
-        mysql.connection.rollback()
-        return jsonify({"status": "error", "message": str(e)})
 
 @salidas_delete.route('/api/salidas_remove', methods=['POST'])
 @cross_origin()
@@ -998,7 +954,7 @@ def operarDevolucionSalidas():
                                 "AND `salidas`.`estado` > 0 "
                                 "AND existencias_devueltas >= 0")
         data_salidas_update =   [
-                                (s['existencias_post'], s['idSal'], usuarioLlave) 
+                                (s['existencias_post'], s['id_op'], usuarioLlave) 
                                 for s in data_dev
                                 ]
         cur.executemany(query_salidas_update, data_salidas_update)
@@ -1037,14 +993,15 @@ def gestionDeVenta():
         dato_uno = 1
         numeracion = []
         usuarioLlave = session.get('usernameDos')
-        sucursal_post = request.json['sucursal_post']
         usuarioId = session.get('identificacion_usuario')
         item_ticket = request.json['item_ticket']
-        data_venta = request.json.get('array_data', [])
+        fecha = request.json['fecha']
+        cliente = request.json['dni_cliente']
+        array_productos = request.json.get('array_productos', [])
+        array_salidas = request.json.get('array_salidas', [])
 
-        # Validación de la sucursal
-        if sucursal_post not in ['existencias_ac', 'existencias_su', 'existencias_sd', 'existencias_st', 'existencias_sc']:
-            return jsonify({"status": "error", "message": "Sucursal no válida"}), 400
+        if not array_productos or not array_salidas or not usuarioLlave or not fecha or not usuarioLlave:
+            return jsonify({"status": "error", "message": "Faltan datos requeridos para procesar la venta"}), 400
         
         # Validación del item_ticket
         ticket_prefixes = {
@@ -1058,48 +1015,41 @@ def gestionDeVenta():
         ticket = ticket_prefixes[item_ticket]
 
         # Iniciar la transacción manualmente
-        cur = mysql.connection.cursor()
-        cur.execute("BEGIN")
+        with mysql.connection.cursor() as cur:
 
-        # Numeración
-        numeracion = incrementar_obtener_numeracion(cur, item_ticket, dato_uno, usuarioLlave, ticket)
+            # Numeración
+            numeracion = incrementar_obtener_numeracion(cur, item_ticket, dato_uno, usuarioLlave, ticket)
 
-        # Almacén central - Actualización del stock
-        actualizar_inventario(cur, sucursal_post, data_venta, usuarioLlave)
+            try:
+                actualizar_almacen_central(cur, array_productos, usuarioLlave)
+            except Exception as e:
+                mysql.connection.rollback()  # Hacer rollback si hay un error en actualizar_almacen_central
+                return jsonify({"status": "error", "message": f"Error al actualizar existencias: {str(e)}"}), 400
+            
+            try:
+                insertar_salidas(cur, array_salidas, numeracion, usuarioId, usuarioLlave, dato_cero, dato_uno, fecha, cliente)
+            except Exception as e:
+                mysql.connection.rollback()  # Hacer rollback si hay un error en actualizar_almacen_central
+                return jsonify({"status": "error", "message": f"Error al insertar salidas: {str(e)}"}), 400
 
-        # Insertar en salidas
-        query_salidas = ("INSERT INTO `salidas` "
-                         "(`idSal`, `idProd`, `sucursal`, `existencias_salidas`, `precio_venta_salidas`,`comprobante`, "
-                         "`causa_devolucion`, `cliente`, `usuario`, `fecha`, `existencias_devueltas`, `identificadorSal`, `estado`) "
-                         "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
-        data_salidas =  [
-                        (s['idProd'], request.json['sucursal'], s['existencias_post'], s['precio_venta_salidas'],
-                        numeracion[0], dato_cero, s['cliente'], usuarioId, request.json['fecha'], dato_cero, usuarioLlave, dato_uno) 
-                        for s in data_venta
-                        ]
-        cur.executemany(query_salidas, data_salidas)
+            # Detalle de la venta
+            query_detalle = ("INSERT INTO `ventas` (`id_det_ventas`, `sucursal`, `comprobante`, `tipo_comprobante`, `dni_cliente`, "
+                            "`modo_efectivo`, `modo_credito`, `modo_tarjeta`, `modo_perdida`, `total_venta`, `fecha_det_ventas`, "
+                            "`identificador_ventas`, `canal_venta`, `estado`) "
+                            "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+            data_detalle = (request.json['sucursal_v'], f"{numeracion[0]}", f"{numeracion[1]}", cliente, 
+                            request.json['modo_efectivo'], request.json['modo_credito'], request.json['modo_tarjeta'], 
+                            request.json['modo_perdida'], request.json['total_venta'], fecha, 
+                            usuarioLlave, request.json['canal_venta'], dato_uno)
+            cur.execute(query_detalle, data_detalle)
 
-        # Detalle de la venta
-        query_detalle = ("INSERT INTO `ventas` (`id_det_ventas`, `sucursal`, `comprobante`, `tipo_comprobante`, `dni_cliente`, "
-                         "`modo_efectivo`, `modo_credito`, `modo_tarjeta`, `modo_perdida`, `total_venta`, `fecha_det_ventas`, "
-                         "`identificador_ventas`, `canal_venta`, `estado`) "
-                         "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
-        data_detalle = (request.json['sucursal'], f"{numeracion[0]}", f"{numeracion[1]}", request.json['dni_cliente'], 
-                        request.json['modo_efectivo'], request.json['modo_credito'], request.json['modo_tarjeta'], 
-                        request.json['modo_perdida'], request.json['total_venta'], request.json['fecha'], 
-                        usuarioLlave, request.json['canal_venta'], dato_uno)
-        cur.execute(query_detalle, data_detalle)
-
-        mysql.connection.commit()# Si todo sale bien, confirmar la transacción
+            mysql.connection.commit()# Si todo sale bien, confirmar la transacción
 
         return jsonify({"status": "success", "message": [f"{numeracion[0]}", f"{numeracion[1]}"]})
     
     except Exception as e:
         mysql.connection.rollback()# Hacer rollback en caso de cualquier error
         return jsonify({"status": "error", "message": str(e)})
-    
-    finally:
-        cur.close()  # Asegurarse de cerrar el cursor
 
 
 def incrementar_obtener_numeracion(cur, item_ticket, dato_uno, usuarioLlave, ticket):
@@ -1127,24 +1077,6 @@ def incrementar_obtener_numeracion(cur, item_ticket, dato_uno, usuarioLlave, tic
     }
     
     return [f"Venta-{contenido['ventas']}", f"{ticket}{contenido[item_ticket]}"]
-
-def actualizar_inventario(cur, sucursal_post, data_venta, usuarioLlave):
-    # Definir la consulta para actualizar el stock en `almacen_central`
-    query_productos = (f"UPDATE `almacen_central` SET {sucursal_post} = {sucursal_post} - %s "
-                       "WHERE `almacen_central`.`idProd` = %s "
-                       "AND identificadorProd = %s "
-                       "AND `almacen_central`.`estado` > 0 "
-                       f"AND {sucursal_post} >= %s")
-
-    # Preparar los datos para la actualización
-    data_productos = [(p['existencias_post'], p['idProd'], usuarioLlave, p['existencias_post']) for p in data_venta]
-
-    # Ejecutar la actualización
-    cur.executemany(query_productos, data_productos)
-
-    # Verificar si todas las filas fueron afectadas
-    if cur.rowcount != len(data_productos):
-        raise Exception("Uno de los productos no cuenta con unidades suficientes, actualice los saldos.")
 
 def actualizar_almacen_central_suma(cur, recompra_data, usuarioLlave, nombre_array):
     """
@@ -1180,4 +1112,49 @@ def actualizar_almacen_central_suma(cur, recompra_data, usuarioLlave, nombre_arr
 
     if cur.rowcount != data_len:
         raise Exception("Uno de los productos no cuenta con unidades suficientes, actualice los saldos.")
+    
+def actualizar_almacen_central(cur, array_productos, usuarioLlave):
+    query = (   "UPDATE `almacen_central` SET "
+                "existencias_ac = existencias_ac + %s, "
+                "existencias_su = existencias_su + %s, "
+                "existencias_sd = existencias_sd + %s, "
+                "existencias_st = existencias_st + %s, "
+                "existencias_sc = existencias_sc + %s "
+                "WHERE `almacen_central`.`idProd` = %s "
+                "AND `almacen_central`.`estado` > 0 "
+                "AND identificadorProd = %s "
+                # Validación: asegurarse de que las existencias no queden negativas
+                "AND (existencias_ac + %s) >= 0 "
+                "AND (existencias_su + %s) >= 0 "
+                "AND (existencias_sd + %s) >= 0 "
+                "AND (existencias_st + %s) >= 0 "
+                "AND (existencias_sc + %s) >= 0")
+    data_productos =    [
+                            (p['existencias_ac'], p['existencias_su'], p['existencias_sd'],
+                            p['existencias_st'], p['existencias_sc'], p['idProd'], usuarioLlave,
+                            p['existencias_ac'], p['existencias_su'], p['existencias_sd'],
+                            p['existencias_st'], p['existencias_sc']) 
+                            for p in array_productos
+                        ]
+    cur.executemany(query, data_productos)
 
+    # Verificar si la cantidad de filas actualizadas es igual a la cantidad de productos
+    if cur.rowcount != len(array_productos):
+        raise Exception("Uno de los productos no cuenta con unidades suficientes, actualice los saldos.")
+
+def insertar_salidas(cur, array_salidas, numeracion, usuarioId, usuarioLlave, dato_cero, dato_uno, fecha, cliente):
+    query_salidas = ("INSERT INTO `salidas` "
+                    "(`idSal`, `idProd`, `sucursal`, `existencias_salidas`, `precio_venta_salidas`,`comprobante`, "
+                    "`causa_devolucion`, `cliente`, `usuario`, `fecha`, `existencias_devueltas`, `identificadorSal`, `estado`) "
+                    "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+    data_salidas =  [
+                        (s['idProd'], s['sucursal'], s['existencias_salidas'], s['precio_venta_salidas'],
+                        numeracion[0], dato_cero, cliente, usuarioId, fecha, dato_cero, usuarioLlave, dato_uno) 
+                        for s in array_salidas
+                    ]
+
+    cur.executemany(query_salidas, data_salidas)
+
+    # Comprobar si la inserción se realizó correctamente
+    if cur.rowcount != len(array_salidas):
+        raise Exception("No se pudieron insertar todas las salidas correctamente.")

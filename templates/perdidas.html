@@ -5,12 +5,15 @@
     <div class="contenedor_compras_principal">
         <div>
             <div class="contenedor_formulario_compras" id="form_contenedor"></div>
-            <label>Motivo de Salida
-                <select id="motivo_salida">motivo
+            <div class="boton-cli">
+                <select id="motivo_salida" onchange="selectForm(this)">
+                    <option value="0" selected>-- Motivo de despacho --</option>
                     <option value="Donación">Donación</option>
+                    <option value="Hurto">Hurto</option>
+                    <option value="Oferta">Oferta</option>
                     <option value="Pérdida">Pérdida</option>
                 </select>
-            </label>
+            </div>
             <div  class="boton-cli" id="button_contenedor"></div>
         </div>
         <div class="contenedor_busqueda_detalle_general">
@@ -18,9 +21,9 @@
                 <h2 style="text-align: center;">Buscador</h2>
                 <div style="display: grid;grid-template-columns: 1fr 1fr;align-items: center;">
 
-                        <input type="text" id="buscador_descripcion" placeholder="Buscar por palabras clave..." class="input-general-importante" style="width: 240px;">
-                        <select id="categoria_buscador_detalle" class="">
-                        </select>
+                    <input type="text" id="buscador_descripcion" placeholder="Buscar por palabras clave..." class="input_busqueda_dos">
+                    <select id="categoria_buscador_detalle" class="">
+                    </select>
                 </div>
                 <div style="display: grid;grid-template-columns: 1fr 1fr 1fr;align-items: center;">
 
@@ -39,32 +42,20 @@
     </div>
     
     <div class="contenedor-pre-recompra">
-        <table id="tabla-pre-despacho" class="tabla_modal contenido-tabla">
+        <table id="tabla_modal" class="tabla_modal contenido-tabla">
             <thead>
                 <tr>
-                    <th scope="row" colspan="15"><h2>Proforma</h2></th>
-                </tr>
-                <tr>
-                    <th style="width: 120px;">Sucursal</th>
-                    <th style="width: 120px;">Categoría</th>
-                    <th style="width: 120px;">Código</th>
-                    <th style="width: 200px;">Descripción</th>
-                    <th style="width: 70px;">Existencias</th>
-                    <th style="width: 70px;">Despacho</th>
-                    <th style="width: 70px;">Saldo</th>
-                    <th style="width: 70px;">Motivo de salida</th>
-                    <th style="width: 40px;">
-                        <span style="font-size:18px;" class="material-symbols-outlined">delete</span>
-                    </th>
+                    <th scope="row" colspan="15"><h2>Pre lista</h2></th>
                 </tr>
             </thead>
             <tbody>
             </tbody>
             <tfoot>
-                <th scope="row" colspan="15">
+                <th scope="row" colspan="18" id="contenedor_botones_modal"></th>
+                <!-- <th scope="row" colspan="15">
                     <button id="procesar-pre-despacho" class="myButtonAgregar">Enviar a tabla despacho</button>
                     <button id="remover-tabla-despacho-uno" class="eliminarTablaFila">Cancelar</button>
-                </th>
+                </th> -->
             </tfoot>
         </table>
     </div>
@@ -72,16 +63,19 @@
         <table id="tabla_principal" class="tabla-proforma">
             <thead>
                 <tr>
-                    <th scope="row" colspan="9"><h2>Lista de Despacho</h2></th>
+                    <th scope="row" colspan="12"><h2>Lista de Despacho</h2></th>
                 </tr>
                 <tr>
-                    <th style="width: 150px;">Sucursal</th>
                     <th style="width: 130px;">Categoría</th>
                     <th style="width: 150px;">Código</th>
                     <th style="width: 250px;">Descripción</th>
-                    <th style="width: 70px;">Existencias</th>
-                    <th style="width: 70px;">Despacho</th>
-                    <th style="width: 70px;">Saldo</th>
+                    <th style="width: 70px;">Q AC</th>
+                    <th style="width: 70px;">Q SU</th>
+                    <th style="width: 70px;">Q SD</th>
+                    <th style="width: 70px;">Q ST</th>
+                    <th style="width: 70px;">Q SC</th>
+                    <th style="width: 70px;">Costo</th>
+                    <th style="width: 70px;">Costo total</th>
                     <th style="width: 120px;">Motivo de salida</th>
                     <th style="width: 100%;" id="remover-tabla-despacho-dos" class="eliminarTablaFila">
                         <div class="tooltip">
@@ -95,7 +89,12 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <th scope="row" colspan="4">Total unidades despachadas</th>
+                    <th scope="row" colspan="3">Total unidades despachadas</th>
+                    <th class="t_e_1">0</th>
+                    <th class="t_e_2">0</th>
+                    <th class="t_e_3">0</th>
+                    <th class="t_e_4">0</th>
+                    <th class="t_e_5">0</th>
                     <th scope="row" colspan="5">
                         <label style="margin: 0 5px;" class="label-checkbox">Imprimir lista de despacho
                             <input type="checkbox" id="check_comprobante">
@@ -103,7 +102,7 @@
                     </th>
                 </tr>
                 <tr>
-                    <th scope="row" colspan="9">
+                    <th scope="row" colspan="12">
                         <button id="procesar-despacho-plus" class="myButtonProcesar">Procesar</button>
                     </th>
                 </tr>
@@ -113,4 +112,5 @@
 </div>
 <script src="../static/perdidas.js"></script>
 <script src="../static/form.js"></script>
+<script src="../static/buscador.js"></script>
 {% endblock %}

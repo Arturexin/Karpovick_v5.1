@@ -10,10 +10,10 @@
         <div class="contenedor_busqueda_detalle_general">
             <div style="display: grid;">
                 <h2 style="text-align: center;">Buscador</h2>
-                <div style="display: grid;grid-template-columns: 1fr 1fr 1fr 1fr 1fr;align-items: center;">
+                <div style="display: grid;grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;align-items: center;">
 
                     <div style="display: grid;grid-template-columns: 1fr;align-items: center; justify-items: center; gap: 5px;">
-                        <input type="text" id="buscador_descripcion" placeholder="Buscar por palabras clave..." class="input-general-importante" style="width: 240px;">
+                        <input type="text" id="buscador_descripcion" placeholder="Buscar por palabras clave..." class="input_busqueda_dos">
                         <div style="display: grid; grid-template-columns: 60% 40%;gap: 5px;">
 
                             <select id="categoria_buscador_detalle" class="" style="width: 120px;">
@@ -42,6 +42,10 @@
                     <div class="tooltip">
                         <button class="eliminarTablaFila stock_sucursal">Stock S3</button>
                         <span class="tooltiptext">Número de operaciónes y stock en Sucursal Tres</span>
+                    </div>
+                    <div class="tooltip">
+                        <button class="eliminarTablaFila stock_sucursal">Stock S4</button>
+                        <span class="tooltiptext">Número de operaciónes y stock en Sucursal Cuatro</span>
                     </div>
                 </div>
                 <div style="display: grid;grid-template-columns: 1.3fr 1.3fr 0.7fr 0.7fr;align-items: center;">
@@ -120,4 +124,5 @@
 </div>
 <script src="../static/transferencias.js"></script>
 <script src="../static/form.js"></script>
+<script src="../static/buscador.js"></script>
 {% endblock %}

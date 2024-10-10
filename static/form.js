@@ -2,12 +2,7 @@ function formInsert(titulo){
     return  `
             <form id="formulario-compras-uno" class="into_form baja_opacidad_interior">
             
-                    <h2>${titulo}
-                        <div class="tooltip_ayuda">
-                            <span class="material-symbols-outlined">help</span>
-                            <span class="tooltiptext_ayuda">Crea nuevos productos en la base de datos.</span>
-                        </div>
-                    </h2>
+                    <h2>${titulo}</h2>
                     <div class="contenedor-label-input-compras">
                         <input class="input-compras fondo" type="hidden" id="id-form"/>
                         <label class="label-general">
@@ -17,7 +12,7 @@ function formInsert(titulo){
                                     <span class="tooltiptext_ayuda">Cada categoría presenta diferentes medidas.</span>
                                 </div>
                             </div>
-                            <select id="categoria-form" class="input-general fondo" style="cursor: pointer;">
+                            <select id="categoria-form" class="input-general fondo" style="cursor: pointer;" onChange="selectForm(this)">
                             </select>
                         </label>
                         <label class="label-general">
@@ -27,7 +22,7 @@ function formInsert(titulo){
                                     <span class="tooltiptext_ayuda">El código solo puede contener como caracteres letras y números. (Ejemplo: Ab001).</span>
                                 </div>
                             </div>
-                            <input class="input-general fondo" type="text" id="codigo-form"/>
+                            <input class="input-general fondo" type="text" id="codigo-form" onKeyup="expCodigo(this)"/>
                         </label>
                         <label class="label-general">
                             <div style="display: flex; width: 140px; justify-content: space-between;">Descripción
@@ -36,7 +31,7 @@ function formInsert(titulo){
                                     <span class="tooltiptext_ayuda">La descripción del producto solo puede contener como caracteres letras y números.</span>
                                 </div>
                             </div>
-                            <input class="input-general fondo" type="text" id="descripcion-form"/>
+                            <input class="input-general fondo" type="text" id="descripcion-form" onKeyup="expDescripcion(this)"/>
                         </label>
                         <label class="label-general">
                             <div style="display: flex; width: 140px; justify-content: space-between;">Costo de compra
@@ -45,7 +40,7 @@ function formInsert(titulo){
                                     <span class="tooltiptext_ayuda">EL costo unitario del producto solo puede contener números.</span>
                                 </div>
                             </div>
-                            <input class="input-general fondo" type="text" id="costo-form"/>
+                            <input class="input-general fondo" type="text" id="costo-form" onKeyup="expCosto(this)"/>
                         </label>
                         <label class="label-general">
                             <div style="display: flex; width: 140px; justify-content: space-between;">Precio de venta
@@ -54,7 +49,7 @@ function formInsert(titulo){
                                     <span class="tooltiptext_ayuda">EL precio de venta unitario del producto solo puede contener números.</span>
                                 </div>
                             </div>
-                            <input class="input-general fondo" type="text" id="precio-form"/>
+                            <input class="input-general fondo" type="text" id="precio-form" onKeyup="expPrecio(this)"/>
                         </label>
                         <label class="label-general">
                             <div style="display: flex; width: 140px; justify-content: space-between;">Lote
@@ -63,7 +58,7 @@ function formInsert(titulo){
                                     <span class="tooltiptext_ayuda">El lote de producto solo puede contener números.</span>
                                 </div>
                             </div>
-                            <input class="input-general fondo" type="text" id="lote-form"/>
+                            <input class="input-general fondo" type="text" id="lote-form" onKeyup="expLote(this)"/>
                         </label>
                         <label class="label-general">
                             <div style="display: flex; width: 140px; justify-content: space-between;">Proveedor
@@ -72,7 +67,7 @@ function formInsert(titulo){
                                     <span class="tooltiptext_ayuda">Si no encuentra el proveedor correspondiente, asegurese de haberlo ingresado previamente en el apartado de "Clientes".</span>
                                 </div>
                             </div>
-                            <select class="input-general fondo" id="proveedor-form" style="cursor: pointer;">
+                            <select class="input-general fondo" id="proveedor-form" style="cursor: pointer;" onChange="selectForm(this)">
                             </select>
                         </label>
                     </div>
@@ -88,12 +83,7 @@ function formButton(titulo_go, funcion_go, funcion_back){
 function formUpdate(titulo){
     return  `
             <form id="formulario-compras-uno" class="into_form baja_opacidad_interior">
-                <h2 class="">${titulo}
-                    <div class="tooltip_ayuda">
-                        <span class="material-symbols-outlined">help</span>
-                        <span class="tooltiptext_ayuda">Recompra productos ya existentes en la base de datos.</span>
-                    </div>
-                </h2>
+                <h2 class="">${titulo}</h2>
 
                 <div style="display: flex;">
                     <input id="buscador-productos-form" type="text" class="input-general-importante fondo-importante" placeholder="Buscar código">
@@ -120,7 +110,7 @@ function formUpdate(titulo){
 class ObjGeneral {
     constructor(categoria, codigo, descripcion, talla, existencias_ac, existencias_su, 
                 existencias_sd, existencias_st, existencias_sc, costo, precio, lote, 
-                proveedor, idProd, in_ac, in_su, in_sd, in_st, in_sc) {
+                proveedor, idProd, in_ac, in_su, in_sd, in_st, in_sc, motivo) {
         this.categoria = categoria;
         this.codigo = codigo;
         this.descripcion = descripcion;
@@ -140,6 +130,7 @@ class ObjGeneral {
         this.in_sd = in_sd;
         this.in_st = in_st;
         this.in_sc = in_sc;
+        this.motivo = motivo;
     };
 
     total_costo(indice) {
@@ -149,11 +140,17 @@ class ObjGeneral {
             throw new Error('Índice fuera de rango');
         };
     };
-    in_q(input, indice){
+    in_q_q(input_value, indice_sucursal){//ventas
+        if(Number(input_value) > 0 || !isNaN(Number(input_value))){
+            this[sucursales_activas[indice_sucursal]] = this[sucursales_activas[indice_sucursal]] + Number(input_value);
+        };
+        return this[sucursales_activas[indice_sucursal]];
+    };
+    in_q(input, indice_sucursal){
         if(Number(input.value) < 0 || isNaN(Number(input.value))){
             input.style.background = "var(--fondo-marca-uno)";
         }else{
-            this[sucursales_activas[indice]] = Number(input.value);
+            this[sucursales_activas[indice_sucursal]] = Number(input.value);
             input.style.background = "";
         };
     };
@@ -172,8 +169,15 @@ class ObjGeneral {
         }else{
             this.precio = Number(input.value);
             blurInputMoneda(input);
+            console.log(input)
             input.style.background = "";
         };
+    };
+    in_p_v(input_value){
+        if(Number(input_value) > 0 || !isNaN(Number(input_value))){
+            this.precio = Number(input_value);
+        };
+        return this.precio
     };
     in_l(input){
         if(Number(input.value) < 0 || isNaN(Number(input.value))){
@@ -244,4 +248,84 @@ function blurInputMoneda(elemento){
     elemento.addEventListener('blur', () => {
         elemento.value = formatoMoneda(elemento.value)
     });
+};
+const expregul = {
+    cliente: /^[A-ZÑa-zñáéíóúÁÉÍÓÚ'° ]+$/,
+    precios: /^(?!0(\.00?)?$)\d+(\.\d{1,2})?$/,  // Modificada para no aceptar ceros
+    dni: /^\d{8,8}$/,
+    email: /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/,
+    telefono: /^[ 0-9]+$/,
+    direccion: /^[A-ZÑa-zñáéíóúÁÉÍÓÚ'°,.:/\d\- ]+$/,
+    cantidad: /^[1-9]\d*$/,  // Modificada para no aceptar ceros
+    codigo: /^[A-ZÑa-zñ'°\d ]+$/,
+    descripcion: /^[A-ZÑa-zñáéíóúÁÉÍÓÚ'°\-_/:()\d ]+$/,
+    password: /(?=(.*[0-9]))(?=.*[\!@#$%^&*()\\[\]{}\-_+=|:;"'<>,./?])(?=.*[a-z])(?=(.*[A-Z]))(?=(.*)).{8,}/
+};
+function expCodigo(e){
+    expregul.codigo.test(e.value) ? e.style.background = "":
+                                    e.style.background = "var(--boton-dos)"
+}
+function expDescripcion(e){
+    expregul.descripcion.test(e.value) ?    e.style.background = "":
+                                            e.style.background = "var(--boton-dos)"
+}
+function expCosto(e){
+    expregul.precios.test(e.value) ?    e.style.background = "":
+                                        e.style.background = "var(--boton-dos)"
+}
+function expPrecio(e){
+    expregul.precios.test(e.value) ?    e.style.background = "":
+                                        e.style.background = "var(--boton-dos)"
+}
+function expLote(e){
+    expregul.cantidad.test(e.value) ?   e.style.background = "":
+                                        e.style.background = "var(--boton-dos)"
+}
+
+function selectForm(e){
+    e.value !== "0" ? e.style.background = "":
+                    e.style.background = "var(--boton-dos)"
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////Validaciones///////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+const campos = [
+    { id: "codigo-form", regex: expregul.codigo, mensaje: "El código no es válido." },
+    { id: "descripcion-form", regex: expregul.descripcion, mensaje: "La descripción no es válida." },
+    { id: "costo-form", regex: expregul.precios, mensaje: "El costo no es válido." },
+    { id: "precio-form", regex: expregul.precios, mensaje: "El precio no es válido." },
+    { id: "lote-form", regex: expregul.cantidad, mensaje: "El lote no es válido." },
+];
+
+function validarFormulario() {
+    let errores = [];
+    // Validar categoría
+    if (document.getElementById("categoria-form").value === "0") {
+        document.getElementById("categoria-form").style.background = "var(--boton-dos)"
+        errores.push("Debe seleccionar una categoría.");
+    }
+    // Validar campos con expresiones regulares
+    campos.forEach(campo => {
+        const valor = document.getElementById(campo.id).value;
+        if (!campo.regex.test(valor)) {
+            errores.push(campo.mensaje);
+        }
+    });
+    // Validar proveedor
+    if (document.getElementById("proveedor-form").value === "0") {
+        document.getElementById("proveedor-form").style.background = "var(--boton-dos)"
+        errores.push("Debe seleccionar un proveedor.");
+    }
+    // Mostrar errores si existen
+    if (errores.length > 0) {
+        let cabecera =  `<ul>Errores encontrados: `
+        for(let event of errores){
+            cabecera += `<li class="diseno_li">${event}</li>`;
+        }
+        cabecera +=`</ul>`;
+        modal_proceso_abrir("", "", cabecera)
+        modal_proceso_salir_botones()
+        return false; // Detener el proceso
+    };
+    return true; // Continuar con el proceso
 };

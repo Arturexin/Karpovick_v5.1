@@ -107,7 +107,9 @@ function cuerpoFilaTabla(e){
                 <td style="text-align: end;">${e.existencias_salidas}</td>
                 <td style="text-align: end;">${e.existencias_devueltas}</td>
                 <td style="text-align: end;">${formatoMoneda(e.precio_venta_salidas)}</td>
-                <td style="text-align: end;">${formatoMoneda((e.existencias_salidas - e.existencias_devueltas) * e.precio_venta_salidas)}</td>
+                <td style="text-align: end;">${e.existencias_salidas === 0 
+                    ? formatoMoneda(0.00) 
+                    : formatoMoneda((e.existencias_salidas - e.existencias_devueltas) * e.precio_venta_salidas)}</td>
                 <td>${e.comprobante}</td>
                 <td>${e.fecha}</td>
                 <td style="text-align: center;width: 80px">
@@ -156,7 +158,7 @@ async function accionRemove(id) {
     contenedor_tab.children[0].remove();
     
     contenedorBotonesProducto(`procesarRemove(${salidas.idSal})`, "Eliminar salida")
-    document.getElementById("acciones_rapidas_salidas").classList.add("modal-show-salida")
+    document.getElementById("acciones_rapidas_salidas").classList.add("modal_show")
 };
 
 async function procesarRemove(idSal){
@@ -198,7 +200,7 @@ function accionDevoluciones(id) {
             }
         });
         contenedorBotonesProducto(`procesarDevolucion()`, "Procesar Devolución")
-        document.getElementById("acciones_rapidas_salidas").classList.add("modal-show-salida")
+        document.getElementById("acciones_rapidas_salidas").classList.add("modal_show")
     }else{
         modal_proceso_abrir("No es una venta.", "")
         modal_proceso_salir_botones()
@@ -292,7 +294,7 @@ function contenedorBotonesProducto(funcion, titulo){
 function removerContenido(){
     let contenido = document.getElementById("form_accion_rapida")
     contenido.remove();
-    document.getElementById("acciones_rapidas_salidas").classList.remove("modal-show-salida")
+    document.getElementById("acciones_rapidas_salidas").classList.remove("modal_show")
 };
 function op_dev(e){
     let row_ = e.closest("tr");
@@ -332,7 +334,7 @@ async function realizarDevolucion(){
         this.sucursal_post = sucursales_activas[a.children[9].textContent];
         this.existencias_post = Number(a.children[5].children[0].value);
 
-        this.idSal = a.children[0].textContent;
+        this.id_op = a.children[0].textContent;
 
         this.comprobante = "Dev-" + a.children[1].textContent;
         this.causa_devolucion = a.children[7].children[0].value;
@@ -363,7 +365,7 @@ async function realizarDevolucion(){
         modal_proceso_salir_botones()
         removerContenido()
     };
-    document.getElementById("acciones_rapidas_salidas").classList.remove("modal-show-salida")
+    document.getElementById("acciones_rapidas_salidas").classList.remove("modal_show")
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

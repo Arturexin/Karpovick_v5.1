@@ -114,7 +114,6 @@ app.register_blueprint(salidas_.salidas_cod_kardex_id)
 app.register_blueprint(salidas_.entradas_suma_mes_kardex)
 app.register_blueprint(salidas_.salidas_extraccion_csv)
 app.register_blueprint(salidas_.salidas_comprobante)
-app.register_blueprint(salidas_.salidas_post)
 app.register_blueprint(salidas_.salidas_delete)
 app.register_blueprint(salidas_.procesar_devolucion_salidas_post)
 app.register_blueprint(salidas_.salidas_gestion_ventas_post)
@@ -362,17 +361,17 @@ def devolucion_compras():
         return render_template('index.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
     else:
         return render_template('devolucion_compras.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
-@app.route('/devolucion_salidas')
+@app.route('/analisis')
 @cross_origin()
 @login_required
-def devolucion_salidas():
+def analisis():
     puesto = session.get('puesto')
     identificacion_usuario = session.get('identificacion_usuario')
     usuario_nombre = session.get('usuario_nombre')
     if puesto != 201 and puesto != 202:
         return render_template('index.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
     else:
-        return render_template('devolucion_salidas.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
+        return render_template('analisis.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
 @app.route('/perdidas')
 @cross_origin()
 @login_required
