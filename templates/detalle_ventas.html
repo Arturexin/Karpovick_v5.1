@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="detalleVentas-form baja_opacidad">
-    <div class="contenedor_compras">
+    <div class="contenedor_compras_principal">
         <div>
             <div class="titulo_graficos">
                 <h4 style="font-size: 20px;">Metodo de Pago</h4>
@@ -17,176 +17,27 @@
                     </span>
                 </div>
             </div>  
-            <div class="etiquetas_graficos_colores">
-                <div>
-                    <div class="color_item_grafico_detVenta"></div>
-                    <span class="descripcion_item_grafico">Efectivo</span>
-                </div>
-                <div>
-                    <div class="color_item_grafico_detVenta"></div>
-                    <span class="descripcion_item_grafico">Tarjeta</span>
-                </div>
-                <div>
-                    <div class="color_item_grafico_detVenta"></div>
-                    <span class="descripcion_item_grafico">Crédito</span>
-                </div>
-                <div>
-                    <div class="color_item_grafico_detVenta"></div>
-                    <span class="descripcion_item_grafico">Devoluciones</span>
-                </div>
-            </div>
             <div class="grafico_compras">
-                <grafico-eje_y e_0="eje_y_numeracion"></grafico-eje_y>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="cg_2_c" c_4="cg_3_c" c_5="cg_4_c" s_1="" s_2="sg_1_c" s_3="sg_2_c" s_4="sg_3_c" s_5="sg_4_c"></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="cg_2_c" c_4="cg_3_c" c_5="cg_4_c" s_1="" s_2="sg_1_c" s_3="sg_2_c" s_4="sg_3_c" s_5="sg_4_c"></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="cg_2_c" c_4="cg_3_c" c_5="cg_4_c" s_1="" s_2="sg_1_c" s_3="sg_2_c" s_4="sg_3_c" s_5="sg_4_c"></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="cg_2_c" c_4="cg_3_c" c_5="cg_4_c" s_1="" s_2="sg_1_c" s_3="sg_2_c" s_4="sg_3_c" s_5="sg_4_c"></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="cg_2_c" c_4="cg_3_c" c_5="cg_4_c" s_1="" s_2="sg_1_c" s_3="sg_2_c" s_4="sg_3_c" s_5="sg_4_c"></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="cg_2_c" c_4="cg_3_c" c_5="cg_4_c" s_1="" s_2="sg_1_c" s_3="sg_2_c" s_4="sg_3_c" s_5="sg_4_c"></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="cg_2_c" c_4="cg_3_c" c_5="cg_4_c" s_1="" s_2="sg_1_c" s_3="sg_2_c" s_4="sg_3_c" s_5="sg_4_c"></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="cg_2_c" c_4="cg_3_c" c_5="cg_4_c" s_1="" s_2="sg_1_c" s_3="sg_2_c" s_4="sg_3_c" s_5="sg_4_c"></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="cg_2_c" c_4="cg_3_c" c_5="cg_4_c" s_1="" s_2="sg_1_c" s_3="sg_2_c" s_4="sg_3_c" s_5="sg_4_c"></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="cg_2_c" c_4="cg_3_c" c_5="cg_4_c" s_1="" s_2="sg_1_c" s_3="sg_2_c" s_4="sg_3_c" s_5="sg_4_c"></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="cg_2_c" c_4="cg_3_c" c_5="cg_4_c" s_1="" s_2="sg_1_c" s_3="sg_2_c" s_4="sg_3_c" s_5="sg_4_c"></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="cg_2_c" c_4="cg_3_c" c_5="cg_4_c" s_1="" s_2="sg_1_c" s_3="sg_2_c" s_4="sg_3_c" s_5="sg_4_c"></barra-grafico_vertical>
+                <section id="contenedor_detalle_ventas">
+                    <!-- <canvas id="ventas_mensuales" class="gradico_detalle_ventas"></canvas> -->
+                </section>
             </div>
         </div>
-        <div class="contenedor_detalle_circulos">
+        <div>
             <div>
-                <div style="font-size: 20px; text-align: center;">
-                    <div class="etiqueta_canal_venta">
-                        <div><h4 class="titulo_circulo_detalle_venta"></h4></div>
-                        <div>
-                            <div style="font-size: 12px;display: flex;justify-content: space-around;">
-                                <h4>Local </h4>
-                                <span>/ </span>
-                                <h4>Delivery</h4>
-                            </div>
-                            <div style="font-size: 18px;display: flex;justify-content: space-around;">
-                                <h4 class="porcentaje_local"> </h4>
-                                <span>/ </span>
-                                <h4 class="porcentaje_delivery"></h4>
-                            </div>
-                            <div style="font-size: 12px;display: flex;justify-content: space-around;">
-                                <span style="font-size: 12px;" class="absoluto_local"></span>
-                                <span style="font-size: 12px;">/ </span>
-                                <span style="font-size: 12px;" class="absoluto_delivery"></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>  
+                <h4 style="font-size: 20px;">Operaciones acumuladas por sucursal</h4>
+            </div>
+            <div id="contenedor_detalle_sucursales">
+                <!-- <canvas id="detalle_sucursales" class="gradico_anual"></canvas> -->
+            </div>
+            <div style="display: flex; gap: 11px; align-content: center;">
                 
-                <div class="contenedor_circulo_det">
-                    <div id="circulo_stock_uno" class="adorno_circulo">
-                        <div class="cirulo_interior">
-                            <span class="nombre_circulo_sucursal_uno"></span>
-                            <h4 style="font-size: 18px;" class="valor_circulo_sucursal_uno"></h4>
-                            <h4 class="porcentaje_circulo_sucursal_uno"></h4>
-                        </div>
-                    </div>
-                </div>
-                
+                <div class="contenedor_dona" style="width: 100px; height: 45px;font-size: 10px;"><span>Almacén Central</span><canvas class="absoluto_local"></canvas></div>
+                <div class="contenedor_dona" style="width: 100px; height: 45px;font-size: 10px;"><span>Sucursal Uno</span><canvas class="absoluto_local"></canvas></div>
+                <div class="contenedor_dona" style="width: 100px; height: 45px;font-size: 10px;"><span>Sucursal Dos</span><canvas class="absoluto_local"></canvas></div>
+                <div class="contenedor_dona" style="width: 100px; height: 45px;font-size: 10px;"><span>Sucursal Tres</span><canvas class="absoluto_local"></canvas></div>
+                <div class="contenedor_dona" style="width: 100px; height: 45px;font-size: 10px;"><span>Sucursal Cuatro</span><canvas class="absoluto_local"></canvas></div>
             </div>
-            <div>
-                <div style="font-size: 20px; text-align: center;">
-                    <div class="etiqueta_canal_venta">
-                        <div><h4 class="titulo_circulo_detalle_venta"></h4></div>
-                        <div>
-                            <div style="font-size: 12px;display: flex;justify-content: space-around;">
-                                <h4>Local </h4>
-                                <span>/ </span>
-                                <h4>Delivery</h4>
-                            </div>
-                            <div style="font-size: 18px;display: flex;justify-content: space-around;">
-                                <h4 class="porcentaje_local"> </h4>
-                                <span>/ </span>
-                                <h4 class="porcentaje_delivery"></h4>
-                            </div>
-                            <div style="font-size: 12px;display: flex;justify-content: space-around;">
-                                <span style="font-size: 12px;" class="absoluto_local"></span>
-                                <span style="font-size: 12px;">/ </span>
-                                <span style="font-size: 12px;" class="absoluto_delivery"></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>    
-                <div class="contenedor_circulo_det">
-                    <div id="circulo_stock_dos">
-                        <div class="cirulo_interior">
-                            <span class="nombre_circulo_sucursal_dos"></span>
-                            <h4 style="font-size: 18px;" class="valor_circulo_sucursal_dos"></h4>
-                            <h4 class="porcentaje_circulo_sucursal_dos"></h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div>
-                <div style="font-size: 20px; text-align: center;">
-                    <div class="etiqueta_canal_venta">
-                        <div><h4 class="titulo_circulo_detalle_venta"></h4></div>
-                        <div>
-                            <div style="font-size: 12px;display: flex;justify-content: space-around;">
-                                <h4>Local </h4>
-                                <span>/ </span>
-                                <h4>Delivery</h4>
-                            </div>
-                            <div style="font-size: 18px;display: flex;justify-content: space-around;">
-                                <h4 class="porcentaje_local"> </h4>
-                                <span>/ </span>
-                                <h4 class="porcentaje_delivery"></h4>
-                            </div>
-                            <div style="font-size: 12px;display: flex;justify-content: space-around;">
-                                <span style="font-size: 12px;" class="absoluto_local"></span>
-                                <span style="font-size: 12px;">/ </span>
-                                <span style="font-size: 12px;" class="absoluto_delivery"></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>   
-                <div class="contenedor_circulo_det">
-                    <div id="circulo_stock_tres" class="adorno_circulo">
-                        <div class="cirulo_interior">
-                            <span class="nombre_circulo_sucursal_tres"></span>
-                            <h4 style="font-size: 18px;" class="valor_circulo_sucursal_tres"></h4>
-                            <h4 class="porcentaje_circulo_sucursal_tres"></h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div>
-                <div style="font-size: 20px; text-align: center;">
-                    <div class="etiqueta_canal_venta">
-                        <div><h4 class="titulo_circulo_detalle_venta"></h4></div>
-                        <div>
-                            <div style="font-size: 12px;display: flex;justify-content: space-around;">
-                                <h4>Local </h4>
-                                <span>/ </span>
-                                <h4>Delivery</h4>
-                            </div>
-                            <div style="font-size: 18px;display: flex;justify-content: space-around;">
-                                <h4 class="porcentaje_local"> </h4>
-                                <span>/ </span>
-                                <h4 class="porcentaje_delivery"></h4>
-                            </div>
-                            <div style="font-size: 12px;display: flex;justify-content: space-around;">
-                                <span style="font-size: 12px;" class="absoluto_local"></span>
-                                <span style="font-size: 12px;">/ </span>
-                                <span style="font-size: 12px;" class="absoluto_delivery"></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>    
-                <div class="contenedor_circulo_det">
-                    <div id="circulo_stock_cuatro">
-                        <div class="cirulo_interior">
-                            <span class="nombre_circulo_sucursal_cuatro"></span>
-                            <h4 style="font-size: 18px;" class="valor_circulo_sucursal_cuatro"></h4>
-                            <h4 class="porcentaje_circulo_sucursal_cuatro"></h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
         </div>
     </div>
     <div id="acciones_creditos" class="contenedor-pre-credito">
@@ -239,9 +90,9 @@
                     <th style="width: 70px;">Efectivo</th>
                     <th style="width: 70px;">Tarjeta</th>
                     <th style="width: 70px;">Crédito</th>
-                    <th style="width: 70px;">Devolu-ción</th>
-                    <th style="width: 70px;">Total venta</th>
+                    <th style="width: 70px;">Dev-</th>
                     <th style="width: 60px;">Canal de venta</th>
+                    <th style="width: 70px;">Situación</th>
                     <th style="width: 90px;">Fecha</th>
                     <th style="width: 50px;">Acciones</th>
                 </tr>
@@ -272,6 +123,10 @@
         </div>
     </details>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script src="../static/detalle_ventas.js"></script>
+<script src="../static/graficos.js"></script>
 <script src="../static/tablas.js"></script>
 {% endblock %}

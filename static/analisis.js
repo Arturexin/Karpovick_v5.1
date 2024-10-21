@@ -1,12 +1,9 @@
 document.addEventListener("DOMContentLoaded", inicioDevolucionSalidas)
 let anio_principal = ""
-let sucursales_comparacion = ""
 function inicioDevolucionSalidas(){
     anio_principal = new Date().getFullYear()
     
-    /* cargarDatosAnio() */
-    /* graficoDevolucionesVentas(); */
-    sucursales_comparacion = JSON.parse(localStorage.getItem("sucursal_encabezado"))
+    cargarDatosAnio()
     btnAnalisis = 1;
 };
 let devolucionesComprobante = [];
@@ -18,9 +15,22 @@ function cargarDatosAnio(){
     document.getElementById("cargar_datos_anio").addEventListener("click", async ()=>{
         reinicioBarraGrafico(barras_dev_salidas);
         anio_principal = anio_referencia.value;
+        document.getElementById("opciones_categorias").value = 0
+        document.getElementById("opciones_codigos").value = 0
+        document.getElementById("tit_monto").textContent = ""
 
-        /* graficoDevolucionesVentas(); */
-
+        document.querySelector("#tabla_codigos_venta > tbody").remove()
+        document.querySelector("#tabla_codigos_venta").createTBody()
+        document.querySelector("#tabla_categorias_venta > tbody").remove()
+        document.querySelector("#tabla_categorias_venta").createTBody()
+        document.querySelectorAll(".total_mes_sucursal").forEach((event)=>{
+            event.textContent = ""
+        })
+        document.querySelectorAll(".total_mes_categoria").forEach((event)=>{
+            event.textContent = ""
+        })
+        
+        quitarMarcaBoton()
         modal_proceso_abrir(`Datos del año ${anio_principal} cargados.`, "")
         modal_proceso_salir_botones()
     })
@@ -37,44 +47,41 @@ let array_ganancias = [];
 ///////
 let conteo_ventas = []
 
-async function ticketPromedio(sucursal_id, anio){
-    let Array_anual = []
-    conteo_ventas = await cargarDatos(`ventas_conteo_montos?`+
-                                        `sucursal_det_venta=${sucursal_id}&`+
-                                        `year_actual=${anio}`)
+function ticketPromedio(){
+    let Array_anual = [];
+ 
     for(let i = 0; i < 12; i++){
         let array_mensual = [];
         let suma = 0;
         let suma_venta = 0;
         let media = 0;
-        conteo_ventas.forEach((event)=>{
+        array_categorias.forEach((event)=>{
             if(event.mes == i + 1){
                 array_mensual.push(event)
-                suma_venta += event.total_venta;
-                suma +=1;
+                suma_venta += event.suma_ventas;
+                suma +=event.suma_veces;
             }
         });
-
         array_mensual.length > 0 ? media = suma_venta/suma : media = 0;
 
         Array_anual.push(media.toFixed(2))
-        let fila = `
-            <tr>
-                <td style="text-align: end;width: 80px;font-size: 14px;">${moneda()} ${Array_anual[0]}</td>
-                <td style="text-align: end;width: 80px;font-size: 14px;">${moneda()} ${Array_anual[1]}</td>
-                <td style="text-align: end;width: 80px;font-size: 14px;">${moneda()} ${Array_anual[2]}</td>
-                <td style="text-align: end;width: 80px;font-size: 14px;">${moneda()} ${Array_anual[3]}</td>
-                <td style="text-align: end;width: 80px;font-size: 14px;">${moneda()} ${Array_anual[4]}</td>
-                <td style="text-align: end;width: 80px;font-size: 14px;">${moneda()} ${Array_anual[5]}</td>
-                <td style="text-align: end;width: 80px;font-size: 14px;">${moneda()} ${Array_anual[6]}</td>
-                <td style="text-align: end;width: 80px;font-size: 14px;">${moneda()} ${Array_anual[7]}</td>
-                <td style="text-align: end;width: 80px;font-size: 14px;">${moneda()} ${Array_anual[8]}</td>
-                <td style="text-align: end;width: 80px;font-size: 14px;">${moneda()} ${Array_anual[9]}</td>
-                <td style="text-align: end;width: 80px;font-size: 14px;">${moneda()} ${Array_anual[10]}</td>
-                <td style="text-align: end;width: 80px;font-size: 14px;">${moneda()} ${Array_anual[11]}</td>
-            </tr>`
-        document.querySelector("#tabla_ticket_promedio > tbody").outerHTML = fila;
     };
+    let fila = `
+        <tr>
+            <td style="text-align: end;width: 80px;font-size: 14px;">${moneda()} ${Array_anual[0]}</td>
+            <td style="text-align: end;width: 80px;font-size: 14px;">${moneda()} ${Array_anual[1]}</td>
+            <td style="text-align: end;width: 80px;font-size: 14px;">${moneda()} ${Array_anual[2]}</td>
+            <td style="text-align: end;width: 80px;font-size: 14px;">${moneda()} ${Array_anual[3]}</td>
+            <td style="text-align: end;width: 80px;font-size: 14px;">${moneda()} ${Array_anual[4]}</td>
+            <td style="text-align: end;width: 80px;font-size: 14px;">${moneda()} ${Array_anual[5]}</td>
+            <td style="text-align: end;width: 80px;font-size: 14px;">${moneda()} ${Array_anual[6]}</td>
+            <td style="text-align: end;width: 80px;font-size: 14px;">${moneda()} ${Array_anual[7]}</td>
+            <td style="text-align: end;width: 80px;font-size: 14px;">${moneda()} ${Array_anual[8]}</td>
+            <td style="text-align: end;width: 80px;font-size: 14px;">${moneda()} ${Array_anual[9]}</td>
+            <td style="text-align: end;width: 80px;font-size: 14px;">${moneda()} ${Array_anual[10]}</td>
+            <td style="text-align: end;width: 80px;font-size: 14px;">${moneda()} ${Array_anual[11]}</td>
+        </tr>`
+    document.querySelector("#tabla_ticket_promedio > tbody").outerHTML = fila;
 };
 async function estadisticasSucursal(sucursa_id, anio){
     array_categorias = [];
@@ -116,7 +123,7 @@ async function estadisticasSucursal(sucursa_id, anio){
     array_categorias = await cargarDatos(`salidas_categorias_sucursal?`+
                                         `sucursal_salidas=${sucursa_id}&`+
                                         `year_actual=${anio}`)
-
+    ticketPromedio()
     for(let i = 0;i < 12; i++){//FOOTER
         let suma_montos_mes = 0;
         let suma_unidades_mes = 0;
@@ -594,21 +601,20 @@ document.querySelectorAll(".suc_estad").forEach((event, i)=>{
     event.addEventListener("click", (e)=>{
         quitarMarcaBoton()
 
-        if(i === 0 && sucursales_comparacion[i]){
-            ticketPromedio(sucursales_comparacion[i].id_sucursales, anio_principal)
-            estadisticasSucursal(sucursales_comparacion[i].id_sucursales, anio_principal)
+        if(i === 0 && suc_db[i]){
+            estadisticasSucursal(suc_db[i].id_sucursales, anio_principal)
             event.classList.add("marcaBoton")
-        }else if(i === 1 && sucursales_comparacion[i]){
-            ticketPromedio(sucursales_comparacion[i].id_sucursales, anio_principal)
-            estadisticasSucursal(sucursales_comparacion[i].id_sucursales, anio_principal)
+        }else if(i === 1 && suc_db[i]){
+            estadisticasSucursal(suc_db[i].id_sucursales, anio_principal)
             event.classList.add("marcaBoton")
-        }else if(i === 2 && sucursales_comparacion[i]){
-            ticketPromedio(sucursales_comparacion[i].id_sucursales, anio_principal)
-            estadisticasSucursal(sucursales_comparacion[i].id_sucursales, anio_principal)
+        }else if(i === 2 && suc_db[i]){
+            estadisticasSucursal(suc_db[i].id_sucursales, anio_principal)
             event.classList.add("marcaBoton")
-        }else if(i === 3 && sucursales_comparacion[i]){
-            ticketPromedio(sucursales_comparacion[i].id_sucursales, anio_principal)
-            estadisticasSucursal(sucursales_comparacion[i].id_sucursales, anio_principal)
+        }else if(i === 3 && suc_db[i]){
+            estadisticasSucursal(suc_db[i].id_sucursales, anio_principal)
+            event.classList.add("marcaBoton")
+        }else if(i === 4 && suc_db[i]){
+            estadisticasSucursal(suc_db[i].id_sucursales, anio_principal)
             event.classList.add("marcaBoton")
         };
     })
@@ -618,6 +624,7 @@ function quitarMarcaBoton(){
     document.querySelectorAll(".suc_estad")[1].classList.remove("marcaBoton")
     document.querySelectorAll(".suc_estad")[2].classList.remove("marcaBoton")
     document.querySelectorAll(".suc_estad")[3].classList.remove("marcaBoton")
+    document.querySelectorAll(".suc_estad")[4].classList.remove("marcaBoton")
 }
 ////////////////////////////////////////////////////////////
 document.getElementById("imprimir_cat").addEventListener("click", ()=>{

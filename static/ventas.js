@@ -425,9 +425,7 @@ async function procesamientoVentas(e){
             modal_proceso_abrir("Procesando la venta!!!.", "")
 
             await funcionGeneralVentas();
-            if(document.querySelector("#check_comprobante").checked){
-                NuevaVentanaComprobanteDePago(response.message[0], response.message[1])//comprobante
-            };
+            
             array_saldos = [];
             resetClientes();
             resetTablaVentas();
@@ -464,7 +462,7 @@ async function realizarCredito(sucursal_ventas, numeracion_comprobante_venta){
 async function funcionGeneralVentas(){
     let array_productos = [];
     let array_salidas = [];
-    let suc__ = ""
+    let suc__ = document.getElementById("fffff-sucursal").value;
     function DatosProductos(a){
         this.idProd = a.idProd;
         this.existencias_ac = -a.existencias_ac;
@@ -485,24 +483,25 @@ async function funcionGeneralVentas(){
             let sucursal_ = suc_db.find(x=> x.sucursal_nombre === e);
             if(sucursal_){
                 event[sucursales_activas[i]] > 0 ? array_salidas.push(new DatosSalidas(event, sucursal_.id_sucursales, i)): "";
-                suc__ = sucursal_.id_sucursales;
             };
         });
     });
     function DatosDeVenta(){
-        this.sucursal_v = suc__;
         this.id_num = datos_usuario[0].id;
+        
+        this.sucursal_v = suc__;
         this.item_ticket = input_tipo_comprobante.value;
         this.modo_efectivo = Number(document.getElementById("efectivo-ventas").value);
         this.modo_credito = Number(document.getElementById("credito-ventas").value);
         this.modo_tarjeta = Number(document.getElementById("tarjeta-ventas").value);
         this.modo_perdida = 0;
-        this.total_venta = Number(document.getElementById("total-importe-tabla-ventas").textContent);
         this.canal_venta = document.getElementById("modo_pago_ventas").checked;
         this.dni_cliente = document.getElementById('txtIdv').value != "" ? 
                             document.getElementById('txtIdv').value : 
                             indice_cli[0].id_cli;
         this.fecha = generarFecha();
+        this.situacion = this.modo_credito > 0 ? "pendiente" : "liquidado";
+
         this.array_productos = array_productos;
         this.array_salidas = array_salidas;
     };
@@ -512,7 +511,12 @@ async function funcionGeneralVentas(){
 
     let response = await funcionFetchDos(url_venta, objeto_venta);
     if(response.status === "success"){
-        await realizarCredito(array_saldos[0].sucursal, response.message[1]);
+        await realizarCredito(suc__, response.message[1]);
+
+        if(document.querySelector("#check_comprobante").checked){
+            NuevaVentanaComprobanteDePago(response.message[0], response.message[1])//comprobante
+        };
+        
         modal_proceso_abrir(`La venta ${response.message[1]} fue procesada satisfactoriamente!!!.`, ``)
         modal_proceso_salir_botones_focus("buscador-productos-ventas")
     }else{
@@ -1017,7 +1021,7 @@ async function actualizarSaldos(){//Esto se usa cuando el producto ya está en l
 
     for(id_v of id_rev){
         let row_ = id_v.closest("tr");
-        modal_proceso_abrir(`Inspeccionando sctock ${row_.children[2].textContent}.`, "")
+
         let fila_array = response.find(x=> x.idProd === Number(row_.children[0].textContent))// Hacemos coincidir los id para actualizar las existencias coherentemente
         if(fila_array){
             row_.children[5].textContent = fila_array.sucursal_get;
@@ -1050,8 +1054,10 @@ async function actualizarSaldos(){//Esto se usa cuando el producto ya está en l
 document.getElementById("actualizar_saldos").addEventListener("click", recalcularSaldos)
 async function recalcularSaldos(e){
     e.preventDefault();
-    await actualizarSaldos();
-    modal_proceso_salir_botones_focus("buscador-productos-ventas");
+    if(document.getElementById("tabla-ventas").children[1].children.length > 0){
+        await actualizarSaldos();
+        modal_proceso_salir_botones_focus("buscador-productos-ventas");
+    }
 };
 ////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////

@@ -117,11 +117,8 @@ let gasto_hoy = []
 let apertura_hoy = []
 let sucursal_caja_apertura = []
 function sucursalesCajaApertura(){
-    sucursal_caja_apertura = JSON.parse(localStorage.getItem("sucursal_encabezado"))
     document.querySelectorAll(".titulo_apertura_caja").forEach((event, i)=>{
-        if(sucursal_caja_apertura[i]){
-            event.textContent = sucursal_caja_apertura[i].sucursal_nombre
-        };
+            event.textContent = suc_add[i]
     });
 };
 
@@ -134,14 +131,15 @@ async function cargarAperturaHoy(){
     let egresos_efectivo_ = document.querySelectorAll(".egresos_caja_gastos");
     let saldo_cierre_ = document.querySelectorAll(".saldo_cierre_caja");
 
-    saldo_apertura_.forEach((event, i)=>{
+    suc_add.forEach((event, i)=>{
+        let suc_ = suc_db.find(x=> x.sucursal_nombre === event)
         consolidado_efectivo.forEach((e)=>{
-            if(sucursal_caja_apertura[i] && e.id_sucursales === sucursal_caja_apertura[i].id_sucursales){
-                event.value = (e.saldo_apertura ? e.saldo_apertura : 0).toFixed(2)
+            if(suc_ && e.id_sucursales === suc_.id_sucursales){
+                saldo_apertura_[i].value = (e.saldo_apertura ? e.saldo_apertura : 0).toFixed(2)
                 ingresos_ventas_[i].value = (   (e.suma_ventas ? e.suma_ventas: 0) + 
                                                 (e.suma_creditos ? e.suma_creditos: 0)).toFixed(2)
                 egresos_efectivo_[i].value = (e.suma_gastos ? e.suma_gastos : 0).toFixed(2)
-                saldo_cierre_[i].value = (  Number(event.value) +
+                saldo_cierre_[i].value = (  Number(saldo_apertura_[i].value) +
                                             Number(ingresos_ventas_[i].value) -
                                             Number(egresos_efectivo_[i].value)).toFixed(2)
                 e.llave_caja === 0 ? (  document.querySelectorAll(".flecha_apertura_caja")[i].style.transform = "rotate(270deg)",
@@ -166,12 +164,13 @@ let btn_aperturar = document.querySelectorAll(".btn_apertura_caja")
 btn_aperturar.forEach((event, i)=>{
     event.addEventListener("click", async (e)=>{
         e.preventDefault();
-        if(sucursal_caja_apertura[i]){
-            let fila = consolidado_efectivo.find(x => x.id_sucursales === sucursal_caja_apertura[i].id_sucursales);
+        let suc_ = suc_db.find(x=> x.sucursal_nombre === suc_add[i])
+        if(suc_){
+            let fila = consolidado_efectivo.find(x => x.id_sucursales === suc_.id_sucursales);
             if(fila === undefined || fila.llave_caja === undefined || fila.llave_caja === 1){
                 modal_proceso_abrir(`Aperturando caja en ${event.parentNode.children[0].children[0].textContent}.`, "")
                 let data = {
-                    "sucursal_caja": sucursal_caja_apertura[i].id_sucursales,
+                    "sucursal_caja": suc_.id_sucursales,
                     "saldo_apertura": document.querySelectorAll(".saldo_apertura_caja")[i].value,
                     "ingresos": document.querySelectorAll(".ingresos_caja_ventas")[i].value,
                     "egresos": document.querySelectorAll(".egresos_caja_gastos")[i].value,
@@ -206,33 +205,36 @@ let btn_cerrar = document.querySelectorAll(".btn_cerrar_caja")
 btn_cerrar.forEach((event, i)=>{
     event.addEventListener("click", async (e)=>{
         e.preventDefault();
-        let fila = consolidado_efectivo.find(x => x.id_sucursales === sucursal_caja_apertura[i].id_sucursales);
-        if(fila && fila.llave_caja === 0){
-            modal_proceso_abrir(`Cerrando caja en ${event.parentNode.children[0].children[0].textContent}.`, "")
-            let data = {
-                "id_caja": fila.id_caja,
-                "sucursal_caja": fila.id_sucursales,
-                "saldo_apertura": document.querySelectorAll(".saldo_apertura_caja")[i].value,
-                "ingresos": document.querySelectorAll(".ingresos_caja_ventas")[i].value,
-                "egresos": document.querySelectorAll(".egresos_caja_gastos")[i].value,
-                "saldo_cierre": document.querySelectorAll(".saldo_cierre_caja")[i].value,
-                "llave_caja": 1
-            };
-
-            let url = URL_API_almacen_central + 'caja'
-            let response = await funcionFetch(url,data)
-            if(response.status === 200){
-                modal_proceso_abrir(`Caja en ${event.parentNode.children[0].children[0].textContent} cerrada.`, "")
+        let suc_ = suc_db.find(x=> x.sucursal_nombre === suc_add[i])
+        if(suc_){
+            let fila = consolidado_efectivo.find(x => x.id_sucursales === suc_.id_sucursales);
+            if(fila && fila.llave_caja === 0){
+                modal_proceso_abrir(`Cerrando caja en ${event.parentNode.children[0].children[0].textContent}.`, "")
+                let data = {
+                    "id_caja": fila.id_caja,
+                    "sucursal_caja": fila.id_sucursales,
+                    "saldo_apertura": document.querySelectorAll(".saldo_apertura_caja")[i].value,
+                    "ingresos": document.querySelectorAll(".ingresos_caja_ventas")[i].value,
+                    "egresos": document.querySelectorAll(".egresos_caja_gastos")[i].value,
+                    "saldo_cierre": document.querySelectorAll(".saldo_cierre_caja")[i].value,
+                    "llave_caja": 1
+                };
+    
+                let url = URL_API_almacen_central + 'caja'
+                let response = await funcionFetch(url,data)
+                if(response.status === 200){
+                    modal_proceso_abrir(`Caja en ${event.parentNode.children[0].children[0].textContent} cerrada.`, "")
+                    modal_proceso_salir_botones()
+                    manejoDeFechas()
+                    await conteoFilas(subRutaA(1), filas_total_bd, indice_tabla, document.getElementById("numeracionTablaCaja"), 20)
+                    await searchDatos(subRutaB((document.getElementById("numeracionTablaCaja").value - 1) * 20, 1), base_datos,"#tabla-caja")
+                    await cargarAperturaHoy()
+                };
+            }else{
+                modal_proceso_abrir(`Esta acción no se puede realizar debido a que esta caja no está aperturada.`, "")
                 modal_proceso_salir_botones()
-                manejoDeFechas()
-                await conteoFilas(subRutaA(1), filas_total_bd, indice_tabla, document.getElementById("numeracionTablaCaja"), 20)
-                await searchDatos(subRutaB((document.getElementById("numeracionTablaCaja").value - 1) * 20, 1), base_datos,"#tabla-caja")
-                await cargarAperturaHoy()
             };
-        }else{
-            modal_proceso_abrir(`Esta acción no se puede realizar debido a que esta caja no está aperturada.`, "")
-            modal_proceso_salir_botones()
-        };
+        }
     });
 });
 /////////////////////////////////////////////////////////////////////////////

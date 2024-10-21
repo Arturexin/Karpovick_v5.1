@@ -138,30 +138,26 @@ function edit(id) {
     document.getElementById('clase_cli').value = cliente.clase_cli
 };
 async function remove(id) {
-    let respuesta = confirm('¿Estas seguro de eliminarlo?')
-    if (respuesta) {
-        if(id != document.querySelector("#tabla-clientes > tbody > tr:nth-child(1) > td.invisible").textContent){
-            let url = URL_API_almacen_central + 'clientes/' + id
-            await fetch(url,{
-                "method": "DELETE",
-                "headers": {
-                    "Content-Type": 'application/json'
-                }
-            });
-            await conteoFilas(subRutaA(1), filas_total_bd, indice_tabla, 
+    manejoDeFechas();
+    let url = URL_API_almacen_central + 'clientes_remove'
+    let data = {
+        'id_cli': id,
+    };
+    let response = await funcionFetchDos(url, data);
+    if(response.status === "success"){
+        await conteoFilas(subRutaA(1), filas_total_bd, indice_tabla, 
                             document.getElementById("numeracionTablaClientes"), 20)
-            await searchDatos(subRutaB(num_filas_tabla.value, 1), base_datos, "#tabla-clientes")
-            if(document.querySelector("#filtro-tabla-clientes-clase").value == 0){
-                localStorage.setItem("base_datos_cli", JSON.stringify(await cargarDatos('clientes_ventas')))                       
-            }else if(document.querySelector("#filtro-tabla-clientes-clase") == 1){
-                localStorage.setItem("base_datos_prov", JSON.stringify(await cargarDatos('proveedores')))
-            };
-        }else{
-            modal_proceso_abrir(`Se obtuvieron ${cantidadFilas} registros.`, "")
-            modal_proceso_salir_botones(`El cliente "Sin datos" no se puede eliminar.`)
+        await searchDatos(subRutaB(num_filas_tabla.value, 1), base_datos, "#tabla-clientes")
+        if(document.querySelector("#filtro-tabla-clientes-clase").value == 0){
+            localStorage.setItem("base_datos_cli", JSON.stringify(await cargarDatos('clientes_ventas')))                       
+        }else if(document.querySelector("#filtro-tabla-clientes-clase") == 1){
+            localStorage.setItem("base_datos_prov", JSON.stringify(await cargarDatos('proveedores')))
         };
+        modal_proceso_abrir(`${response.message}`)
+        modal_proceso_salir_botones()
     };
 };
+
 
 const registrarCliente = document.getElementById("registrar-cliente");
 registrarCliente.addEventListener("click", saveClientes)
@@ -237,12 +233,10 @@ async function saveClientes(e) {
 
 async function graficoClientes(){
     await cargarClientesMes(anio_principal)
+    document.getElementById("contenedor_clientes_proveedores").innerHTML = `<canvas id="clientes_preveedores" class="gradico_anual"></canvas>`
     let array_clientes = [];
     let array_proveedores = [];
-    let masAlto = 0;
-    document.querySelectorAll(".f_l_g").forEach((event, i)=>{
-        event.textContent = `${meses_letras[i]}${anio_principal % 100}`;
-    });
+
     for(let i = 0; i < 12; i++){
         array_clientes.push(0);
         array_proveedores.push(0);
@@ -250,18 +244,11 @@ async function graficoClientes(){
             if(event.mes == i + 1){
                 array_clientes[i] = Number(event.suma_clientes);
                 array_proveedores[i] = Number(event.suma_proveedores);
-            }
-            if(masAlto < Number(event.suma_clientes)){masAlto = Number(event.suma_clientes)}
-            if(masAlto < Number(event.suma_proveedores)){masAlto = Number(event.suma_proveedores)}
+            };
         });
     };
-    let masAltoDos = (226 * masAlto)/214;
-    document.querySelectorAll(".eje_y_numeracion").forEach((e)=>{
-        e.textContent = Number(masAltoDos).toFixed(2)
-        masAltoDos -= 0.20 * ((226 * masAlto)/214);
-    });
-    pintarGraficoPositivo(document.querySelectorAll(".cg_1_c"), array_clientes, masAlto, colorFondoBarra[0], document.querySelectorAll(".sg_1_c"), 8, monedas.Nada)
-    pintarGraficoPositivo(document.querySelectorAll(".cg_2_c"), array_proveedores, masAlto, colorFondoBarra[2], document.querySelectorAll(".sg_2_c"), 8, monedas.Nada)
+
+    graficoBarrasVerticalUnid(document.getElementById("clientes_preveedores"), array_clientes, array_proveedores, ['Clientes', 'Proveedores'])
 };
 async function cargarClientesMes(anio){
     let url = URL_API_almacen_central + 'clientes_mes?'+

@@ -394,3 +394,4 @@ function graficoDonaColores(elemento_id, titulo, array_datos, class_nombre, clas
         
     };
 };
+

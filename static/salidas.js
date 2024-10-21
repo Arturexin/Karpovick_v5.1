@@ -2,47 +2,17 @@
 /////////////////////////////////////SALIDAS////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////
 document.addEventListener("DOMContentLoaded", inicioSalidas)
-let anio_principal = ""
 function inicioSalidas(){
-    anio_principal = new Date().getFullYear()
-    cargarDatosAnio()
-    datosInicio()
     inicioTablasSalidas()
     btnSalidasP = 1;
 };
-const barras_compras = [".cg_1_c", ".cg_2_c", ".cg_3_c", ".cg_4_c", ".cg_5_c"]
+
 const url_array_conteo = ["salidas_conteo", "transferencias_conteo_s"]
 const url_array_tabla = ["salidas_tabla", "transferencias_tabla_s"]
 let url_conteo = url_array_conteo[Number(document.getElementById("filtro_tabla").value)]
 let url_tabla = url_array_tabla[Number(document.getElementById("filtro_tabla").value)]
 const tabla = document.getElementById("filtro_tabla")
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-async function datosInicio(){
-    cincoCategorias = await cargarDatos('salidas_top_cinco_categorias_sucursal?'+
-                                    `year_actual=${anio_principal}`)
-    cincoCodigos = await cargarDatos('salidas_top_cinco_codigos_sucursal?'+
-                                    `year_actual=${anio_principal}`)
-}
-function cargarDatosAnio(){
-    document.getElementById("cargar_datos_anio").addEventListener("click", async ()=>{
-        reinicioBarraGrafico(barras_compras);
-        removerMarcaBoton()
-        anio_principal = anio_referencia.value;
 
-        if(document.querySelector(".contenedor_ranking")){
-            document.querySelector(".contenedor_ranking").classList.remove("alta_opacidad")
-        }
-
-        cincoCategorias = await cargarDatos('salidas_top_cinco_categorias_sucursal?'+
-                                        `year_actual=${anio_principal}`)
-        cincoCodigos = await cargarDatos('salidas_top_cinco_codigos_sucursal?'+
-                                        `year_actual=${anio_principal}`)
-
-        modal_proceso_abrir(`Datos del año ${anio_principal} cargados.`, "")
-        modal_proceso_salir_botones()
-    })
-};
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
 let filas_total_bd = {value: 0};
@@ -366,192 +336,6 @@ async function realizarDevolucion(){
         removerContenido()
     };
     document.getElementById("acciones_rapidas_salidas").classList.remove("modal_show")
-};
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////GRÁFICOS/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-function GraficoRankingCategoria(numSucural, colorRanking, columnaRanking, fechaRanking){
-    
-    let categoria_datos = [];
-    let categoria_nombres = [];
-    let array_datos = [];
-    let array_nombres = [];
-    let alto = 0;
-    let coloresRanking = ["#E6CA7B","#91E69C","#428499","#6380E6","#E66E8D"]
-    
-    document.querySelectorAll(colorRanking).forEach((event, i)=>{
-        event.style.width = "20px"
-        event.style.height = "10px"
-        event.style.background = coloresRanking[i]
-    });
-    for(let i = 0; i < 12; i++){
-        let conteo = 0;
-        array_datos = [0,0,0,0,0]
-        array_nombres = ["","","","",""]
-        categoria_datos.push(0)
-        categoria_nombres.push(0)
-        cincoCategorias.forEach((event, j)=>{
-            if(event.mes == i + 1 && event.sucursal == numSucural && conteo < 5){
-                array_datos[conteo] = event.suma_ventas;
-                array_nombres[conteo] = event.categoria_nombre;
-                conteo +=1;
-            };
-        });
-        categoria_datos[i]=array_datos
-        categoria_nombres[i]=array_nombres
-        categoria_datos.forEach((event)=>{
-            let suma = 0;
-            event.forEach((e)=>{
-                suma +=e
-            });
-            if(alto < suma){
-                alto = suma
-            };
-            
-        });
-        array_datos = []
-        array_nombres = []
-    };
-    rankingColumna(categoria_datos, categoria_nombres, alto, columnaRanking, fechaRanking, arregloMeses, coloresRanking)
-};
-function GraficoRankingCodigo(numSucural, colorRanking, columnaRanking, fechaRanking){
-    
-    let codigo_datos = [];
-    let codigo_nombres = [];
-    let array_datos = [];
-    let array_nombres = [];
-    let alto = 0;
-    let coloresRanking = ["#E6CA7B","#91E69C","#428499","#6380E6","#E66E8D"]
-    
-    document.querySelectorAll(colorRanking).forEach((event, i)=>{
-        event.style.width = "20px"
-        event.style.height = "10px"
-        event.style.background = coloresRanking[i]
-    });
-    for(let i = 0; i < 12; i++){
-        let conteo = 0;
-        array_datos = [0,0,0,0,0]
-        array_nombres = ["","","","",""]
-        codigo_datos.push(0)
-        codigo_nombres.push(0)
-        cincoCodigos.forEach((event, j)=>{
-            if(event.mes == i + 1 && event.sucursal == numSucural && conteo < 5){
-                array_datos[conteo] = event.suma_ventas;
-                array_nombres[conteo] = event.codigo;
-                conteo +=1;
-            };
-        });
-        codigo_datos[i]=array_datos
-        codigo_nombres[i]=array_nombres
-        codigo_datos.forEach((event)=>{
-            let suma = 0;
-            event.forEach((e)=>{
-                suma +=e
-            });
-            if(alto < suma){
-                alto = suma
-            };
-            
-        });
-        array_datos = []
-        array_nombres = []
-    };
-    rankingColumna(codigo_datos, codigo_nombres, alto,columnaRanking, fechaRanking, arregloMeses, coloresRanking)
-};
-
-//////////////BOTONES//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-document.querySelectorAll(".b_g_s_r").forEach((event, i)=>{
-    event.addEventListener("click", (e)=>{
-        removerMarcaBoton()
-        let valor_sucursal_principal = JSON.parse(localStorage.getItem("sucursal_encabezado"))
-        if(i === 0 && valor_sucursal_principal[i]){
-            componenteGraficoRankingSalidas("color_ranking_categoria_uno", "columna_ranking_categoria_uno", "ranking_fecha_categoria_uno", "color_ranking_codigo_uno", "columna_ranking_codigo_uno", "ranking_fecha_codigo_uno")
-            document.querySelector(".contenedor_ranking").classList.add("alta_opacidad")
-            event.classList.add("marcaBoton")
-            GraficoRankingCategoria(valor_sucursal_principal[0].id_sucursales, ".color_ranking_categoria_uno", ".columna_ranking_categoria_uno", ".ranking_fecha_categoria_uno")
-            GraficoRankingCodigo(valor_sucursal_principal[0].id_sucursales, ".color_ranking_codigo_uno", ".columna_ranking_codigo_uno", ".ranking_fecha_codigo_uno")
-        }else if(i === 1 && valor_sucursal_principal[i]){
-            componenteGraficoRankingSalidas("color_ranking_categoria_dos", "columna_ranking_categoria_dos", "ranking_fecha_categoria_dos", "color_ranking_codigo_dos", "columna_ranking_codigo_dos", "ranking_fecha_codigo_dos")
-            document.querySelector(".contenedor_ranking").classList.add("alta_opacidad")
-            event.classList.add("marcaBoton")
-            GraficoRankingCategoria(valor_sucursal_principal[1].id_sucursales, ".color_ranking_categoria_dos", ".columna_ranking_categoria_dos", ".ranking_fecha_categoria_dos")
-            GraficoRankingCodigo(valor_sucursal_principal[1].id_sucursales, ".color_ranking_codigo_dos", ".columna_ranking_codigo_dos", ".ranking_fecha_codigo_dos")
-        }else if(i === 2 && valor_sucursal_principal[i]){
-            componenteGraficoRankingSalidas("color_ranking_categoria_tres", "columna_ranking_categoria_tres", "ranking_fecha_categoria_tres", "color_ranking_codigo_tres", "columna_ranking_codigo_tres", "ranking_fecha_codigo_tres")
-            document.querySelector(".contenedor_ranking").classList.add("alta_opacidad")
-            event.classList.add("marcaBoton")
-            GraficoRankingCategoria(valor_sucursal_principal[2].id_sucursales, ".color_ranking_categoria_tres", ".columna_ranking_categoria_tres", ".ranking_fecha_categoria_tres")
-            GraficoRankingCodigo(valor_sucursal_principal[2].id_sucursales, ".color_ranking_codigo_tres", ".columna_ranking_codigo_tres", ".ranking_fecha_codigo_tres")
-        }else if(i === 3 && valor_sucursal_principal[i]){
-            componenteGraficoRankingSalidas("color_ranking_categoria_cuatro", "columna_ranking_categoria_cuatro", "ranking_fecha_categoria_cuatro", "color_ranking_codigo_cuatro", "columna_ranking_codigo_cuatro", "ranking_fecha_codigo_cuatro")
-            document.querySelector(".contenedor_ranking").classList.add("alta_opacidad")
-            event.classList.add("marcaBoton")
-            GraficoRankingCategoria(valor_sucursal_principal[3].id_sucursales, ".color_ranking_categoria_cuatro", ".columna_ranking_categoria_cuatro", ".ranking_fecha_categoria_cuatro")
-            GraficoRankingCodigo(valor_sucursal_principal[3].id_sucursales, ".color_ranking_codigo_cuatro", ".columna_ranking_codigo_cuatro", ".ranking_fecha_codigo_cuatro")
-        };
-    })
-});
-function removerMarcaBoton(){
-    document.querySelectorAll(".b_g_s_r")[0].classList.remove("marcaBoton")
-    document.querySelectorAll(".b_g_s_r")[1].classList.remove("marcaBoton")
-    document.querySelectorAll(".b_g_s_r")[2].classList.remove("marcaBoton")
-    document.querySelectorAll(".b_g_s_r")[3].classList.remove("marcaBoton")
-}
-function componenteGraficoRankingSalidas(leyenda_cat, columna_cat, fecha_cat, leyenda_cod, columna_cod, fecha_cod){
-    let comp_graf_ran_sal = `<div class="contenedor_ranking baja_opacidad">
-                                <div>
-                                    <h4>Ranking cinco categorías con mayores ventas</h4>
-                                    <div class="leyenda_ranking">
-                                        <div><div class=${leyenda_cat}></div><span>1° Puesto</span></div>
-                                        <div><div class=${leyenda_cat}></div><span>2° Puesto</span></div>
-                                        <div><div class=${leyenda_cat}></div><span>3° Puesto</span></div>
-                                        <div><div class=${leyenda_cat}></div><span>4° Puesto</span></div>
-                                        <div><div class=${leyenda_cat}></div><span>5° Puesto</span></div>
-                                    </div>
-                                    <div class="grafico_ranking">
-                                            <columna-ranking f_r=${fecha_cat} r_c=${columna_cat}></columna-ranking>
-                                            <columna-ranking f_r=${fecha_cat} r_c=${columna_cat}></columna-ranking>
-                                            <columna-ranking f_r=${fecha_cat} r_c=${columna_cat}></columna-ranking>
-                                            <columna-ranking f_r=${fecha_cat} r_c=${columna_cat}></columna-ranking>
-                                            <columna-ranking f_r=${fecha_cat} r_c=${columna_cat}></columna-ranking>
-                                            <columna-ranking f_r=${fecha_cat} r_c=${columna_cat}></columna-ranking>
-                                            <columna-ranking f_r=${fecha_cat} r_c=${columna_cat}></columna-ranking>
-                                            <columna-ranking f_r=${fecha_cat} r_c=${columna_cat}></columna-ranking>
-                                            <columna-ranking f_r=${fecha_cat} r_c=${columna_cat}></columna-ranking>
-                                            <columna-ranking f_r=${fecha_cat} r_c=${columna_cat}></columna-ranking>
-                                            <columna-ranking f_r=${fecha_cat} r_c=${columna_cat}></columna-ranking>
-                                            <columna-ranking f_r=${fecha_cat} r_c=${columna_cat}></columna-ranking>
-                                    </div>
-                                </div>
-                                <div>
-                                    <h4>Ranking cinco productos con mayores ventas</h4>
-                                    <div class="leyenda_ranking">
-                                        <div><div class=${leyenda_cod}></div><span>1° Puesto</span></div>
-                                        <div><div class=${leyenda_cod}></div><span>2° Puesto</span></div>
-                                        <div><div class=${leyenda_cod}></div><span>3° Puesto</span></div>
-                                        <div><div class=${leyenda_cod}></div><span>4° Puesto</span></div>
-                                        <div><div class=${leyenda_cod}></div><span>5° Puesto</span></div>
-                                    </div>
-                                    <div class="grafico_ranking">
-                                            <columna-ranking f_r=${fecha_cod} r_c=${columna_cod}></columna-ranking>
-                                            <columna-ranking f_r=${fecha_cod} r_c=${columna_cod}></columna-ranking>
-                                            <columna-ranking f_r=${fecha_cod} r_c=${columna_cod}></columna-ranking>
-                                            <columna-ranking f_r=${fecha_cod} r_c=${columna_cod}></columna-ranking>
-                                            <columna-ranking f_r=${fecha_cod} r_c=${columna_cod}></columna-ranking>
-                                            <columna-ranking f_r=${fecha_cod} r_c=${columna_cod}></columna-ranking>
-                                            <columna-ranking f_r=${fecha_cod} r_c=${columna_cod}></columna-ranking>
-                                            <columna-ranking f_r=${fecha_cod} r_c=${columna_cod}></columna-ranking>
-                                            <columna-ranking f_r=${fecha_cod} r_c=${columna_cod}></columna-ranking>
-                                            <columna-ranking f_r=${fecha_cod} r_c=${columna_cod}></columna-ranking>
-                                            <columna-ranking f_r=${fecha_cod} r_c=${columna_cod}></columna-ranking>
-                                            <columna-ranking f_r=${fecha_cod} r_c=${columna_cod}></columna-ranking>
-                                    </div>
-                                </div>
-                            </div>`;
-    document.querySelector(".contenedor_graficos_sucursales").innerHTML = comp_graf_ran_sal;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////

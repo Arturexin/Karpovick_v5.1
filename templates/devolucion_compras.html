@@ -37,26 +37,7 @@
         </div>
         <div>
             <div class="titulo_graficos"><p>Devoluciones por Entradas</p></div>  
-            <div class="etiquetas_graficos_colores">
-                <div>
-                    <div class="color_item_grafico_compra"></div>
-                    <span class="descripcion_item_grafico">Dev-Entradas</span>
-                </div>
-            </div>
-            <div class="grafico_compras">
-                <grafico-eje_y e_0="eje_y_numeracion"></grafico-eje_y>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="" c_3="cg_1_c" c_4="" c_5="" s_1="" s_2="" s_3="sg_1_c" s_4="" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="" c_3="cg_1_c" c_4="" c_5="" s_1="" s_2="" s_3="sg_1_c" s_4="" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="" c_3="cg_1_c" c_4="" c_5="" s_1="" s_2="" s_3="sg_1_c" s_4="" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="" c_3="cg_1_c" c_4="" c_5="" s_1="" s_2="" s_3="sg_1_c" s_4="" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="" c_3="cg_1_c" c_4="" c_5="" s_1="" s_2="" s_3="sg_1_c" s_4="" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="" c_3="cg_1_c" c_4="" c_5="" s_1="" s_2="" s_3="sg_1_c" s_4="" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="" c_3="cg_1_c" c_4="" c_5="" s_1="" s_2="" s_3="sg_1_c" s_4="" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="" c_3="cg_1_c" c_4="" c_5="" s_1="" s_2="" s_3="sg_1_c" s_4="" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="" c_3="cg_1_c" c_4="" c_5="" s_1="" s_2="" s_3="sg_1_c" s_4="" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="" c_3="cg_1_c" c_4="" c_5="" s_1="" s_2="" s_3="sg_1_c" s_4="" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="" c_3="cg_1_c" c_4="" c_5="" s_1="" s_2="" s_3="sg_1_c" s_4="" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="" c_3="cg_1_c" c_4="" c_5="" s_1="" s_2="" s_3="sg_1_c" s_4="" s_5=""></barra-grafico_vertical>
+            <div id="contenedor_grafico_devoluciones" class="gradico_anual">
             </div>
         </div>
     </div>
@@ -138,5 +119,9 @@
         </table>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script src="../static/devolucion_compras.js"></script>
+<script src="../static/graficos.js"></script>
 {% endblock %}

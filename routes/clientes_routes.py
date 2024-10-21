@@ -299,15 +299,20 @@ def crearClienteControl():
         mysql.connection.rollback()
         return jsonify({"status": "error", "message": str(e)})
 
-@clientes_remove.route('/api/clientes/<int:id_cli>', methods=['DELETE'])
+@clientes_remove.route('/api/clientes_remove', methods=['POST'])
 @cross_origin()
-def removeClientes(id_cli):
+def removeClientes():
     try:
+        dato_cero = 0
+        usuarioLlave = session.get('usernameDos')
         with mysql.connection.cursor() as cur:
-            query = "DELETE FROM `clientes` WHERE `clientes`.`id_cli` = %s"
-            cur.execute(query, (id_cli,))
+            query = ("UPDATE `clientes` SET `estado` = %s "
+                     "WHERE `clientes`.`id_cli` = %s "
+                     "AND identificador_cli = %s")
+            data = (dato_cero, request.json['id_cli'], usuarioLlave)
+            cur.execute(query, data)
             mysql.connection.commit()
         
-        return "Cliente Eliminado"
+        return jsonify({"status": "success", "message": "Entidad eliminada correctamente."})
     except Exception as e:
         return jsonify({'error': str(e)}), 500

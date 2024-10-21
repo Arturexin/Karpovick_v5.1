@@ -1,13 +1,12 @@
 document.addEventListener("DOMContentLoaded", inicioDetalleVentas)
 let anio_principal = ""
-let sucursales_comparacion = ""
+
 function inicioDetalleVentas(){
     anio_principal = new Date().getFullYear()
     cargarDatosAnio()
     inicioTablasDetalleVentas()
     cargarDatosEmpresa()
     btnDetalleVentas = 1;
-    sucursales_comparacion = JSON.parse(localStorage.getItem("sucursal_encabezado"))
 };
 let metodo_pago_detalle = ["Efectivo", "Tarjeta", "Crédito", "Devoluciones"];
 const barras_detalle = [".cg_1_c", ".cg_2_c", ".cg_3_c", ".cg_4_c", ".cg_5_c"]
@@ -19,15 +18,8 @@ let reporte_dos_ = []
 async function cargarDatosEmpresa(){
     det_ve_gr = await cargarDatos(  `ventas_grafico?`+
                                     `year_actual=${anio_principal}`)
-    graficoModoVenta(0, "circulo_stock_uno", "Total Venta", ".nombre_circulo_sucursal_uno", ".valor_circulo_sucursal_uno", ".porcentaje_circulo_sucursal_uno",
-                    metodo_pago_detalle, colorFondoBarra)
-    graficoModoVenta(1, "circulo_stock_dos", "Total Venta", ".nombre_circulo_sucursal_dos", ".valor_circulo_sucursal_dos", ".porcentaje_circulo_sucursal_dos",
-                    metodo_pago_detalle, colorFondoBarra)
-    graficoModoVenta(2, "circulo_stock_tres", "Total Venta", ".nombre_circulo_sucursal_tres", ".valor_circulo_sucursal_tres", ".porcentaje_circulo_sucursal_tres",
-                    metodo_pago_detalle, colorFondoBarra)
-    graficoModoVenta(3, "circulo_stock_cuatro", "Total Venta", ".nombre_circulo_sucursal_cuatro", ".valor_circulo_sucursal_cuatro", ".porcentaje_circulo_sucursal_cuatro",
-                    metodo_pago_detalle, colorFondoBarra)
-    llenarTituloCirculos()
+
+    graficoModoVenta()
     graficoVentas()
 
     promCanalVenta()
@@ -40,19 +32,10 @@ function cargarDatosAnio(){
         det_ve_gr = await cargarDatos(`ventas_grafico?`+
                                     `year_actual=${anio_principal}`)
 
-        graficoModoVenta(0, "circulo_stock_uno", "Total Venta", ".nombre_circulo_sucursal_uno", ".valor_circulo_sucursal_uno", ".porcentaje_circulo_sucursal_uno",
-                        metodo_pago_detalle, colorFondoBarra)
-        graficoModoVenta(1, "circulo_stock_dos", "Total Venta", ".nombre_circulo_sucursal_dos", ".valor_circulo_sucursal_dos", ".porcentaje_circulo_sucursal_dos",
-                        metodo_pago_detalle, colorFondoBarra)
-        graficoModoVenta(2, "circulo_stock_tres", "Total Venta", ".nombre_circulo_sucursal_tres", ".valor_circulo_sucursal_tres", ".porcentaje_circulo_sucursal_tres",
-                        metodo_pago_detalle, colorFondoBarra)
-        graficoModoVenta(3, "circulo_stock_cuatro", "Total Venta", ".nombre_circulo_sucursal_cuatro", ".valor_circulo_sucursal_cuatro", ".porcentaje_circulo_sucursal_cuatro",
-                        metodo_pago_detalle, colorFondoBarra)
-        llenarTituloCirculos()
+        graficoModoVenta()
         graficoVentas()
 
         promCanalVenta()
-        
 
         modal_proceso_abrir(`Datos del año ${anio_principal} cargados.`, "")
         modal_proceso_salir_botones()
@@ -112,7 +95,9 @@ function subRutaB(num, index){
             `fecha_fin_det_venta=${fecha_fin[index]}`
 };
 function cuerpoFilaTabla(e){
-    return  `<tr class="ventas-fila">
+    let color_fondo = e.situacion === "pendiente" ? "var(--fondo-marca-uno)": e.situacion === "pérdida" ? "rgb(113, 89, 142)": "";
+    let dev_ = e.modo_perdida - e.modo_efectivo - e.modo_tarjeta
+    return  `<tr class="ventas-fila" style="background: ${color_fondo}">
                 <td class="invisible">${e.id_det_ventas}</td>
                 <td>${e.sucursal_nombre}</td>
                 <td>${e.comprobante}</td>
@@ -122,19 +107,20 @@ function cuerpoFilaTabla(e){
                 <td style="text-align: end;">${e.modo_tarjeta.toFixed(2)}</td>
                 <td style="text-align: end;">${e.modo_credito.toFixed(2)}</td>
                 <td style="text-align: end;">${e.modo_perdida.toFixed(2)}</td>
-                <td style="text-align: end;">${e.total_venta.toFixed(2)}</td>
                 <td style="text-align: end;" class="invisible">${e.canal_venta}</td>
                 <td>${e.canal_venta === 0 ? modelo = "Local" : modelo = "Delivery"}</td>
+                <td>${e.situacion}</td>
                 <td style="width: 95px">${e.fecha_det_ventas}</td>
                 <td style="text-align: center; width: 90px">
                     <div class="tooltip">
-                        <span onclick="buscarTicketVenta(${e.id_det_ventas})" style="font-size:18px;" class="material-symbols-outlined myButtonEditar">print</span>
+                        <span onclick="buscarTicketVenta(${e.id_det_ventas})" style="font-size:18px;" class="myButtonEditar material-symbols-outlined">print</span>
                         <span class="tooltiptext">Imprimir comprobante</span>
                     </div>
                     <div class="tooltip">
-                        <span onclick="buscarCredito(   '${e.tipo_comprobante}', 
+                        <span onclick="buscarCredito('${e.tipo_comprobante}', 
                                                     '${e.nombre_cli}', 
-                                                    ${e.id_det_ventas})" style="font-size:18px;" class="material-symbols-outlined myButtonEditar">credit_card</span>
+                                                    ${e.id_det_ventas},
+                                                    ${dev_ > 0 ? dev_ : 0})" style="font-size:18px;" class="myButtonEditar material-symbols-outlined">credit_card</span>
                         <span class="tooltiptext">Saldo de crédito</span>
                     </div>
                     
@@ -187,6 +173,7 @@ async function buscarTicketVenta(id_ventas) {
     }else{
         nombre_cliente = _cliente.nombre_cli;
     };
+
     // Generar el contenido HTML con los datos de la tabla
     let contenidoHTML = `<style>
                             *{
@@ -246,16 +233,16 @@ async function buscarTicketVenta(id_ventas) {
         detVentasComprobante.forEach((event) =>{
         if(event.comprobante === filaDetalleVenta.comprobante){
             let producto = event.descripcion;
-            let catidad = event.existencias_salidas;
+            let catidad = event.existencias;
             let precio = Number(event.precio_venta_salidas).toFixed(2);
-            let importe = (event.precio_venta_salidas * event.existencias_salidas).toFixed(2);
+            let importe = (event.precio_venta_salidas * event.existencias).toFixed(2);
             contenidoHTML += `<tr>
                         <td>${producto}</td>
                         <td>${catidad}</td>
                         <td>${precio}</td>
                         <td>${importe}</td>
                     </tr>`;
-            importe_venta += Number(event.precio_venta_salidas * event.existencias_salidas);
+            importe_venta += Number(event.precio_venta_salidas * event.existencias);
 
         }
     });
@@ -335,20 +322,11 @@ async function buscarTicketVenta(id_ventas) {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function graficoVentas(){
-    
+    document.getElementById("contenedor_detalle_ventas").innerHTML = `<canvas id="gradico_detalle_ventas" class="gradico_anual"></canvas>`
     let array_efectivo = [];
     let array_tarjeta = [];
     let array_credito = [];
     let array_perdida = [];
-    let masAlto = 0;
-    document.querySelectorAll(".color_item_grafico_detVenta").forEach((event, i)=>{
-        event.style.background = `${colorFondoBarra[i]}`
-        event.style.width = `20px`
-        event.style.height = `10px`
-    });
-    document.querySelectorAll(".f_l_g").forEach((event, i)=>{
-        event.textContent = `${meses_letras[i]}${anio_principal % 100}`;
-    })
     for(let i = 0; i < 12; i++){
         array_efectivo.push(0);
         array_tarjeta.push(0);
@@ -361,110 +339,86 @@ function graficoVentas(){
                 array_credito[i] += event.suma_credito;
                 array_perdida[i] += event.suma_perdida;
             }
-            
-            if(masAlto < array_efectivo[i]){masAlto = array_efectivo[i]}
-            if(masAlto < array_tarjeta[i]){masAlto = array_tarjeta[i]}
-            if(masAlto < array_credito[i]){masAlto = array_credito[i]}
-            if(masAlto < array_perdida[i]){masAlto = array_perdida[i]}
         });
     };
-    let masAltoDos = (226 * masAlto)/214;
-    document.querySelectorAll(".eje_y_numeracion").forEach((e)=>{
-        e.textContent = Number(masAltoDos).toFixed(2)
-        masAltoDos -= 0.20 * ((226 * masAlto)/214);
-    });
-    pintarGraficoPositivo(document.querySelectorAll(".cg_1_c"), array_efectivo, masAlto, colorFondoBarra[0], document.querySelectorAll(".sg_1_c"), 4, moneda())
-    pintarGraficoPositivo(document.querySelectorAll(".cg_2_c"), array_tarjeta, masAlto, colorFondoBarra[1], document.querySelectorAll(".sg_2_c"), 4, moneda())
-    pintarGraficoPositivo(document.querySelectorAll(".cg_3_c"), array_credito, masAlto, colorFondoBarra[2], document.querySelectorAll(".sg_3_c"), 4, moneda())
-    pintarGraficoPositivo(document.querySelectorAll(".cg_4_c"), array_perdida, masAlto, colorFondoBarra[3], document.querySelectorAll(".sg_4_c"), 4, moneda())
-};
-function llenarTituloCirculos(){
-    /* let sucursales_comparacion = JSON.parse(localStorage.getItem("sucursal_encabezado")) */
-    document.querySelectorAll(".titulo_circulo_detalle_venta").forEach((event, i)=>{
-        if(sucursales_comparacion[i]){
-            event.textContent = sucursales_comparacion[i].sucursal_nombre;
-        };
-    });
+    graficoLineasVertical(  document.getElementById("gradico_detalle_ventas"), 
+                            array_efectivo, 
+                            array_tarjeta, 
+                            array_credito, 
+                            array_perdida, 
+                            [], 
+                            mes_anio, 
+                            ['Efectivo', 'Tarjetea','Crédito','Devoluciones']);
 };
 
-function graficoModoVenta(sucursal, elemento_id, titulo, class_nombre, class_valor, class_porcentaje,
-                        array_nombres, array_colores){
-    let modo_cobro = [0,0,0,0];
-    let num_oper = [0,0,0,0];
-    let total_oper = 0;
-    let total_oper_neto = 0;
-    det_ve_gr.forEach((event)=>{
-        if(sucursales_comparacion[sucursal] && event.sucursal === sucursales_comparacion[sucursal].id_sucursales){
-            modo_cobro[0] += event.suma_efectivo
-            modo_cobro[1] += event.suma_tarjeta
-            modo_cobro[2] += event.suma_credito
-            modo_cobro[3] += event.suma_perdida
+function graficoModoVenta(){
+    document.getElementById("contenedor_detalle_sucursales").innerHTML = `<canvas id="detalle_sucursales" class="gradico_anual"></canvas>`
+    document.querySelectorAll(".contenedor_dona").forEach((event, i)=>{
+        event.innerHTML = `<span>${suc_add[i]}</span><canvas class="absoluto_local"></canvas>`
+    })
+    let modo_cobro = [];
+    let num_oper = [];
+    let total_oper = Array(5).fill(0);//5 sucursales
+    let modo_delivery = Array(5).fill(0);//5 sucursales
+    suc_add.forEach((event, i)=>{
+        let c_s = suc_db.find(x => x.sucursal_nombre === event);
+        modo_cobro[i] = Array(4).fill(0);// 4 modos de pago
+        num_oper[i] = Array(4).fill(0);// 4 modos de pago
+        det_ve_gr.forEach((e, j)=>{
+            if (c_s && e.sucursal === c_s.id_sucursales){
+                modo_cobro[i][0] += e.suma_efectivo
+                modo_cobro[i][1] += e.suma_tarjeta
+                modo_cobro[i][2] += e.suma_credito
+                modo_cobro[i][3] += e.suma_perdida
+    
+                num_oper[i][0] += e.conteo_efectivo
+                num_oper[i][1] += e.conteo_tarjeta
+                num_oper[i][2] += e.conteo_credito
+                num_oper[i][3] += e.conteo_perdida
 
-            num_oper[0] += event.suma_conteo_efectivo
-            num_oper[1] += event.suma_conteo_tarjeta
-            num_oper[2] += event.suma_conteo_credito
-            num_oper[3] += event.suma_conteo_perdida
-        }
-    });
-    num_oper.forEach((event, i)=>{
-        total_oper +=event
-        if(i < 3){//evitamos sumar pérdidas
-            total_oper_neto +=event
-        }
-    });
-    graficoDonaColores(elemento_id, titulo, modo_cobro, class_nombre, class_valor, class_porcentaje,
-                        array_nombres, array_colores, num_oper, `/ ${total_oper_neto} oper.`)
+                total_oper[i] += (  e.conteo_efectivo +
+                                    e.conteo_tarjeta +
+                                    e.conteo_credito +
+                                    e.conteo_perdida)
+                modo_delivery[i] += e.suma_delivery
+            }
+        });
+    })
+
+    graficoBarrasHorizontalDos( document.getElementById("detalle_sucursales"),
+                                suc_add, 
+                                ['Efectivo','Tarjeta','Crédito','Devoluciones'],
+                                [num_oper[0][0],num_oper[1][0],num_oper[2][0],num_oper[3][0],num_oper[4][0]],
+                                [num_oper[0][1],num_oper[1][1],num_oper[2][1],num_oper[3][1],num_oper[4][1]],
+                                [num_oper[0][2],num_oper[1][2],num_oper[2][2],num_oper[3][2],num_oper[4][2]],
+                                [num_oper[0][3],num_oper[1][3],num_oper[2][3],num_oper[3][3],num_oper[4][3]],
+                                total_oper);
+    document.querySelectorAll(".absoluto_local").forEach((event, i)=>{
+        graficoDona(event, ['Local', 'Delivery'], [(total_oper[i] - modo_delivery[i]), modo_delivery[i]], cls[0], cls_dos[3], false, ' op.')
+    })
 };
 function promCanalVenta(){
     let meses = 0;
     let suma_conteo = 0;
     let suma_delivery = 0;
-    let abs_local = [];
-    let abs_delivery = [];
-    let total_local = 0;
-    let total_delivery = 0;
+
     document.getElementById("promedio_venta_local").textContent = "";//Reinicio de span
     document.getElementById("promedio_venta_delivery").textContent = "";//Reinicio de span
-    document.querySelectorAll(".absoluto_local").forEach((event)=>{//reinicio
-        event.textContent = `0 oper.`
-        event.parentNode.children[2].textContent = `0 oper.`
-    })
-    document.querySelectorAll(".porcentaje_local").forEach((event)=>{//reinicio
-        event.textContent = `0%`
-        event.parentNode.children[2].textContent = `0%`
-    })
 
     if(det_ve_gr.length > 0){
         det_ve_gr.forEach((event)=>{
             suma_conteo += event.conteo
             suma_delivery += event.suma_delivery
         });
-        for(let i = 0; i < sucursales_comparacion.length; i++){
-            let suma_local = 0;
+        for(let i = 0; i < suc_db.length; i++){
             let suma_delivery = 0;
             det_ve_gr.forEach((event)=>{
-                if(event.sucursal === Number(sucursales_comparacion[i].id_sucursales)){
-                    suma_local += (event.conteo - event.suma_delivery)
+                if(event.sucursal === Number(suc_db[i].id_sucursales)){
                     suma_delivery += event.suma_delivery
                 }
             });
-            abs_local.push(suma_local)
-            abs_delivery.push(suma_delivery)
         };
-        abs_local.forEach((event)=>{
-            total_local += event
-        })
-        abs_delivery.forEach((event)=>{
-            total_delivery += event
-        })
-        document.querySelectorAll(".absoluto_local").forEach((event, i)=>{
-            event.textContent = `${abs_local[i]} oper.`
-            event.parentNode.children[2].textContent = `${abs_delivery[i]} oper.`
-        })
-        document.querySelectorAll(".porcentaje_local").forEach((event, i)=>{
-            event.textContent = `${Math.round((abs_local[i]/(abs_local[i] + abs_delivery[i]))*100)}%`
-            event.parentNode.children[2].textContent = `${Math.round((abs_delivery[i]/(abs_local[i] + abs_delivery[i]))*100)}%`
-        })
+
         if((det_ve_gr[det_ve_gr.length-1].mes - det_ve_gr[0].mes) === 0){
             meses = 1
         }else{
@@ -475,19 +429,19 @@ function promCanalVenta(){
     }
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-async function buscarCredito(tipo_comprobante, nombre, id_det_ventas){
+async function buscarCredito(tipo_comprobante, nombre, id_det_ventas, devolucion_){
     credito_ = await cargarDatos(`credito_comprobante/${id_det_ventas}`)
+    console.log(credito_)
     if(credito_.length > 0){
-        tabla_creditos(nombre)
-        cargarSucursalesEjecucion(document.getElementById("fffff-sucursal"))
+        tabla_creditos(nombre, devolucion_)
         document.getElementById("acciones_creditos").classList.add("modal-show-credito")
         removerAccionRapida()
         let _input_efectivo = document.querySelector("#accion_efectivo")
         let _input_tarjeta = document.querySelector("#accion_tarjeta")
         let _input_perdida = document.querySelector("#accion_perdida")
         let _input_pendiente = document.getElementById("accion_pendiente")
-        saldoPendiente(credito_, _input_efectivo, _input_tarjeta, _input_pendiente)
-        declararPerdida(credito_, _input_efectivo, _input_tarjeta, _input_pendiente, _input_perdida)
+        saldoPendiente(credito_, _input_efectivo, _input_tarjeta, _input_pendiente, devolucion_)
+        declararPerdida(credito_, _input_efectivo, _input_tarjeta, _input_pendiente, _input_perdida, devolucion_)
         document.getElementById("accion_procesar_pago").addEventListener("click", async (e)=>{
             e.preventDefault()
     
@@ -526,44 +480,42 @@ async function buscarCredito(tipo_comprobante, nombre, id_det_ventas){
         modal_proceso_salir_botones()
     }
 }
-function saldoPendiente(credito_, _input_efectivo, _input_tarjeta, _input_pendiente){
-    _input_pendiente.textContent = credito_[credito_.length - 1].saldo_total
+function saldoPendiente(credito_, _input_efectivo, _input_tarjeta, _input_pendiente, devolucion_){
+    _input_pendiente.textContent = (credito_[credito_.length - 1].saldo_total - devolucion_).toFixed(2)
     _input_efectivo.addEventListener("keyup", ()=>{
-        _input_pendiente.textContent = credito_[credito_.length - 1].saldo_total - 
-                                (Number(_input_efectivo.value) + Number(_input_tarjeta.value ))
+        _input_pendiente.textContent = (credito_[credito_.length - 1].saldo_total - 
+                                ((Number(_input_efectivo.value) + Number(_input_tarjeta.value ))+
+                                devolucion_)).toFixed(2)
         _input_pendiente.style.background = _input_pendiente.textContent >= 0 ? "" : "var(--fondo-marca-uno)";
     })
     _input_tarjeta.addEventListener("keyup", ()=>{
-        _input_pendiente.textContent = credito_[credito_.length - 1].saldo_total - 
-                                (Number(_input_tarjeta.value) + Number(_input_efectivo.value ))
+        _input_pendiente.textContent = (credito_[credito_.length - 1].saldo_total - 
+                                ((Number(_input_tarjeta.value) + Number(_input_efectivo.value ))+
+                                devolucion_)).toFixed(2)
         _input_pendiente.style.background = _input_pendiente.textContent >= 0 ? "" : "var(--fondo-marca-uno)";
     })
 }
-function declararPerdida(credito_, _input_efectivo, _input_tarjeta, _input_pendiente, _input_perdida){
+function declararPerdida(credito_, _input_efectivo, _input_tarjeta, _input_pendiente, _input_perdida, devolucion_){
     document.querySelector("#check_perdida").addEventListener("click", ()=>{
         _input_efectivo.value = ""
         _input_tarjeta.value = ""
-        _input_pendiente.textContent = credito_[credito_.length - 1].saldo_total
+        _input_pendiente.style.background = "";
+        _input_pendiente.textContent = (credito_[credito_.length - 1].saldo_total - devolucion_).toFixed(2)
         if(document.querySelector("#check_perdida").checked){
             _input_efectivo.setAttribute("disabled", "true")
             _input_tarjeta.setAttribute("disabled", "true")
-            _input_pendiente.setAttribute("disabled", "true")
             _input_perdida.value = _input_pendiente.textContent
         }else{
             _input_efectivo.removeAttribute("disabled")
             _input_tarjeta.removeAttribute("disabled")
-            _input_pendiente.removeAttribute("disabled")
             _input_perdida.value = ""
         }
     })
 }
-function tabla_creditos(nombre){
+function tabla_creditos(nombre, devolucion_){
     let html = `<div id="form_accion_rapida" class="nuevo-contenedor-box">
                     <h2 style="text-align: center;">Cliente: ${nombre}</h2>
-                    <div style="display: flex; justify-content: center;">
-                        <select name="fffff-sucursal" id="fffff-sucursal" class="input-select-ventas">
-                        </select>
-                    </div>
+                    
                     <div class="contenedor_tabla_salidas">
                     `;
                 html += `<table class="tabla-proforma" id="tabla_credito">
@@ -613,6 +565,9 @@ function tabla_creditos(nombre){
                             <label class="label-general" style="border: 1px solid var(--fondo-marca-uno); padding-left: 3px">Saldo adeudado
                                 <span style="width: 100px; text-align: center; background: var(--fondo-marca-uno);" >${moneda()} ${credito_.length>0 ?(credito_[credito_.length - 1].saldo_total).toFixed(2): ""}</span>
                             </label>
+                            <label class="label-general" style="border: 1px solid rgb(113, 89, 142); padding-left: 3px">Devolución
+                                <span style="width: 100px; text-align: center; background: rgb(113, 89, 142);" >${moneda()} ${devolucion_}</span>
+                            </label>
                         </div>
                         <div style="display: grid; justify-items: center;">
                             <label class="label-general">Pago en efectivo</label>
@@ -653,33 +608,36 @@ async function procesarPagoCredito(array_cre, tipo_comprobante, id_det_ventas){
         let tarjeta = Number(document.getElementById("accion_tarjeta").value)
         let perdida = Number(document.getElementById("accion_perdida").value)
         let tasa = 1 + array_cre[array_cre.length - 1].tasa / 100
-        let credito = {
-            "sucursal_cre": document.getElementById("fffff-sucursal").value,
-            "id_detalle": id_det_ventas,
-            "efectivo": (efectivo).toFixed(2),
-            "tarjeta": (tarjeta).toFixed(2),
-            "tasa": array_cre[array_cre.length - 1].tasa,
-            "a_monto": ((efectivo + tarjeta)/tasa).toFixed(2),
-            "a_interes": ((efectivo + tarjeta) - (efectivo + tarjeta)/tasa).toFixed(2),
-            "saldo_monto": (array_cre[array_cre.length - 1].saldo_monto - (efectivo + tarjeta)/tasa).toFixed(2),
-            "saldo_interes": (array_cre[array_cre.length - 1].saldo_interes - ((efectivo + tarjeta) - (efectivo + tarjeta)/tasa)).toFixed(2),
-            "saldo_total": ((array_cre[array_cre.length - 1].saldo_monto - (efectivo + tarjeta)/tasa) + 
-                            (array_cre[array_cre.length - 1].saldo_interes - ((efectivo + tarjeta) - (efectivo + tarjeta)/tasa))-
-                            perdida).toFixed(2),
-            "saldo_perdida":(perdida).toFixed(2),
-            "fecha_cre": generarFecha()
+        let suc__ = suc_db.find(x=> x.sucursal_nombre === array_cre[0].sucursal_nombre)
+        function Credito(){
+            this.sucursal_cre = suc__.id_sucursales;
+            this.id_detalle = id_det_ventas;
+            this.efectivo = parseFloat((efectivo).toFixed(2));
+            this.tarjeta = parseFloat((tarjeta).toFixed(2));
+            this.tasa = array_cre[array_cre.length - 1].tasa;
+            this.a_monto = parseFloat(((efectivo + tarjeta)/tasa).toFixed(2));
+            this.a_interes = parseFloat(((efectivo + tarjeta) - (efectivo + tarjeta)/tasa).toFixed(2));
+            this.saldo_monto = parseFloat((array_cre[array_cre.length - 1].saldo_monto - (efectivo + tarjeta)/tasa).toFixed(2));
+            this.saldo_interes = parseFloat((array_cre[array_cre.length - 1].saldo_interes - ((efectivo + tarjeta) - (efectivo + tarjeta)/tasa)).toFixed(2));
+            this.saldo_total = parseFloat(((array_cre[array_cre.length - 1].saldo_monto - (efectivo + tarjeta)/tasa) + 
+                                (array_cre[array_cre.length - 1].saldo_interes - ((efectivo + tarjeta) - (efectivo + tarjeta)/tasa))-
+                                perdida).toFixed(2));
+            this.saldo_perdida = parseFloat((perdida).toFixed(2));
+            this.fecha_cre = generarFecha();
+            this.situacion = this.saldo_perdida > 0 ? "pérdida" : this.saldo_total > 0 ? "pendiente" : "liquidado";
         }
-
+        let credito = new Credito()
+        
         let urlCredito = URL_API_almacen_central + 'operar_creditos'
-        let responde_credito = await funcionFetch(urlCredito, credito)
-        if(responde_credito.ok){
-            console.log("Respuesta creditos "+responde_credito.status)
+        let responde_credito = await funcionFetchDos(urlCredito, credito)
+        if(responde_credito.status === "success"){
+            console.log("Respuesta creditos "+responde_credito.message)
             manejoDeFechas()
             await conteoFilas(subRutaA(1), filas_total_bd, indice_tabla, 
                             document.getElementById("numeracionTablaVentas"), 20)
             await searchDatos(subRutaB((document.getElementById("numeracionTablaVentas").value - 1) * 20, 1), 
                             base_datos, "#tabla-detalle-ventas")
-            modal_proceso_abrir(`Operación completada exitosamente (${tipo_comprobante}).`, "")
+            modal_proceso_abrir(`${responde_credito.message}`, "")
             modal_proceso_salir_botones()
             document.getElementById("form_accion_rapida").remove()
             document.getElementById("acciones_creditos").classList.remove("modal-show-credito")
@@ -693,28 +651,23 @@ async function procesarPagoCredito(array_cre, tipo_comprobante, id_det_ventas){
     }
 }
 async function revertirUltimoPago(array_cre){
-    let respuesta = confirm(`Eliminar esta fila podría generar conflictos en el stock de este producto, `+
-                            `¿Desea continuar?.`)
-    if (respuesta && array_cre.length > 1) {
-        let url = URL_API_almacen_central + `creditos/${array_cre[array_cre.length - 1].id_creditos}`
-        let response = await fetch(url, {
-                                            "method": 'DELETE',
-                                            "headers": {
-                                                "Content-Type": 'application/json'
-                                                }
-                                        })
-        if(response.ok){
+    if (array_cre.length > 1) {
+        let url = URL_API_almacen_central + 'creditos_remove'
+        let data = {
+            'id_creditos': array_cre[array_cre.length - 1].id_creditos
+        };
+        let response = await funcionFetchDos(url, data);
+        if(response.status === "success"){
             manejoDeFechas()
             await conteoFilas(subRutaA(1), filas_total_bd, indice_tabla, 
-                            document.getElementById("numeracionTablaVentas"), 20)
+                                document.getElementById("numeracionTablaVentas"), 20)
             await searchDatos(subRutaB((document.getElementById("numeracionTablaVentas").value - 1) * 20, 1), 
-                            base_datos, "#tabla-detalle-ventas")
-
-            modal_proceso_abrir("Operación completada exitosamente.", "")
+                                base_datos, "#tabla-detalle-ventas")
+            modal_proceso_abrir(`${response.message}.`)
             modal_proceso_salir_botones()
             document.getElementById("form_accion_rapida").remove()
             document.getElementById("acciones_creditos").classList.remove("modal-show-credito")
-        }
+        };
     };
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////

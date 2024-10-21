@@ -118,20 +118,19 @@ reiniciarConfig.addEventListener("click", (e)=>{
     agregarItem()
 })
 async function removeCategorias(id) {
-    respuesta = confirm(`Eliminar esta categoría borrará todos los productos que la contengan, ¿Desea continuar?.`)
-    if (respuesta) {
-        let url = URL_API_almacen_central + 'categorias/' + id
-        await fetch(url,{
-            "method": "DELETE",
-            "headers": {
-                "Content-Type": 'application/json'
-            }
-        })
+    manejoDeFechas();
+    let url = URL_API_almacen_central + 'categorias_remove'
+    let data = {
+        'id': id,
+    };
+    let response = await funcionFetchDos(url, data);
+    if(response.status === "success"){
         await conteoFilas(subRutaA(), filas_total_bd, indice_tabla, 
                         document.getElementById("numeracionTablaCategorias"), 10)
         await searchDatos(subRutaB(num_filas_tabla.value), base_datos,"#tabla-categorias")
         localStorage.setItem("categoria_consulta", JSON.stringify(await cargarDatos('categorias')))
-
+        modal_proceso_abrir(`${response.message}`)
+        modal_proceso_salir_botones()
     };
 };
 const registrarCategoria = document.getElementById("registrar-categoria");

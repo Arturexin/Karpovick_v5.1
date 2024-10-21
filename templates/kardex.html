@@ -4,7 +4,7 @@
 <div class="kardex-form baja_opacidad">
     <div class="contenedor_compras">
         <div>
-            <select name="fffff-sucursal" id="fffff-sucursal" class="input-select-ventas">
+            <select name="fffff-sucursal" id="fffff-sucursal" class="input-select-ventas boton-cli">
             </select>
             <div class="contenedor_formulario_compras" id="form_contenedor"></div>
             <div  class="boton-cli" id="button_contenedor"></div>
@@ -12,57 +12,9 @@
 
         <div class="grafico_interno">
             <div class="titulo_graficos_dos">
-                <div><h3>Ventas Mensuales</h3></div>
-                <div>Mayor venta </p><span style="display: flex; gap: 5px;"><p id="mayor_venta" style="font-weight: bold;"></p><span class="material-symbols-outlined" style="color: var(--boton-tres);">expand_less</span></span><p class="mes_max" style="font-size: 10px;color: #9b9b9b;"></p></div>
-                <div>Menor venta </p><span style="display: flex; gap: 5px;"><p id="menor_venta" style="font-weight: bold;"></p><span class="material-symbols-outlined" style="color: var(--boton-dos);">expand_more</span></span><p class="mes_min" style="font-size: 10px;color: #9b9b9b;"></p></div>
-                <div>Venta promedio <span style="display: flex; gap: 5px;"><p id="promedio_venta" style="font-weight: bold;"></p><span class="material-symbols-outlined" style="color: var(--boton-uno);">vital_signs</span></span></div>
+                <div><h3>Movimiento de unidades</h3></div>
             </div>  
-            <div class="etiquetas_graficos_colores">
-                <div>
-                    <div class="color_total_venta"></div>
-                    <span class="descripcion_item_grafico">Total Venta</span>
-                </div>
-                <div>
-                    <div class="color_total_costo"></div>
-                    <span class="descripcion_item_grafico">Costo de Venta</span>
-                </div>
-            </div>
-            <div class="grafico_compras">
-                <grafico-eje_y e_0="eje_y_numeracion"></grafico-eje_y>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g" c_1="" c_2="cg_1_c" c_3="" c_4="cg_2_c" c_5="" s_1="" s_2="sg_1_c" s_3="" s_4="sg_2_c" s_5=""></barra-grafico_vertical>
-            </div>
-            <br>
-            <div style="display: flex; gap: 10px; justify-content: center;">
-                <div style="border: 1px solid var(--boton-dos);border-radius: 7px;">
-                    <label>Margen de beneficios real<h4 id="kardex_margen"></h4></label>
-                    <label>Margen de beneficios esperado <h4 id="kardex_margen_esperado"></h4></label>
-                </div>
-                <div style="display: flex; gap: 10px; justify-content: center;border: 1px solid var(--boton-dos);border-radius: 7px;">
-
-                    <div>
-                        <label>Número de ventas <h4 id="kardex_num"></h4></label>
-                        <label>Total monto de venta <h4 id="kardex_venta"></label>
-                    </div>
-                    <div>
-                        <label>% Categoría <h4 id="kardex_num_categoria"></h4></label>
-                        <label>% Categoría <h4 id="kardex_venta_categoria"></label>
-                    </div>
-                    <div>
-                        <label>% Sucursal <h4 id="kardex_num_sucursal"></h4></label>
-                        <label>% Sucursal <h4 id="kardex_venta_sucursal"></label>
-                    </div>
-                </div>
+            <div id="contenedor_grafico_kardex" class="gradico_anual">
             </div>
         </div>
     </div>        
@@ -107,7 +59,7 @@
         </table>
     </div>
 
-    <div class="contenedor_compras">
+    <div class="contenedor_compras_principal">
         <div>
             <h2 style="text-align: center;">Lista de Entradas</h2>
             <div class="contenedor-codigo-barras">
@@ -206,6 +158,9 @@
         </div>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script src="../static/kardex.js"></script>
 <script src="../static/form.js"></script>
+<script src="../static/graficos.js"></script>
 {% endblock %}

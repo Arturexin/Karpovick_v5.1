@@ -92,13 +92,6 @@ def getCreditoReporteDos():
 @aperturar_creditos_post.route('/api/aperturar_creditos', methods=['POST'])
 @cross_origin()
 @login_required
-def saveCreditos():
-    if 'id_creditos' in request.json:
-        editCreditos()
-    else:
-        createCreditos()
-    return "ok"
-
 def createCreditos():
     try:
         usuarioLlave = session.get('usernameDos')
@@ -129,22 +122,6 @@ def createCreditos():
         mysql.connection.rollback()
         return jsonify({"status": "error", "message": str(e)})
 
-def editCreditos():
-    try:
-        usuarioLlave = session.get('usernameDos')
-        with mysql.connection.cursor() as cur:
-            query = ("UPDATE `ventas` SET `efectivo` = %s, `tarjeta` = %s, `tasa` = %s, `a_monto` = %s, `a_interes` = %s, `saldo_monto` = %s, `saldo_interes` = %s, `saldo_total` = %s, `saldo_perdida` = %s "
-                     "WHERE `ventas`.`id_creditos` = %s "
-                     "AND identificador_ventas = %s ")
-            data = (request.json['modo_efectivo'], request.json['modo_credito'], request.json['modo_tarjeta'], request.json['modo_perdida'], 
-                    request.json['total_venta'], request.json['saldo_perdida'], request.json['id_det_ventas'], usuarioLlave)
-            cur.execute(query, data)
-            mysql.connection.commit()
-        return jsonify({"status": "success", "message": "Crédito editado correctamente."})
-    except Exception as e:
-        mysql.connection.rollback()
-        return jsonify({"status": "error", "message": str(e)})
-    
 @credito_operar_creditos.route('/api/operar_creditos', methods=['POST'])
 @cross_origin()
 @login_required
@@ -153,30 +130,52 @@ def operarCreditos():
         dato_uno = 1
         usuarioLlave = session.get('usernameDos')
         usuarioId = session.get('identificacion_usuario')
+        situacion = request.json['situacion']
+
+        if situacion not in ["liquidado", "pendiente", "pérdida"]:
+            return jsonify({"status": "error", "message": f"Situación no válida: {situacion}"}), 400
 
         with mysql.connection.cursor() as cur:
             query = ("INSERT INTO `creditos` (`id_creditos`, `sucursal_cre`, `id_detalle`, `efectivo`, `tarjeta`, `tasa`, `a_monto`, `a_interes`, "
                      "`saldo_monto`, `saldo_interes`, `saldo_total`, `saldo_perdida`, `fecha_cre`, `id_usuario`, `identificador_cre`, `estado`) "
                      "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
-            data = (request.json['sucursal_cre'], request.json['id_detalle'], request.json['efectivo'], request.json['tarjeta'], request.json['tasa'], 
-                    request.json['a_monto'], request.json['a_interes'], request.json['saldo_monto'], request.json['saldo_interes'], 
-                    request.json['saldo_total'], request.json['saldo_perdida'], request.json['fecha_cre'], usuarioId, usuarioLlave, dato_uno)
+            data = (
+                request.json['sucursal_cre'], request.json['id_detalle'], request.json['efectivo'], request.json['tarjeta'], request.json['tasa'],
+                request.json['a_monto'], request.json['a_interes'], request.json['saldo_monto'], request.json['saldo_interes'],
+                request.json['saldo_total'], request.json['saldo_perdida'], request.json['fecha_cre'], usuarioId, usuarioLlave, dato_uno
+            )
             cur.execute(query, data)
+            
+            query_detalle = ("UPDATE `ventas` SET `situacion` = %s "
+                             "WHERE `ventas`.`id_det_ventas` = %s "
+                             "AND ventas.estado > 0 "
+                             "AND identificador_ventas = %s")
+            data_detalle = (request.json['situacion'], request.json['id_detalle'], usuarioLlave)
+            cur.execute(query_detalle, data_detalle)
+            
             mysql.connection.commit()
+        
         return jsonify({"status": "success", "message": "Crédito operado correctamente."})
+
     except Exception as e:
         mysql.connection.rollback()
         return jsonify({"status": "error", "message": str(e)})
-    
-@creditos_delete.route('/api/creditos/<int:id_cre>', methods=['DELETE'])
+
+@creditos_delete.route('/api/creditos_remove', methods=['POST'])
 @cross_origin()
 @login_required
-def removeCreditos(id_cre):
+def removeCreditos():
     try:
+        dato_cero = 0
+        usuarioLlave = session.get('usernameDos')
         with mysql.connection.cursor() as cur:
-            query = "DELETE FROM creditos WHERE `creditos`.`id_creditos` = %s"
-            cur.execute(query, (id_cre,))
+            query = ("UPDATE `creditos` SET `estado` = %s "
+                     "WHERE `creditos`.`id_creditos` = %s "
+                     "AND identificador_cre = %s")
+            data = (dato_cero, request.json['id_creditos'], usuarioLlave)
+            cur.execute(query, data)
             mysql.connection.commit()
-        return "Fila eliminada."
+        
+        return jsonify({"status": "success", "message": "Pago eliminado correctamente."})
     except Exception as e:
-        return jsonify({'error': str(e)}), 500  
+        return jsonify({'error': str(e)}), 500

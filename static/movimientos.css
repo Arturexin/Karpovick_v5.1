@@ -6,20 +6,15 @@
 }
 .contenedor_compras{
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 40% 60%;
     justify-items: center;
-    background: linear-gradient(45deg, var(--fondo-principal), var(--fondo-quinto));
     width: 1100px;
-    border-radius: 14px;
     align-content: space-around;
     padding: 20px 0;
+    background: linear-gradient(45deg, var(--fondo-principal), var(--fondo-quinto));
+    border-radius: 14px;
 }
-.titulo_graficos{
-    display: flex;
-    justify-content: space-around;
-    text-align: center;
-    margin-bottom: 30px;
-}
+
 .etiquetas_graficos_colores{
     display: flex;
     justify-content: space-around;

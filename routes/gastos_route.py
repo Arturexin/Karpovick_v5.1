@@ -153,7 +153,6 @@ def getSumaGastosPorMes():
 
         with mysql.connection.cursor() as cur:
             query = ("SELECT sucursal_gastos, "
-                     "SUM(CASE WHEN concepto LIKE %s THEN (monto + caja_bancos) ELSE 0 END) AS _mercancía, "
                      "SUM(CASE WHEN concepto LIKE %s THEN (monto + caja_bancos) ELSE 0 END) AS _nomina, "
                      "SUM(CASE WHEN concepto LIKE %s THEN (monto + caja_bancos) ELSE 0 END) AS _seguridad_social, "
                      "SUM(CASE WHEN concepto LIKE %s THEN (monto + caja_bancos) ELSE 0 END) AS _proveedores, "
@@ -164,14 +163,13 @@ def getSumaGastosPorMes():
                      "SUM(CASE WHEN concepto LIKE %s THEN (monto + caja_bancos) ELSE 0 END) AS _publicidad, "
                      "SUM(CASE WHEN concepto LIKE %s THEN (monto + caja_bancos) ELSE 0 END) AS _pago_prestamos, "
                      "SUM(CASE WHEN concepto LIKE %s THEN (monto + caja_bancos) ELSE 0 END) AS _depositos, "
-                     "SUM(CASE WHEN concepto LIKE %s THEN (monto + caja_bancos) ELSE 0 END) AS _otros, "
-                     "SUM(CASE WHEN concepto LIKE %s THEN (monto + caja_bancos) ELSE 0 END) AS devoluciones "
+                     "SUM(CASE WHEN concepto LIKE %s THEN (monto + caja_bancos) ELSE 0 END) AS _otros "
                      "FROM gastos_varios "
                      "WHERE `identificador_gastos` = %s "
                      "AND gastos_varios.estado > 0 "
                      "AND YEAR(fecha_gastos) = %s "
                      "GROUP BY sucursal_gastos")
-            data_params = ('1_%', '2_%', '3_%', '4_%', '5_%', '6_%', '7_%', '8_%', '9_%', '12_%', '13_%', '14_%', 'Dev%', usuarioLlave, year_actual)
+            data_params = ('2_%', '3_%', '4_%', '5_%', '6_%', '7_%', '8_%', '9_%', '12_%', '13_%', '14_%', usuarioLlave, year_actual)
             cur.execute(query, data_params)
             data = cur.fetchall()
 
@@ -179,19 +177,17 @@ def getSumaGastosPorMes():
         for fila in data:
             contenido = { 
                         'sucursal_gastos': fila[0],
-                        '_mercancía': fila[1],
-                        '_nomina': fila[2],
-                        '_seguridad_social': fila[3],
-                        '_proveedores': fila[4],
-                        '_impuestos': fila[5],
-                        '_servicios': fila[6],
-                        '_alquiler': fila[7],
-                        '_mantenimientos': fila[8],
-                        '_publicidad': fila[9],
-                        '_pago_prestamos': fila[10],
-                        '_depositos': fila[11],
-                        '_otros': fila[12],
-                        'devoluciones': fila[13]
+                        '_nomina': fila[1],
+                        '_seguridad_social': fila[2],
+                        '_proveedores': fila[3],
+                        '_impuestos': fila[4],
+                        '_servicios': fila[5],
+                        '_alquiler': fila[6],
+                        '_mantenimientos': fila[7],
+                        '_publicidad': fila[8],
+                        '_pago_prestamos': fila[9],
+                        '_depositos': fila[10],
+                        '_otros': fila[11]
                         }
             resultado.append(contenido)
         return jsonify(resultado)

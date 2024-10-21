@@ -8,8 +8,6 @@ from db_connection import mysql
 perdidas_conteo = Blueprint('perdidas_conteo', __name__)
 perdidas_tabla = Blueprint('perdidas_tabla', __name__)
 perdidas_kardex_id = Blueprint('perdidas_kardex_id', __name__)
-perdidas_suma_total = Blueprint('perdidas_suma_total', __name__)
-perdidas_suma_total_pasado = Blueprint('perdidas_suma_total_pasado', __name__)
 perdidas_perdida_post = Blueprint('perdidas_perdida_post', __name__)
 
 
@@ -136,75 +134,13 @@ def getPerdidasCodigoKardex(id_producto):
                 'existencias': fila[0],
                 'comprobante':fila[1],
                 'costo_unitario': fila[2],
-                'fecha': fila[3].strftime('%d-%m-%Y')
+                'fecha': fila[3]
                 }
             resultado.append(contenido)
         return jsonify(resultado)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-       
-@perdidas_suma_total.route('/api/perdidas_suma_total')#HOME
-@cross_origin()
-@login_required
-def getSumaTotalPerdidas():
-    try:
-        usuarioLlave = session.get('usernameDos')
-        year_actual = request.args.get('year_actual')
 
-        with mysql.connection.cursor() as cur:
-            query = ("SELECT suc_perdidas AS sucursal, "
-                    "SUM(cantidad * costo_unitario) AS sumar_perdidas "
-                    "FROM perdidas "
-                    "JOIN almacen_central ON `perdidas`.`id_productos` = `almacen_central`.`idProd` "
-                    "WHERE `identificador_per` = %s "
-                    "AND perdidas.estado > 0 "
-                    "AND YEAR(fecha_perdidas) = %s "
-                    "GROUP BY suc_perdidas")
-            data_params = (usuarioLlave, year_actual)
-            cur.execute(query, data_params)
-            data = cur.fetchall()
-        resultado = []
-        for fila in data:
-            contenido = { 
-                'sucursal': fila[0],
-                'sumar_perdidas': fila[1]
-                }
-            resultado.append(contenido)
-        return jsonify(resultado)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500 
-       
-@perdidas_suma_total_pasado.route('/api/perdidas_suma_total_anio_pasado')#HOME
-@cross_origin()
-@login_required
-def getSumaTotalPerdidasAnioPasado():
-    try:
-        usuarioLlave = session.get('usernameDos')
-        year_actual = request.args.get('year_actual')
-
-        with mysql.connection.cursor() as cur:
-            query = ("SELECT suc_perdidas AS sucursal, "
-                    "SUM(cantidad * costo_unitario) AS sumar_perdidas "
-                    "FROM perdidas "
-                    "JOIN almacen_central ON `perdidas`.`id_productos` = `almacen_central`.`idProd` "
-                    "WHERE `identificador_per` = %s "
-                    "AND perdidas.estado > 0 "
-                    "AND YEAR(fecha_perdidas) < %s "
-                    "GROUP BY suc_perdidas")
-            data_params = (usuarioLlave, year_actual)
-            cur.execute(query, data_params)
-            data = cur.fetchall()
-        resultado = []
-        for fila in data:
-            contenido = { 
-                'sucursal': fila[0],
-                'sumar_perdidas': fila[1]
-                }
-            resultado.append(contenido)
-        return jsonify(resultado)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500 
-    
 @perdidas_perdida_post.route('/api/procesar_perdida', methods=['POST'])##Perdidas
 @cross_origin()
 @login_required

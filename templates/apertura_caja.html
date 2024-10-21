@@ -68,6 +68,21 @@
             <button class="myButtonAgregar btn_apertura_caja">Aperturar Caja</button>
             <button class="myButtonEliminar btn_cerrar_caja">Cerrar Caja</button>
         </div>
+        <div class="contenedor_apertura_caja_interno">
+            <div class="contenedor_titulo_flecha">
+                <p class="titulo_apertura_caja"></p>
+                <div class="tooltip_ayuda">
+                    <span class="flecha_apertura_caja material-symbols-outlined">arrow_circle_right</span>
+                    <span class="tooltiptext_ayuda">Estado de la caja.</span>
+                </div>
+            </div>
+            <label>Saldo de apertura<input type="text" class="saldo_apertura_caja" value="0"></label>
+            <label>Ingresos<input type="text" class="ingresos_caja_ventas" disabled value="0"></label>
+            <label>Egresos<input type="text" class="egresos_caja_gastos" disabled value="0"></label>
+            <label>Saldo de cierre<input type="text" class="saldo_cierre_caja" disabled value="0"></label>
+            <button class="myButtonAgregar btn_apertura_caja">Aperturar Caja</button>
+            <button class="myButtonEliminar btn_cerrar_caja">Cerrar Caja</button>
+        </div>
     </div>
     <div class="contenedor_kardex">
         <table id="tabla-caja" class="tabla-proforma">

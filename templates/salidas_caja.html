@@ -7,99 +7,41 @@
         <button id="entradas-caja" class="myButtonAgregarDos">Entradas de Caja</button>
         <button id="salidas-caja" class="myButtonAgregarDos marcaBoton">Salidas de Caja</button>
     </div>
-    <div style="display: flex; width: 1100px; justify-content: space-around;">
-        <div id="circulo_total_deposito" class="modelo_circulo_sucursal">
-            <div class="cirulo_interior_margen">
-                <span>Depósitos</span>
-                <h4 class="valor_circulo_deposito"></h4>
-                <h4 class="porcentaje_circulo_deposito"></h4>
-            </div>
+    <!-- <div style="display: flex; width: 1100px; justify-content: space-around;">
+        <div class="modelo_circulo_sucursal">
+            <canvas id="circulo_total_deposito"></canvas>
         </div>
-        <div id="circulo_total_personal" class="modelo_circulo_sucursal">
-            <div class="cirulo_interior_margen">
-                <span>Personal</span>
-                <h4 class="valor_circulo_personal"></h4>
-                <h4 class="porcentaje_circulo_personal"></h4>
-            </div>
+        <div class="modelo_circulo_sucursal">
+            <canvas id="circulo_total_personal"></canvas>
         </div>
-        <div id="circulo_total_alquiler" class="modelo_circulo_sucursal">
-            <div class="cirulo_interior_margen">
-                <span>Alquiler</span>
-                <h4 class="valor_circulo_alquiler"></h4>
-                <h4 class="porcentaje_circulo_alquiler"></h4>
-            </div>
+        <div class="modelo_circulo_sucursal">
+            <canvas id="circulo_total_alquiler"></canvas>
         </div>
-        <div id="circulo_total_servicios" class="modelo_circulo_sucursal">
-            <div class="cirulo_interior_margen">
-                <span>Servicios</span>
-                <h4 class="valor_circulo_servicios"></h4>
-                <h4 class="porcentaje_circulo_servicios"></h4>
-            </div>
+        <div class="modelo_circulo_sucursal">
+            <canvas id="circulo_total_servicios"></canvas>
         </div>
-        <div id="circulo_total_insumos" class="modelo_circulo_sucursal">
-            <div class="cirulo_interior_margen">
-                <span>Insumos</span>
-                <h4 class="valor_circulo_insumos"></h4>
-                <h4 class="porcentaje_circulo_insumos"></h4>
-            </div>
+        <div class="modelo_circulo_sucursal">
+            <canvas id="circulo_total_insumos"></canvas>
         </div>
-        <div id="circulo_total_devoluciones" class="modelo_circulo_sucursal">
-            <div class="cirulo_interior_margen">
-                <span>Devoluciones</span>
-                <h4 class="valor_circulo_devoluciones"></h4>
-                <h4 class="porcentaje_circulo_devoluciones"></h4>
-            </div>
+        <div class="modelo_circulo_sucursal">
+            <canvas id="circulo_total_seguridad_social"></canvas>
         </div>
-        <div id="circulo_total_mercancias" class="modelo_circulo_sucursal">
-            <div class="cirulo_interior_margen">
-                <span>Mercancias</span>
-                <h4 class="valor_circulo_mercancias"></h4>
-                <h4 class="porcentaje_circulo_mercancias"></h4>
-            </div>
+        <div class="modelo_circulo_sucursal">
+            <canvas id="circulo_total_impuestos"></canvas>
         </div>
-        <div id="circulo_total_seguridad_social" class="modelo_circulo_sucursal">
-            <div class="cirulo_interior_margen">
-                <span>Seg soc</span>
-                <h4 class="valor_circulo_seguridad_social"></h4>
-                <h4 class="porcentaje_circulo_seguridad_social"></h4>
-            </div>
+        <div class="modelo_circulo_sucursal">
+            <canvas id="circulo_total_mantenimiento"></canvas>
         </div>
-        <div id="circulo_total_impuestos" class="modelo_circulo_sucursal">
-            <div class="cirulo_interior_margen">
-                <span>Impuestos</span>
-                <h4 class="valor_circulo_impuestos"></h4>
-                <h4 class="porcentaje_circulo_impuestos"></h4>
-            </div>
+        <div class="modelo_circulo_sucursal">
+            <canvas id="circulo_total_publicidad"></canvas>
         </div>
-        <div id="circulo_total_mantenimiento" class="modelo_circulo_sucursal">
-            <div class="cirulo_interior_margen">
-                <span>Mantenimiento</span>
-                <h4 class="valor_circulo_mantenimiento"></h4>
-                <h4 class="porcentaje_circulo_mantenimiento"></h4>
-            </div>
+        <div class="modelo_circulo_sucursal">
+            <canvas id="circulo_total_prestamos"></canvas>
         </div>
-        <div id="circulo_total_publicidad" class="modelo_circulo_sucursal">
-            <div class="cirulo_interior_margen">
-                <span>Publicidad</span>
-                <h4 class="valor_circulo_publicidad"></h4>
-                <h4 class="porcentaje_circulo_publicidad"></h4>
-            </div>
+        <div class="modelo_circulo_sucursal">
+            <canvas id="circulo_total_otros"></canvas>
         </div>
-        <div id="circulo_total_prestamos" class="modelo_circulo_sucursal">
-            <div class="cirulo_interior_margen">
-                <span>Prestamoss</span>
-                <h4 class="valor_circulo_prestamos"></h4>
-                <h4 class="porcentaje_circulo_prestamos"></h4>
-            </div>
-        </div>
-        <div id="circulo_total_otros" class="modelo_circulo_sucursal">
-            <div class="cirulo_interior_margen">
-                <span>Otros Gastos</span>
-                <h4 class="valor_circulo_otros"></h4>
-                <h4 class="porcentaje_circulo_otros"></h4>
-            </div>
-        </div>
-    </div>
+    </div> -->
     <div class="contenedor_kardex_analisis">
         <form id="formulario-gastos-varios" class="contenedor_kardex" style="margin: 10px;">
             <h2>Salidas de efectivo</h2>
@@ -148,44 +90,12 @@
             </div>
         </form>
         <div class="grafico_interno">
-            <div class="titulo_graficos"><h2>Gráfico de salidas de efectivo por sucursal</h2></div>  
-            <div class="etiquetas_graficos_colores">
-                <div>
-                    <div class="color_item_grafico_sucursal"></div>
-                    <span class="descripcion_item_grafico_s"></span>
-                </div>
-                <div>
-                    <div class="color_item_grafico_sucursal"></div>
-                    <span class="descripcion_item_grafico_s"></span>
-                </div>
-                <div>
-                    <div class="color_item_grafico_sucursal"></div>
-                    <span class="descripcion_item_grafico_s"></span>
-                </div>
-                <div>
-                    <div class="color_item_grafico_sucursal"></div>
-                    <span class="descripcion_item_grafico_s"></span>
-                </div>
-                <div>
-                    <div class="color_item_grafico_sucursal"></div>
-                    <span class="descripcion_item_grafico_s"></span>
-                </div>
-            </div>
-            <div class="grafico_compras">
-                <grafico-eje_y e_0="eje_y_numeracion_s"></grafico-eje_y>
-                <barra-grafico_vertical l_0="f_l_g_s" c_1="cg_1_c_s" c_2="cg_2_c_s" c_3="cg_3_c_s" c_4="cg_4_c_s" c_5="" s_1="sg_1_c_s" s_2="sg_2_c_s" s_3="sg_3_c_s" s_4="sg_4_c_s" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g_s" c_1="cg_1_c_s" c_2="cg_2_c_s" c_3="cg_3_c_s" c_4="cg_4_c_s" c_5="" s_1="sg_1_c_s" s_2="sg_2_c_s" s_3="sg_3_c_s" s_4="sg_4_c_s" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g_s" c_1="cg_1_c_s" c_2="cg_2_c_s" c_3="cg_3_c_s" c_4="cg_4_c_s" c_5="" s_1="sg_1_c_s" s_2="sg_2_c_s" s_3="sg_3_c_s" s_4="sg_4_c_s" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g_s" c_1="cg_1_c_s" c_2="cg_2_c_s" c_3="cg_3_c_s" c_4="cg_4_c_s" c_5="" s_1="sg_1_c_s" s_2="sg_2_c_s" s_3="sg_3_c_s" s_4="sg_4_c_s" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g_s" c_1="cg_1_c_s" c_2="cg_2_c_s" c_3="cg_3_c_s" c_4="cg_4_c_s" c_5="" s_1="sg_1_c_s" s_2="sg_2_c_s" s_3="sg_3_c_s" s_4="sg_4_c_s" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g_s" c_1="cg_1_c_s" c_2="cg_2_c_s" c_3="cg_3_c_s" c_4="cg_4_c_s" c_5="" s_1="sg_1_c_s" s_2="sg_2_c_s" s_3="sg_3_c_s" s_4="sg_4_c_s" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g_s" c_1="cg_1_c_s" c_2="cg_2_c_s" c_3="cg_3_c_s" c_4="cg_4_c_s" c_5="" s_1="sg_1_c_s" s_2="sg_2_c_s" s_3="sg_3_c_s" s_4="sg_4_c_s" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g_s" c_1="cg_1_c_s" c_2="cg_2_c_s" c_3="cg_3_c_s" c_4="cg_4_c_s" c_5="" s_1="sg_1_c_s" s_2="sg_2_c_s" s_3="sg_3_c_s" s_4="sg_4_c_s" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g_s" c_1="cg_1_c_s" c_2="cg_2_c_s" c_3="cg_3_c_s" c_4="cg_4_c_s" c_5="" s_1="sg_1_c_s" s_2="sg_2_c_s" s_3="sg_3_c_s" s_4="sg_4_c_s" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g_s" c_1="cg_1_c_s" c_2="cg_2_c_s" c_3="cg_3_c_s" c_4="cg_4_c_s" c_5="" s_1="sg_1_c_s" s_2="sg_2_c_s" s_3="sg_3_c_s" s_4="sg_4_c_s" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g_s" c_1="cg_1_c_s" c_2="cg_2_c_s" c_3="cg_3_c_s" c_4="cg_4_c_s" c_5="" s_1="sg_1_c_s" s_2="sg_2_c_s" s_3="sg_3_c_s" s_4="sg_4_c_s" s_5=""></barra-grafico_vertical>
-                <barra-grafico_vertical l_0="f_l_g_s" c_1="cg_1_c_s" c_2="cg_2_c_s" c_3="cg_3_c_s" c_4="cg_4_c_s" c_5="" s_1="sg_1_c_s" s_2="sg_2_c_s" s_3="sg_3_c_s" s_4="sg_4_c_s" s_5=""></barra-grafico_vertical>
-            </div>
+            <div class="titulo_graficos">
+                <h2>Gráfico de salidas de efectivo por sucursal</h2>
+            </div>  
+            <section id="contenedor_gastos_mensuales_sucursal">
+                <canvas id="gastos_mensuales_sucursal" class="gradico_anual"></canvas>
+            </section>
         </div>
     </div>
     
@@ -253,7 +163,10 @@
     </div>
     
 </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 
 <script src="../static/salidas_caja.js"></script>
 <script src="../static/tablas.js"></script>
+<script src="../static/graficos.js"></script>
 {% endblock %}

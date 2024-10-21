@@ -322,7 +322,7 @@ caption {
     justify-items: center;
     width: 1100px;
     align-content: space-around;
-    /* padding: 20px 0; */
+    padding: 20px 0;
     gap: 10px;
     background: linear-gradient(45deg, var(--fondo-principal), var(--fondo-quinto));
     border-radius: 14px;
@@ -469,4 +469,39 @@ caption {
 .tooltip_ayuda:hover .tooltiptext_ayuda {
     visibility: visible;
     opacity: 1;
+}
+.titulo_graficos{
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+    margin-bottom: 10px;
+}
+.pestana-home{
+    display: flex;
+    width: 1100px;
+    max-width: 1100px;
+    justify-content: space-evenly;
+    margin: 10px auto 0px auto;
+    align-items: center;
+    border-radius: 14px;
+    gap: 10px;
+}
+
+
+
+.gradico_resumen{
+    height: 143px;
+    width: 255px;
+}
+.gradico_anual{
+    height: 260px;
+    width: 500px;
+}
+.gradico_circular{
+    height: 300px;
+    width: 300px;
+}
+.margen_sucursal_dos{
+    height: 90px;
+    width: 90px;
 }

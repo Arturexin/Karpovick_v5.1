@@ -7,7 +7,7 @@ function inicioGastosVarios(){
     cargarSucursalesEjecucion(document.getElementById("fffff-sucursal"))
     cargarDatosAnio()
     graficoBarras(anio_principal)
-    graficoDona(anio_principal)
+    /* graficoDonas(anio_principal) */
 };
 const barras_sucursales = [".cg_1_c_s", ".cg_2_c_s", ".cg_3_c_s", ".cg_4_c_s", ".cg_5_c_s"]
 function cargarDatosAnio(){
@@ -16,7 +16,7 @@ function cargarDatosAnio(){
         anio_principal = anio_referencia.value;
 
         graficoBarras(anio_principal)
-        graficoDona(anio_principal)
+        /* graficoDonas(anio_principal) */
         modal_proceso_abrir(`Datos del año ${anio_principal} cargados.`, "")
         modal_proceso_salir_botones()
     })
@@ -204,17 +204,7 @@ async function graficoBarras(anio){
     let arraySU = [];
     let arraySD = [];
     let arrayST = [];
-    let sumaMasAlto = 0;
-
-    document.querySelectorAll(".f_l_g_s").forEach((event, i)=>{
-        event.textContent = `${meses_letras[i]}${anio_principal % 100}`;
-    });
-    document.querySelectorAll(".color_item_grafico_sucursal").forEach((event, i)=>{
-        event.style.background = `${colorFondoBarra[i]}`
-        event.style.width = `20px`
-        event.style.height = `10px`
-        document.querySelectorAll(".descripcion_item_grafico_s")[i].textContent = array_sucursales[i]
-    });
+    let arraySC = [];
     for(let j = 0; j < 12; j++){
         arrayAC.push(0)
         arraySU.push(0)
@@ -227,29 +217,9 @@ async function graficoBarras(anio){
                 arraySD[j] = event.sd;
                 arrayST[j] = event.st;
             };
-            if(sumaMasAlto < event.ac){
-                sumaMasAlto = event.ac
-            };
-            if(sumaMasAlto < event.su){
-                sumaMasAlto = event.su
-            };
-            if(sumaMasAlto < event.sd){
-                sumaMasAlto = event.sd
-            };
-            if(sumaMasAlto < event.st){
-                sumaMasAlto = event.st
-            };
         });
     };
-    let masAltoDos = (226 * sumaMasAlto)/214;
-    document.querySelectorAll(".eje_y_numeracion_s").forEach((e)=>{
-        e.textContent = Number(masAltoDos).toFixed(2)
-        masAltoDos -= 0.20 * ((226 * sumaMasAlto)/214);
-    });
-    pintarGraficoPositivo(document.querySelectorAll(".cg_1_c_s"), arrayAC, sumaMasAlto, colorFondoBarra[0], document.querySelectorAll(".sg_1_c_s"), 4, moneda())
-    pintarGraficoPositivo(document.querySelectorAll(".cg_2_c_s"), arraySU, sumaMasAlto, colorFondoBarra[1], document.querySelectorAll(".sg_2_c_s"), 4, moneda())
-    pintarGraficoPositivo(document.querySelectorAll(".cg_3_c_s"), arraySD, sumaMasAlto, colorFondoBarra[2], document.querySelectorAll(".sg_3_c_s"), 4, moneda())
-    pintarGraficoPositivo(document.querySelectorAll(".cg_4_c_s"), arrayST, sumaMasAlto, colorFondoBarra[3], document.querySelectorAll(".sg_4_c_s"), 4, moneda())
+    graficoLineasVertical(document.getElementById("gastos_mensuales_sucursal"), arrayAC, arraySU, arraySD, arrayST, arraySC, mes_anio, suc_add);
 };
 function graficarDona(id,clase_valor_margen, clase_porcentaje_margen, numerador, denominador, valor_margen, porcentaje_margen, color_uno, color_dos) {
     
@@ -259,10 +229,9 @@ function graficarDona(id,clase_valor_margen, clase_porcentaje_margen, numerador,
     document.querySelector(clase_valor_margen).textContent = `${moneda()} ${(valor_margen).toFixed(2)}`
     document.querySelector(clase_porcentaje_margen).textContent = porcentaje_margen + "%"
 }
-async function graficoDona(anio){
+async function graficoDonas(anio){
     gastos_grafico_detallado = await cargarDatos(`gastos_suma_mes?`+
                                                 `year_actual=${anio}`)
-    let _mercancía = 0;
     let _nomina = 0;
     let _seguridad_social = 0;
     let _proveedores = 0;
@@ -274,11 +243,8 @@ async function graficoDona(anio){
     let _pago_prestamos = 0;
     let _depositos = 0;
     let _otros = 0;
-    let devoluciones = 0;
 
-    let total = 0;
     gastos_grafico_detallado.forEach((event)=>{
-        _mercancía += event._mercancía;
         _nomina += event._nomina;
         _seguridad_social += event._seguridad_social;
         _proveedores += event._proveedores;
@@ -290,10 +256,8 @@ async function graficoDona(anio){
         _pago_prestamos += event._pago_prestamos;
         _depositos += event._depositos;
         _otros += event._otros;
-        devoluciones += event.devoluciones;
     })
-    total = _mercancía + 
-            _nomina + 
+    total = _nomina + 
             _seguridad_social + 
             _proveedores + 
             _impuestos + 
@@ -303,10 +267,22 @@ async function graficoDona(anio){
             _publicidad + 
             _pago_prestamos + 
             _depositos + 
-            _otros + 
-            devoluciones
+            _otros 
+    console.log(_depositos)
+    graficoDonaDos(document.getElementById("circulo_total_deposito"), ['Depósito', 'Total'], [_depositos, total], colores_uno, colores_dos, true)
+    graficoDonaDos(document.getElementById("circulo_total_personal"), ['Personal', 'Total'], [_nomina, total], colores_uno, colores_dos, true)
+    graficoDonaDos(document.getElementById("circulo_total_alquiler"), ['Alquiler', 'Total'], [_alquiler, total], colores_uno, colores_dos, true)
+    graficoDonaDos(document.getElementById("circulo_total_servicios"), ['Servicios', 'Total'], [_servicios, total], colores_uno, colores_dos, true)
+    graficoDonaDos(document.getElementById("circulo_total_insumos"), ['Insumos', 'Total'], [_proveedores, total], colores_uno, colores_dos, true)
 
-    graficarDona("circulo_total_deposito", ".valor_circulo_deposito", ".porcentaje_circulo_deposito", _depositos, total, 
+    graficoDonaDos(document.getElementById("circulo_total_seguridad_social"), ['Seg. Social', 'Total'], [_seguridad_social, total], colores_uno, colores_dos, true)
+    graficoDonaDos(document.getElementById("circulo_total_impuestos"), ['Impuestos', 'Total'], [_impuestos, total], colores_uno, colores_dos, true)
+    graficoDonaDos(document.getElementById("circulo_total_mantenimiento"), ['Mantenimiento', 'Total'], [_mantenimientos, total], colores_uno, colores_dos, true)
+    graficoDonaDos(document.getElementById("circulo_total_publicidad"), ['Publicidad', 'Total'], [_publicidad, total], colores_uno, colores_dos, true)
+    graficoDonaDos(document.getElementById("circulo_total_prestamos"), ['Préstamos', 'Total'], [_pago_prestamos, total], colores_uno, colores_dos, true)
+    graficoDonaDos(document.getElementById("circulo_total_otros"), ['Otros', 'Total'], [_otros, total], colores_uno, colores_dos, true)
+
+    /* graficarDona("circulo_total_deposito", ".valor_circulo_deposito", ".porcentaje_circulo_deposito", _depositos, total, 
                 _depositos, (((_depositos/total)) * 100).toFixed(2), colorFondoBarra[0], '#fff0')
     graficarDona("circulo_total_personal", ".valor_circulo_personal", ".porcentaje_circulo_personal", _nomina, total, 
                 _nomina, (((_nomina/total)) * 100).toFixed(2), colorFondoBarra[0], '#fff0')
@@ -318,10 +294,6 @@ async function graficoDona(anio){
                 _proveedores, (((_proveedores/total)) * 100).toFixed(2), colorFondoBarra[0], '#fff0')
     graficarDona("circulo_total_otros", ".valor_circulo_otros", ".porcentaje_circulo_otros", _otros, total, 
                 _otros, (((_otros/total)) * 100).toFixed(2), colorFondoBarra[0], '#fff0')
-    graficarDona("circulo_total_devoluciones", ".valor_circulo_devoluciones", ".porcentaje_circulo_devoluciones", devoluciones, total, 
-                devoluciones, (((devoluciones/total)) * 100).toFixed(2), colorFondoBarra[0], '#fff0')
-    graficarDona("circulo_total_mercancias", ".valor_circulo_mercancias", ".porcentaje_circulo_mercancias", _mercancía, total, 
-                _mercancía, (((_mercancía/total)) * 100).toFixed(2), colorFondoBarra[0], '#fff0')
     graficarDona("circulo_total_seguridad_social", ".valor_circulo_seguridad_social", ".porcentaje_circulo_seguridad_social", _seguridad_social, total, 
                 _seguridad_social, (((_seguridad_social/total)) * 100).toFixed(2), colorFondoBarra[0], '#fff0')
     graficarDona("circulo_total_impuestos", ".valor_circulo_impuestos", ".porcentaje_circulo_impuestos", _impuestos, total, 
@@ -331,7 +303,7 @@ async function graficoDona(anio){
     graficarDona("circulo_total_publicidad", ".valor_circulo_publicidad", ".porcentaje_circulo_publicidad", _publicidad, total, 
                 _publicidad, (((_publicidad/total)) * 100).toFixed(2), colorFondoBarra[0], '#fff0')
     graficarDona("circulo_total_prestamos", ".valor_circulo_prestamos", ".porcentaje_circulo_prestamos", _pago_prestamos, total, 
-                _pago_prestamos, (((_pago_prestamos/total)) * 100).toFixed(2), colorFondoBarra[0], '#fff0')
+                _pago_prestamos, (((_pago_prestamos/total)) * 100).toFixed(2), colorFondoBarra[0], '#fff0') */
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 async function pagoMercancias(comprobante, creditos, tipo_comprobante){

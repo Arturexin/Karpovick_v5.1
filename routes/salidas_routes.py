@@ -9,22 +9,13 @@ salidas_conteo = Blueprint('salidas_conteo', __name__)
 salidas_tabla = Blueprint('salidas_tabla', __name__)
 salidas_tabla_reporte = Blueprint('salidas_tabla_reporte', __name__)
 salidas_suma_ventas_mes = Blueprint('salidas_suma_ventas_mes', __name__)
-salidas_suma_total_mes = Blueprint('salidas_suma_total_mes', __name__)
-salidas_suma_total_pasado = Blueprint('salidas_suma_total_pasado', __name__)
 salidas_suma_total_sucursal_mes = Blueprint('salidas_suma_total_sucursal_mes', __name__)
-salidas_suma_devoluciones_mes_suc = Blueprint('salidas_suma_devoluciones_mes_suc', __name__)
 salidas_suma_ventas_dia_sucursal = Blueprint('salidas_suma_ventas_dia_sucursal', __name__)
 salidas_suma_devoluciones_mes = Blueprint('salidas_suma_devoluciones_mes', __name__)
-salidas_top_cinco_categorias_suc = Blueprint('salidas_top_cinco_categorias_suc', __name__)
-salidas_top_cinco_cod_suc = Blueprint('salidas_top_cinco_cod_suc', __name__)
 salidas_top_ventas = Blueprint('salidas_top_ventas', __name__)
 salidas_categorias_suc = Blueprint('salidas_categorias_suc', __name__)
 salidas_productos_suc = Blueprint('salidas_productos_suc', __name__)
-salidas_individual_id = Blueprint('salidas_individual_id', __name__)
-salidas_categoria_kardex = Blueprint('salidas_categoria_kardex', __name__)
-salidas_suc_kardex = Blueprint('salidas_suc_kardex', __name__)
 salidas_cod_kardex_id = Blueprint('salidas_cod_kardex_id', __name__)
-entradas_suma_mes_kardex = Blueprint('entradas_suma_mes_kardex', __name__)
 salidas_extraccion_csv = Blueprint('salidas_extraccion_csv', __name__)
 salidas_comprobante = Blueprint('salidas_comprobante', __name__)
 salidas_delete = Blueprint('salidas_delete', __name__)
@@ -209,69 +200,6 @@ def getSumaVentasPorMes():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@salidas_suma_total_mes.route('/api/salidas_suma_total_por_mes')#HOME
-@cross_origin()
-@login_required
-def getSumaTotalSalidasMes():
-    try:
-        usuarioLlave = session.get('usernameDos')
-        year_actual = request.args.get('year_actual')
-
-        with mysql.connection.cursor() as cur:
-            query = ("SELECT MONTH(fecha) AS mes, sucursal, "
-                     "SUM((existencias_salidas - existencias_devueltas) * costo_unitario) AS suma_total_salidas "
-                     "FROM salidas "
-                     "JOIN almacen_central ON `salidas`.`idProd` = `almacen_central`.`idProd` "
-                     "WHERE `identificadorSal` = %s "
-                     "AND salidas.estado > 0 "
-                     "AND YEAR(fecha) = %s "
-                     "GROUP BY mes, sucursal")
-            cur.execute(query, (usuarioLlave, year_actual))
-            data = cur.fetchall()
-
-        resultado = []
-        for fila in data:
-            contenido = { 
-                'mes': fila[0],
-                'sucursal': fila[1],
-                'suma_total_salidas': fila[2]
-                }
-            resultado.append(contenido)
-        return jsonify(resultado)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@salidas_suma_total_pasado.route('/api/salidas_suma_total_pasado')#HOME
-@cross_origin()
-@login_required
-def getSumaTotalSalidasPasado():
-    try:
-        usuarioLlave = session.get('usernameDos')
-        year_actual = request.args.get('year_actual')
-
-        with mysql.connection.cursor() as cur:
-            query = ("SELECT sucursal, "
-                     "SUM((existencias_salidas - existencias_devueltas) * costo_unitario) AS suma_total_salidas_pasado "
-                     "FROM salidas "
-                     "JOIN almacen_central ON `salidas`.`idProd` = `almacen_central`.`idProd` "
-                     "WHERE `identificadorSal` = %s "
-                     "AND salidas.estado > 0 "
-                     "AND YEAR(fecha) < %s "
-                     "GROUP BY sucursal")
-            cur.execute(query, (usuarioLlave, year_actual))
-            data = cur.fetchall()
-
-        resultado = []
-        for fila in data:
-            contenido = { 
-                'sucursal': fila[0],
-                'suma_total_salidas_pasado': fila[1]
-                }
-            resultado.append(contenido)
-        return jsonify(resultado)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
 @salidas_suma_total_sucursal_mes.route('/api/salidas_suma_ventas_por_mes_por_sucursal')#HOME
 @cross_origin()
 @login_required
@@ -306,42 +234,6 @@ def getSumaVentasPorMesSucursal():
                 'suma_costos': fila[3],
                 'unidades_devueltas': fila[4],
                 'suma_ventas_esperado': fila[5]
-                }
-            resultado.append(contenido)
-        return jsonify(resultado)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@salidas_suma_devoluciones_mes_suc.route('/api/salidas_suma_ventas_devoluciones_mes_actual_sucursal')#HOME
-@cross_origin()
-@login_required
-def getSumaVentasDevolucionesSucursal():
-    try:
-        usuarioLlave = session.get('usernameDos')
-        mes_actual = datetime.now().month
-        anio_actual = datetime.now().year
-
-        with mysql.connection.cursor() as cur:
-            query = ("SELECT sucursal, "
-                     "SUM((existencias_salidas - existencias_devueltas) * precio_venta_salidas) AS suma_ventas, "
-                     "SUM(existencias_devueltas) AS unidades_devueltas "
-                     "FROM `salidas` "
-                     "WHERE `identificadorSal` = %s "
-                     "AND comprobante LIKE %s "
-                     "AND salidas.estado > 0 "
-                     "AND YEAR(fecha) = %s "
-                     "AND MONTH(fecha) = %s "
-                     "GROUP BY sucursal")
-            data_params = (usuarioLlave, 'Venta%', anio_actual, mes_actual)
-            cur.execute(query, data_params)
-            data = cur.fetchall()
-
-        resultado = []
-        for fila in data:
-            contenido = { 
-                'sucursal': fila[0],
-                'suma_ventas': fila[1],
-                'unidades_devueltas': fila[2]
                 }
             resultado.append(contenido)
         return jsonify(resultado)
@@ -393,7 +285,7 @@ def getSumaDevolucionesSalidasMes():
 
         with mysql.connection.cursor() as cur:
             query = ("SELECT MONTH(fecha) AS mes, "
-                     "SUM((existencias_Salidas - existencias_devueltas) * precio_venta_salidas) AS suma_devoluciones_salidas "
+                     "SUM(existencias_devueltas) AS suma_devoluciones_salidas "
                      "FROM salidas "
                      "JOIN almacen_central ON `salidas`.`idProd` = `almacen_central`.`idProd` "
                      "WHERE `identificadorSal` = %s "
@@ -409,89 +301,13 @@ def getSumaDevolucionesSalidasMes():
         for fila in data:
             contenido = { 
                 'mes': fila[0],
-                'suma_devoluciones_salidas': fila[1]
+                'suma_devoluciones_salidas': int(fila[1])
                 }
             resultado.append(contenido)
         return jsonify(resultado)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@salidas_top_cinco_categorias_suc.route('/api/salidas_top_cinco_categorias_sucursal')#SALIDAS
-@cross_origin()
-@login_required
-def getTopCincoCategoriasSucursal():
-    try:
-        usuarioLlave = session.get('usernameDos')
-        year_actual = request.args.get('year_actual')
-
-        with mysql.connection.cursor() as cur:
-            query = ("SELECT MONTH(fecha) AS mes, sucursal, categoria_nombre, "
-                     "SUM((existencias_salidas - existencias_devueltas) * precio_venta_salidas) AS suma_ventas, "
-                     "SUM((existencias_salidas - existencias_devueltas) * costo_unitario) AS suma_costos "
-                     "FROM `salidas` "
-                     "JOIN `almacen_central` ON `salidas`.`idProd` = `almacen_central`.`idProd` "
-                     "JOIN categorias ON `almacen_central`.`categoria` = `categorias`.`id` "
-                     "WHERE `identificadorSal` = %s "
-                     "AND comprobante LIKE %s "
-                     "AND salidas.estado > 0 "
-                     "AND YEAR(fecha) = %s "
-                     "GROUP BY mes, sucursal, categoria_nombre "
-                     "ORDER BY suma_ventas DESC")
-            data_params = (usuarioLlave, 'Venta%', year_actual)
-            cur.execute(query, data_params)
-            data = cur.fetchall()
-
-        resultado = []
-        for fila in data:
-            contenido = { 
-                'mes': fila[0],
-                'sucursal': fila[1],
-                'categoria_nombre': fila[2],
-                'suma_ventas': fila[3],
-                'suma_costos': fila[4]
-                }
-            resultado.append(contenido)
-        return jsonify(resultado)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@salidas_top_cinco_cod_suc.route('/api/salidas_top_cinco_codigos_sucursal')#SALIDAS
-@cross_origin()
-@login_required
-def getTopCincoCodigosSucursal():
-    try:
-        usuarioLlave = session.get('usernameDos')
-        year_actual = request.args.get('year_actual')
-
-        with mysql.connection.cursor() as cur:
-            query = ("SELECT MONTH(fecha) AS mes, sucursal, codigo, "
-                     "SUM((existencias_salidas - existencias_devueltas) * precio_venta_salidas) AS suma_ventas, "
-                     "SUM((existencias_salidas - existencias_devueltas) * costo_unitario) AS suma_costos "
-                     "FROM `salidas` "
-                     "JOIN `almacen_central` ON `salidas`.`idProd` = `almacen_central`.`idProd` "
-                     "WHERE `identificadorSal` = %s "
-                     "AND comprobante LIKE %s "
-                     "AND salidas.estado > 0 "
-                     "AND YEAR(fecha) = %s "
-                     "GROUP BY mes, sucursal, "
-                     "codigo ORDER BY suma_ventas DESC")
-            data_params = (usuarioLlave, 'Venta%', year_actual)
-            cur.execute(query, data_params)
-            data = cur.fetchall()
-        resultado = []
-        for fila in data:
-            contenido = { 
-                'mes': fila[0],
-                'sucursal': fila[1],
-                'codigo': fila[2],
-                'suma_ventas': fila[3],
-                'suma_costos': fila[4]
-                }
-            resultado.append(contenido)
-        return jsonify(resultado)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-    
 @salidas_top_ventas.route('/api/salidas_top_ventas')#Compras Buscador
 @cross_origin()
 @login_required
@@ -650,106 +466,6 @@ def getCodigoSucursalSalidas():
         return jsonify(resultado)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
-####----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@salidas_individual_id.route('/api/salidas/<int:idSal>')#Salidas
-@cross_origin()
-@login_required
-def getSalidas(idSal):
-    try:
-        with mysql.connection.cursor() as cur:
-            query = ("SELECT idSal, idProd, sucursal, existencias_salidas, precio_venta_salidas, comprobante, causa_devolucion, cliente, usuario, fecha, existencias_devueltas "
-                     "FROM salidas "
-                     "WHERE idSal = %s "
-                     "AND salidas.estado > 0 ")
-            cur.execute(query, (idSal,))
-            data = cur.fetchall()
-        contenido = {}
-        for fila in data:
-            contenido = { 
-                'idSal': fila[0],
-                'idProd': fila[1], 
-                'sucursal': fila[2], 
-                'existencias_salidas':fila[3],
-                'precio_venta_salidas': fila[4],
-                'comprobante': fila[5],
-                'causa_devolucion': fila[6],
-                'cliente': fila[7],
-                'usuario': fila[8],
-                'fecha': fila[9],
-                'existencias_devueltas': fila[10]
-                }
-        return jsonify(contenido)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-###------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@salidas_categoria_kardex.route('/api/salidas_categoria_kardex/<string:categoria>')#KARDEX
-@cross_origin()
-@login_required
-def getSumaVentasPorCategoria(categoria):
-    try:
-        usuarioLlave = session.get('usernameDos')
-        sucursal_salidas = request.args.get('sucursal_salidas')
-        year_actual = request.args.get('year_actual')
-
-        with mysql.connection.cursor() as cur:
-            query = ("SELECT COUNT(*) AS conteo, "
-                     "SUM((existencias_salidas - existencias_devueltas) * precio_venta_salidas) AS suma_ventas "
-                     "FROM `salidas` "
-                     "JOIN `almacen_central` ON `salidas`.`idProd` = `almacen_central`.`idProd` "
-                     "WHERE `identificadorSal` = %s "
-                     "AND comprobante LIKE %s "
-                     "AND sucursal = %s "
-                     "AND categoria LIKE %s "
-                     "AND salidas.estado > 0 "
-                     "AND YEAR(fecha) = %s")
-            data_params = (usuarioLlave, 'Venta%', f"{sucursal_salidas}", f"{categoria}", year_actual)
-            cur.execute(query, data_params)
-            data = cur.fetchall()
-
-        resultado = []
-        for fila in data:
-            contenido = { 
-                'conteo': fila[0],
-                'suma_ventas': fila[1]
-                }
-            resultado.append(contenido)
-        return jsonify(resultado)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@salidas_suc_kardex.route('/api/salidas_sucursal_kardex/<int:sucursal>')#KARDEX
-@cross_origin()
-@login_required
-def getSumaVentasPorSucursal(sucursal):
-    try:
-        usuarioLlave = session.get('usernameDos')
-        year_actual = request.args.get('year_actual')
-
-        with mysql.connection.cursor() as cur:
-            query = ("SELECT COUNT(*) AS conteo, "
-                     "SUM((existencias_salidas - existencias_devueltas) * precio_venta_salidas) AS suma_ventas "
-                     "FROM `salidas` "
-                     "JOIN `almacen_central` ON `salidas`.`idProd` = `almacen_central`.`idProd` "
-                     "WHERE `identificadorSal` = %s "
-                     "AND comprobante LIKE %s "
-                     "AND sucursal = %s "
-                     "AND salidas.estado > 0 "
-                     "AND YEAR(fecha) = %s")
-            data_params = (usuarioLlave, 'Venta%', f"{sucursal}", year_actual)
-            cur.execute(query, data_params)
-            data = cur.fetchall()
-
-        resultado = []
-        for fila in data:
-            contenido = { 
-                'conteo': fila[0],
-                'suma_ventas': fila[1]
-                }
-            resultado.append(contenido)
-        return jsonify(resultado)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 
 @salidas_cod_kardex_id.route('/api/salidas_codigo_kardex/<int:id_producto>')###Kardex############################################################
 @cross_origin()
@@ -777,56 +493,14 @@ def getSalidasCodigoKardex(id_producto):
                 'costo_unitario': fila[0],
                 'existencias':fila[1],
                 'comprobante': fila[2],
-                'fecha': fila[3].strftime('%d-%m-%Y'),
+                'fecha': fila[3],
                 'existencias_devueltas': fila[4],
-                'precio_venta_salidas': fila[5],
-                'precio_venta': fila[6]
                 }
             resultado.append(contenido)
         return jsonify(resultado)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
-@entradas_suma_mes_kardex.route('/api/suma_ventas_por_mes_kardex/<int:id_codigo>')###Kardex############################################################
-@cross_origin()
-@login_required
-def getSumaVentasPorMesKardex(id_codigo):
-    try:
-        usuarioLlave = session.get('usernameDos')
-        salidas_sucursal = request.args.get('salidas_sucursal')
-        year_actual = request.args.get('year_actual')
-        with mysql.connection.cursor() as cur:
-            query = ("SELECT MONTH(t1.fecha) AS mes, "
-                     "SUM((t1.existencias_salidas - t1.existencias_devueltas) * t1.precio_venta_salidas) AS suma_ventas, "
-                     "SUM((t1.existencias_salidas - t1.existencias_devueltas) * t2.costo_unitario) AS suma_costos, "
-                     "SUM(t1.existencias_devueltas) AS unidades_devueltas, "
-                     "SUM((t1.existencias_salidas - t1.existencias_devueltas) * t2.precio_venta) AS suma_ventas_esperado "
-                     "FROM `salidas` AS t1 "
-                     "JOIN `almacen_central` AS t2 ON t1.idProd = t2.idProd "
-                     "WHERE `identificadorSal` = %s "
-                     "AND t1.comprobante LIKE %s "
-                     "AND sucursal LIKE %s "
-                     "AND t1.estado > 0 "
-                     "AND t1.idProd = %s "
-                     "AND YEAR(t1.fecha) = %s "
-                     "GROUP BY mes")
-            data_params = (usuarioLlave, 'Venta%', f"{salidas_sucursal}%", id_codigo, year_actual)
-            cur.execute(query, data_params)
-            data = cur.fetchall()
 
-        resultado = []
-        for fila in data:
-            contenido = { 
-                'mes': fila[0],
-                'suma_ventas': fila[1],
-                'suma_costos': fila[2],
-                'unidades_devueltas': int(fila[3]),
-                'suma_ventas_esperado': fila[4],
-                }
-            resultado.append(contenido)
-        return jsonify(resultado)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 ###------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @salidas_extraccion_csv.route('/api/salidas_extraccion')#Salidas para formato CSV
 @cross_origin()
@@ -888,7 +562,7 @@ def getSalidasComprobante(comprobante):
                      "WHERE `identificadorSal` = %s "
                      "AND salidas.estado > 0 "
                      "AND comprobante LIKE %s")
-            cur.execute(query, (usuarioLlave, f"{comprobante}%"))
+            cur.execute(query, (usuarioLlave, comprobante))
             data = cur.fetchall()
         resultado = []
         for fila in data:
@@ -941,44 +615,40 @@ def operarDevolucionSalidas():
         dato_uno = 1
         data_dev = request.json.get('array_devolucion', [])
 
+        with mysql.connection.cursor() as cur:
 
-        # Iniciar la transacción manualmente
-        cur = mysql.connection.cursor()
-        cur.execute("BEGIN")
+            actualizar_almacen_central_suma(cur, devolucion_data, usuarioLlave, 'array_devolucion')
 
-        actualizar_almacen_central_suma(cur, devolucion_data, usuarioLlave, 'array_devolucion')
+            query_salidas_update = ("UPDATE `salidas` SET existencias_devueltas = existencias_devueltas + %s "
+                                    "WHERE `salidas`.`idSal` = %s "
+                                    "AND identificadorSal = %s "
+                                    "AND `salidas`.`estado` > 0 "
+                                    "AND existencias_devueltas >= 0")
+            data_salidas_update =   [
+                                    (s['existencias_post'], s['id_op'], usuarioLlave) 
+                                    for s in data_dev
+                                    ]
+            cur.executemany(query_salidas_update, data_salidas_update)
 
-        query_salidas_update = ("UPDATE `salidas` SET existencias_devueltas = existencias_devueltas + %s "
-                                "WHERE `salidas`.`idSal` = %s "
-                                "AND identificadorSal = %s "
-                                "AND `salidas`.`estado` > 0 "
-                                "AND existencias_devueltas >= 0")
-        data_salidas_update =   [
-                                (s['existencias_post'], s['id_op'], usuarioLlave) 
-                                for s in data_dev
-                                ]
-        cur.executemany(query_salidas_update, data_salidas_update)
+            query_salidas_insert = ("INSERT INTO `salidas` "
+                                    "(`idSal`, `idProd`, `sucursal`, `existencias_salidas`, `precio_venta_salidas`, `comprobante`, `causa_devolucion`, "
+                                    "`cliente`, `usuario`, `fecha`, `existencias_devueltas`, `identificadorSal`, `estado`) "
+                                    "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+            data_salidas_insert =   [
+                                    (s['idProd'], s['sucursal'], dato_cero, s['precio_venta_salidas'], s['comprobante'], s['causa_devolucion'], 
+                                    s['cliente'], usuarioId, request.json['fecha'], s['existencias_post'], usuarioLlave, dato_uno) 
+                                    for s in data_dev
+                                    ]
+            cur.executemany(query_salidas_insert, data_salidas_insert)
 
-        query_salidas_insert = ("INSERT INTO `salidas` "
-                                "(`idSal`, `idProd`, `sucursal`, `existencias_salidas`, `precio_venta_salidas`, `comprobante`, `causa_devolucion`, "
-                                "`cliente`, `usuario`, `fecha`, `existencias_devueltas`, `identificadorSal`, `estado`) "
-                                "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
-        data_salidas_insert =   [
-                                (s['idProd'], s['sucursal'], dato_cero, s['precio_venta_salidas'], s['comprobante'], s['causa_devolucion'], 
-                                s['cliente'], usuarioId, request.json['fecha'], s['existencias_post'], usuarioLlave, dato_uno) 
-                                for s in data_dev
-                                ]
-        cur.executemany(query_salidas_insert, data_salidas_insert)
+            query_detalle = (   "UPDATE `ventas` SET `modo_perdida` =  `modo_perdida` + %s "
+                        "WHERE `ventas`.`id_det_ventas` = %s "
+                        "AND ventas.estado > 0 "
+                        "AND identificador_ventas = %s ")
+            data_detalle = (request.json['modo_perdida'], request.json['id_det_ventas'], usuarioLlave)
+            cur.execute(query_detalle, data_detalle)
 
-        query = (   "UPDATE `ventas` SET `modo_perdida` =  `modo_perdida` + %s, `total_venta` = `total_venta` - %s "
-                    "WHERE `ventas`.`id_det_ventas` = %s "
-                    "AND total_venta >= %s "
-                    "AND identificador_ventas = %s ")
-        data = (request.json['modo_perdida'], request.json['modo_perdida'], request.json['id_det_ventas'], 
-                request.json['modo_perdida'], usuarioLlave)
-        cur.execute(query, data)
-
-        mysql.connection.commit()
+            mysql.connection.commit()
         return jsonify({"status": "success", "message": 'Devolución procesada correctamente' })
     except Exception as e:
         mysql.connection.rollback()
@@ -1034,13 +704,12 @@ def gestionDeVenta():
 
             # Detalle de la venta
             query_detalle = ("INSERT INTO `ventas` (`id_det_ventas`, `sucursal`, `comprobante`, `tipo_comprobante`, `dni_cliente`, "
-                            "`modo_efectivo`, `modo_credito`, `modo_tarjeta`, `modo_perdida`, `total_venta`, `fecha_det_ventas`, "
-                            "`identificador_ventas`, `canal_venta`, `estado`) "
+                            "`modo_efectivo`, `modo_credito`, `modo_tarjeta`, `modo_perdida`, `fecha_det_ventas`, "
+                            "`identificador_ventas`, `canal_venta`, `estado`, `situacion`) "
                             "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
             data_detalle = (request.json['sucursal_v'], f"{numeracion[0]}", f"{numeracion[1]}", cliente, 
-                            request.json['modo_efectivo'], request.json['modo_credito'], request.json['modo_tarjeta'], 
-                            request.json['modo_perdida'], request.json['total_venta'], fecha, 
-                            usuarioLlave, request.json['canal_venta'], dato_uno)
+                            request.json['modo_efectivo'], request.json['modo_credito'], request.json['modo_tarjeta'], request.json['modo_perdida'], fecha, 
+                            usuarioLlave, request.json['canal_venta'], dato_uno, request.json['situacion'])
             cur.execute(query_detalle, data_detalle)
 
             mysql.connection.commit()# Si todo sale bien, confirmar la transacción

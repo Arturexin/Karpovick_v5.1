@@ -174,15 +174,20 @@ def editCategorias():
         mysql.connection.rollback()
         return jsonify({"status": "error", "message": str(e)})
 
-@categorias_delete.route('/api/categorias/<int:id>', methods=['DELETE'])
+@categorias_delete.route('/api/categorias_remove', methods=['POST'])
 @cross_origin()
 @login_required
-def removeCategorias(id):
+def removeCategorias():
     try:
+        dato_cero = 0
+        usuarioLlave = session.get('usernameDos')
         with mysql.connection.cursor() as cur:
-            query = "DELETE FROM categorias WHERE `categorias`.`id` = %s"
-            cur.execute(query, (id,))
+            query = ("UPDATE `categorias` SET `estado` = %s "
+                     "WHERE `categorias`.`id` = %s "
+                     "AND identificador = %s")
+            data = (dato_cero, request.json['id'], usuarioLlave)
+            cur.execute(query, data)
             mysql.connection.commit()
-        return "Categoria eliminada."
+        return jsonify({"status": "success", "message": "Categoría eliminada correctamente."})
     except Exception as e:
-        return jsonify({'error': str(e)}), 500    
+        return jsonify({'error': str(e)}), 500

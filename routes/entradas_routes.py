@@ -7,10 +7,7 @@ from db_connection import mysql
 # Definimos el blueprint para las rutas de entradas
 entradas_conteo = Blueprint('entradas_conteo', __name__)
 entradas_tabla = Blueprint('entradas_tabla', __name__)
-entradas_suma_total_mes = Blueprint('entradas_suma_total_mes', __name__)
-entradas_suma_total_pasado = Blueprint('entradas_suma_total_pasado', __name__)
 entradas_suma_devoluciones_mes = Blueprint('entradas_suma_devoluciones_mes', __name__)
-entradas_individual_id = Blueprint('entradas_individual_id', __name__)
 entradas_extraccion_csv = Blueprint('entradas_extraccion_csv', __name__)
 entradas_id_kardex = Blueprint('entradas_id_kardex', __name__)
 entradas_comprobante = Blueprint('entradas_comprobante', __name__)
@@ -114,72 +111,6 @@ def getAllEntradas(numero):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-@entradas_suma_total_mes.route('/api/entradas_suma_total_mes')#HOME
-@cross_origin()
-@login_required
-def getSumaTotalEntradasMes():
-    try:
-        usuarioLlave = session.get('usernameDos')
-        year_actual = request.args.get('year_actual')
-
-        with mysql.connection.cursor() as cur:
-            query = ("SELECT MONTH(fecha) AS mes, sucursal, "
-                     "SUM((existencias_entradas - existencias_devueltas) * costo_unitario) AS suma_total_entradas "
-                     "FROM entradas JOIN almacen_central ON `entradas`.`idProd` = `almacen_central`.`idProd` "
-                     "WHERE `identificadorEntr` = %s "
-                     "AND entradas.estado > 0 "
-                     "AND YEAR(fecha) = %s "
-                     "GROUP BY mes, sucursal")
-            data_params = (usuarioLlave, year_actual)
-            cur.execute(query, data_params)
-            data = cur.fetchall()
-
-        resultado = []
-        for fila in data:
-            contenido = { 
-                'mes': fila[0],
-                'sucursal': fila[1],
-                'suma_total_entradas': fila[2]
-                }
-            resultado.append(contenido)
-        return jsonify(resultado)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@entradas_suma_total_pasado.route('/api/entradas_suma_total_pasado')#HOME
-@cross_origin()
-@login_required
-def getSumaTotalEntradasPasado():
-    try:
-        usuarioLlave = session.get('usernameDos')
-        year_actual = request.args.get('year_actual')
-
-        with mysql.connection.cursor() as cur:
-            query = ("SELECT sucursal, "
-                     "SUM((existencias_entradas - existencias_devueltas) * costo_unitario) AS suma_total_entradas_pasado "
-                     "FROM entradas "
-                     "JOIN almacen_central ON `entradas`.`idProd` = `almacen_central`.`idProd` "
-                     "WHERE `identificadorEntr` = %s "
-                     "AND entradas.estado > 0 "
-                     "AND YEAR(fecha) < %s "
-                     "GROUP BY sucursal")
-            data_params = (usuarioLlave, year_actual)
-            cur.execute(query, data_params)
-            data = cur.fetchall()
-
-        resultado = []
-        for fila in data:
-            contenido = { 
-                'sucursal': fila[0],
-                'suma_total_entradas_pasado': fila[1]
-                }
-            resultado.append(contenido)
-        return jsonify(resultado)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
 @entradas_suma_devoluciones_mes.route('/api/entradas_suma_devoluciones_mes')#DEVOLUCIONES POR COMPRAS
 @cross_origin()
 @login_required
@@ -190,7 +121,7 @@ def getSumaDevolucionesEntradasMes():
 
         with mysql.connection.cursor() as cur:
             query = ("SELECT MONTH(fecha) AS mes, "
-                     "SUM((existencias_entradas - existencias_devueltas) * costo_unitario) AS suma_devoluciones_entradas "
+                     "SUM(existencias_devueltas) AS suma_devoluciones_entradas "
                      "FROM entradas "
                      "JOIN almacen_central ON `entradas`.`idProd` = `almacen_central`.`idProd` "
                      "WHERE `identificadorEntr` = %s "
@@ -206,42 +137,13 @@ def getSumaDevolucionesEntradasMes():
         for fila in data:
             contenido = { 
                 'mes': fila[0],
-                'suma_devoluciones_entradas': fila[1]
+                'suma_devoluciones_entradas': int(fila[1])
                 }
             resultado.append(contenido)
         return jsonify(resultado)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@entradas_individual_id.route('/api/entradas/<int:idEntr>')#ENTRADAS
-@cross_origin()
-@login_required
-def getEntradas(idEntr):
-    try:
-        with mysql.connection.cursor() as cur:
-            query = ("SELECT idEntr, idProd, sucursal, existencias_entradas, comprobante, causa_devolucion, usuario, fecha, existencias_devueltas "
-                     "FROM entradas "
-                     "WHERE idEntr = %s "
-                     "AND entradas.estado > 0 ")
-            cur.execute(query, (idEntr,))
-            data = cur.fetchall()
-        contenido = {}
-        for fila in data:
-            contenido = { 
-                'idEntr': fila[0],
-                'idProd': fila[1],
-                'sucursal': fila[2],
-                'existencias_entradas':fila[3],
-                'comprobante': fila[4],
-                'causa_devolucion': fila[5],
-                'usuario': fila[6],
-                'fecha': fila[7],
-                'existencias_devueltas': fila[8]
-                }
-        return jsonify(contenido)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 ###------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @entradas_extraccion_csv.route('/api/entradas_extraccion')#ENTRADAS para formato CSV
 @cross_origin()
@@ -316,7 +218,7 @@ def getEntradasCodigoKardex(id_producto):
                 'costo_unitario': fila[0],
                 'existencias':fila[1],
                 'comprobante': fila[2],
-                'fecha': fila[3].strftime('%d-%m-%Y'),
+                'fecha': fila[3],
                 'existencias_devueltas': fila[4]
                 }
             resultado.append(contenido)
@@ -338,7 +240,7 @@ def getEntradasComprobante(comprobante):
                      "WHERE `identificadorEntr` = %s "
                      "AND entradas.estado > 0 "
                      "AND comprobante LIKE %s")
-            data_params = (usuarioLlave, f"{comprobante}%")
+            data_params = (usuarioLlave, comprobante)
             cur.execute(query, data_params)
             data = cur.fetchall()
 

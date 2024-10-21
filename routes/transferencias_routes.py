@@ -10,8 +10,6 @@ transferencias_tabla = Blueprint('transferencias_tabla', __name__)
 transferencias_conteo_s = Blueprint('transferencias_conteo_s', __name__)
 transferencias_tabla_s = Blueprint('transferencias_tabla_s', __name__)
 transfrencias_kardex_id = Blueprint('transfrencias_kardex_id', __name__)
-transferencias_suma_total = Blueprint('transferencias_suma_total', __name__)
-transferencias_suma_total_pasado = Blueprint('transferencias_suma_total_pasado', __name__)
 productos_transferencias = Blueprint('productos_transferencias', __name__)
 productos_transferencias_p = Blueprint('productos_transferencias_p', __name__)
 
@@ -233,153 +231,12 @@ def getTransferenciasCodigoKardex(id_producto):
                 'existencias': fila[2],
                 'comprobante': fila[3],
                 'costo_unitario': fila[4],
-                'fecha': fila[5].strftime('%d-%m-%Y')
+                'fecha': fila[5]
                 }
             resultado.append(contenido)
         return jsonify(resultado)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
-@transferencias_suma_total.route('/api/transferencias_suma_total')#HOME
-@cross_origin()
-@login_required
-def getSumaTotalTransferencias():
-    try:
-        usuarioLlave = session.get('usernameDos')
-        year_actual = request.args.get('year_actual')
-        id_sucursal = request.args.get('id_sucursal')
-
-        with mysql.connection.cursor() as cur:
-            query = ("SELECT %s AS sucursal,"
-                    "SUM(CASE WHEN id_suc_destino = %s THEN cantidad * costo_unitario ELSE 0 END) AS sumar_monto, "
-                    "SUM(CASE WHEN id_suc_origen = %s THEN cantidad * costo_unitario ELSE 0 END) AS restar_monto "
-                    "FROM transfrencias "
-                    "JOIN almacen_central ON `transfrencias`.`id_prod` = `almacen_central`.`idProd` "
-                    "WHERE `identificador_tran` = %s "
-                    "AND YEAR(fecha_tran) = %s ")
-            data_params = (id_sucursal, id_sucursal, id_sucursal, usuarioLlave, year_actual)
-            cur.execute(query, data_params)
-            data = cur.fetchall()
-
-        for fila in data:
-            contenido = { 
-                'sucursal': int(fila[0]),
-                'sumar_monto': fila[1],
-                'restar_monto': fila[2]
-                }
-        return jsonify(contenido)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-       
-# @transferencias_suma_total.route('/api/transferencias_suma_total')  # HOME
-# @cross_origin()
-# @login_required
-# def getSumaTotalTransferencias():
-#     try:
-#         usuarioLlave = session.get('usernameDos')
-#         year_actual = request.args.get('year_actual')
-
-#         with mysql.connection.cursor() as cur:
-#             query = ("SELECT "
-#                      "SUM(q_ac * costo_unitario) AS suma_total_ac, "
-#                      "SUM(q_su * costo_unitario) AS suma_total_su, "
-#                      "SUM(q_sd * costo_unitario) AS suma_total_sd, "
-#                      "SUM(q_st * costo_unitario) AS suma_total_st "
-#                      "FROM transfrencias "
-#                      "JOIN almacen_central ON transfrencias.id_prod = almacen_central.idProd "
-#                      "WHERE identificador_tran = %s "
-#                      "AND transfrencias.estado > 0 "
-#                      "AND YEAR(fecha_tran) = %s")
-#             data_params = (usuarioLlave, year_actual)
-#             cur.execute(query, data_params)
-#             data = cur.fetchone()  # Usamos fetchone ya que esperamos un solo resultado
-
-#         if data:
-#             contenido = { 
-#                 'suma_total_ac': data[0],
-#                 'suma_total_su': data[1],
-#                 'suma_total_sd': data[2],  
-#                 'suma_total_st': data[3]   
-#             }
-#             return jsonify(contenido), 200
-#         else:
-#             return jsonify({'message': 'No se encontraron transferencias para el año actual.'}), 404
-
-#     except Exception as e:
-#         return jsonify({'error': str(e)}), 500
-
-@transferencias_suma_total_pasado.route('/api/transferencias_suma_total_anio_pasado')#HOME
-@cross_origin()
-@login_required
-def getSumaTotalTransferenciasAnioPasado():
-    try:
-        usuarioLlave = session.get('usernameDos')
-        year_actual = request.args.get('year_actual')
-        id_sucursal = request.args.get('id_sucursal')
-
-        with mysql.connection.cursor() as cur:
-            query = ("SELECT %s AS sucursal,"
-                    "SUM(CASE WHEN id_suc_destino = %s THEN cantidad * costo_unitario ELSE 0 END) AS sumar_monto, "
-                    "SUM(CASE WHEN id_suc_origen = %s THEN cantidad * costo_unitario ELSE 0 END) AS restar_monto "
-                    "FROM transfrencias "
-                    "JOIN almacen_central ON `transfrencias`.`id_prod` = `almacen_central`.`idProd` "
-                    "WHERE `identificador_tran` = %s "
-                    "AND YEAR(fecha_tran) < %s ")
-            data_params = (id_sucursal, id_sucursal, id_sucursal, usuarioLlave, year_actual)
-            cur.execute(query, data_params)
-            data = cur.fetchall()
-
-        for fila in data:
-            contenido = { 
-                'sucursal': int(fila[0]),
-                'sumar_monto': fila[1],
-                'restar_monto': fila[2]
-                }
-        return jsonify(contenido)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-       
-# @transferencias_suma_total_pasado.route('/api/transferencias_suma_total_anio_pasado')#HOME
-# @cross_origin()
-# @login_required
-# def getSumaTotalTransferenciasAnioPasado():
-#     try:
-#         usuarioLlave = session.get('usernameDos')
-#         year_actual = request.args.get('year_actual')
-
-#         with mysql.connection.cursor() as cur:
-#             query = ("SELECT "
-#                     "SUM(q_ac * costo_unitario) AS suma_total_ac, "
-#                     "SUM(q_su * costo_unitario) AS suma_total_su, "
-#                     "SUM(q_sd * costo_unitario) AS suma_total_sd, "
-#                     "SUM(q_st * costo_unitario) AS suma_total_st "
-#                     "FROM transfrencias "
-#                     "JOIN almacen_central ON `transfrencias`.`id_prod` = `almacen_central`.`idProd` "
-#                     "WHERE `identificador_tran` = %s "
-#                     "AND transfrencias.estado > 0 "
-#                     "AND YEAR(fecha_tran) < %s ")
-#             data_params = (usuarioLlave, year_actual)
-#             cur.execute(query, data_params)
-#             data = cur.fetchone()
-
-#         if data:
-#             contenido = { 
-#                 'suma_total_ac': data[0],
-#                 'suma_total_su': data[1],
-#                 'suma_total_sd': data[2],  
-#                 'suma_total_st': data[3]   
-#             }
-#             return jsonify(contenido), 200
-#         else:
-#             return jsonify({'message': 'No se encontraron transferencias para el año actual.'}), 404
-
-#     except Exception as e:
-#         return jsonify({'error': str(e)}), 500
-
-
-
-
-
 
 @productos_transferencias.route('/api/procesar_transferencia', methods=['POST'])##Transferencias, Productos
 @cross_origin()

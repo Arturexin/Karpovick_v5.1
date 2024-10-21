@@ -16,13 +16,15 @@ function generarFecha(){
 };
 let clave_form = 0;
 let array_sucursales = [];
-let colorFondoBarra = ["#E6CA7B","#91E69C","#6380E6","#E66E8D"];
+let colorFondoBarra = ["#E6CA7B","#91E69C","#6380E6","#E66E8D","#4D4D4D"];
 let sucursales_activas = ['existencias_ac', 'existencias_su', 'existencias_sd', 'existencias_st', 'existencias_sc'];
-let suc_add = ["Almacén Central", "Sucursal Uno", "Sucursal Dos", "Sucursal Tres", "Sucursal Cuatro"]
+let suc_add = ["Almacén Central", "Sucursal Uno", "Sucursal Dos", "Sucursal Tres", "Sucursal Cuatro"];
 let mapa_calor = ["#91ff85","#C6F556","#F5CF6F","#DE8B59","#FF666D"];
 let obtenerAnio = new Date().getFullYear() % 100
 const arregloMeses = [`01-${obtenerAnio}`, `02-${obtenerAnio}` ,`03-${obtenerAnio}` ,`04-${obtenerAnio}` ,`05-${obtenerAnio}` ,`06-${obtenerAnio}`, 
                     `07-${obtenerAnio}`, `08-${obtenerAnio}`, `09-${obtenerAnio}`, `10-${obtenerAnio}`, `11-${obtenerAnio}` ,`12-${obtenerAnio}`];
+const mes_anio = [`Ene-${obtenerAnio}`, `Feb-${obtenerAnio}` ,`Mar-${obtenerAnio}` ,`Abr-${obtenerAnio}` ,`May-${obtenerAnio}` ,`Jun-${obtenerAnio}`, 
+                    `Jul-${obtenerAnio}`, `Ago-${obtenerAnio}`, `Set-${obtenerAnio}`, `Oct-${obtenerAnio}`, `Nov-${obtenerAnio}` ,`Dic-${obtenerAnio}`];
 const meses_letras = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Set","Oct","Nov","Dic",]
 const monedas = { 
                     "Balboa": "B/.",

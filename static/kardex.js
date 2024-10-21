@@ -30,23 +30,6 @@ function cargarDatosAnio(){
         procesarKardex();
     })
 };
-async function cargarGraficos(){
-    reinicioBarraGrafico(barras_venta);//Reinicia gráfico Ventas Mensuales
-    anio_principal = anio_referencia.value;
-    ventasMensuales = await cargarDatos(`suma_ventas_por_mes_kardex/${document.getElementById("id-form").value}?`+
-                                        `salidas_sucursal=${document.getElementById("fffff-sucursal").value}&`+     
-                                        `year_actual=${anio_principal}`)
-                                        
-    kardex_salidas_categoria = await cargarDatos(`salidas_categoria_kardex/${document.getElementById("categoria-form").value}?`+
-                                                `sucursal_salidas=${document.getElementById("fffff-sucursal").value}&`+     
-                                                `year_actual=${anio_principal}`)
-    kardex_salidas_sucursal = await cargarDatos(`salidas_sucursal_kardex/${document.getElementById("fffff-sucursal").value}?`+    
-                                                `year_actual=${anio_principal}`)
-    
-    analisisProducto()
-    modal_proceso_abrir(`Datos del año ${anio_principal} cargados.`, "")
-    modal_proceso_salir_botones()
-}
 ///////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////DETALLE DE MOVIMIENTOS////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -58,7 +41,6 @@ function reseteoFormulario(){
     document.getElementById('categoria-form').value = "0";
     document.getElementById('codigo-form').value = "";
     document.getElementById('descripcion-form').value = "";
-    /* document.getElementById("costo-unitario-detalle-movimientos").value = ""; */
 };
 document.addEventListener("keyup", () => {
     let almacenCentral = indice_base.find(y => y.codigo.toLowerCase().startsWith(document.getElementById('buscador-productos-form').value.toLocaleLowerCase()))
@@ -74,6 +56,32 @@ document.addEventListener("keyup", () => {
         reseteoFormulario();
     };
 });
+async function procesarKardex(){
+    if(document.querySelector("#codigo-form").value !== ""){
+        anio_principal = anio_referencia.value;
+        removerTablas()
+        kardex_entradas = await cargarDatos(`entradas_codigo_kardex/${document.getElementById("id-form").value}?`+
+                                            `entradas_sucursal=${document.getElementById("fffff-sucursal").value}&`+
+                                            `year_actual=${anio_principal}`)
+        kardex_salidas = await cargarDatos(`salidas_codigo_kardex/${document.getElementById("id-form").value}?`+
+                                            `salidas_sucursal=${document.getElementById("fffff-sucursal").value}&`+
+                                            `year_actual=${anio_principal}`)
+        kardex_perdidas = await cargarDatos(`perdidas_codigo_kardex/${document.getElementById("id-form").value}?`+
+                                            `perdidas_sucursal=${document.getElementById("fffff-sucursal").value}&`+
+                                            `year_actual=${anio_principal}`)
+        kardex_transferencias = await cargarDatos(`transfrencias_codigo_kardex/${document.getElementById("id-form").value}?`+
+                                            `transferencias_sucursal=${document.getElementById("fffff-sucursal").value}&`+
+                                            `year_actual=${anio_principal}`)
+        graficoKardex()
+        
+        llenadoTablaDetalle(kardex_entradas, "tabla-detalle-movimientos-entradas", "costo_unitario");
+        llenadoTablaDetalle(kardex_salidas, "tabla-detalle-movimientos-salidas", "costo_unitario");
+        llenadoTablaDetalle(kardex_perdidas, "tabla-detalle-movimientos-perdidas", "costo_unitario");
+        llenadoTablaDetalle(kardex_transferencias, "tabla-detalle-movimientos-transferencias", "costo_unitario");
+        
+        llenarKardex(kardex_entradas[0].costo_unitario);
+    };
+}
 function llenadoTablaDetalle(array, id_tabla, nombre_propiedad_objeto_valor){
     let suma_existencias = 0;
     let suma_monto = 0;
@@ -89,15 +97,13 @@ function llenadoTablaDetalle(array, id_tabla, nombre_propiedad_objeto_valor){
     array.forEach((event) => {
         let dato = 0;
         if(document.querySelector(`#${id_tabla} > caption`).textContent === "Lista de Transferencias"){
-            /* if(event.id_suc_origen === Number(document.getElementById("fffff-sucursal").value)){
+            if(event.id_suc_origen === Number(document.getElementById("fffff-sucursal").value)){
                 dato = -event.existencias;
                 comprobante(event, dato);
             }else{
                 dato = event.existencias;
                 comprobante(event, dato);
-            } */
-            dato = event.existencias;
-                comprobante(event, dato);
+            };
         }else if(event.comprobante.startsWith("Dev")){
             dato = -event.existencias_devueltas;
             comprobante(event, dato);
@@ -109,15 +115,11 @@ function llenadoTablaDetalle(array, id_tabla, nombre_propiedad_objeto_valor){
         suma_existencias += dato;
         suma_monto += (dato * event[nombre_propiedad_objeto_valor]);
     });
-    /* if(array.length > 0){
-        document.querySelector("#costo-unitario-detalle-movimientos").value = array[0].costo_unitario
-    } */
     document.querySelector(`#${id_tabla} > tbody`).innerHTML = html;
     document.getElementById(`${id_tabla}`).children[2].children[0].children[1].textContent = suma_existencias;
     document.getElementById(`${id_tabla}`).children[2].children[0].children[2].textContent = `${suma_monto.toFixed(2)}`;
 };
-function llenarKardex(){
-    /* let costo = Number(document.querySelector("#costo-unitario-detalle-movimientos").value) */
+function llenarKardex(costo){
     let html = `<tr>`+
                     `<td>${document.getElementById("codigo-form").value}</td>`+
                     `<td>${document.getElementById("descripcion-form").value}</td>`+
@@ -145,43 +147,13 @@ function llenarKardex(){
     document.querySelector(`#tabla-consolidado-kardex > tbody`).innerHTML = html;
 };
 
-async function procesarKardex(){
-    if(document.querySelector("#codigo-form").value !== ""){
-        anio_principal = anio_referencia.value;
-        removerTablas()
-        kardex_entradas = await cargarDatos(`entradas_codigo_kardex/${document.getElementById("id-form").value}?`+
-                                            `entradas_sucursal=${document.getElementById("fffff-sucursal").value}&`+
-                                            `year_actual=${anio_principal}`)
-        kardex_salidas = await cargarDatos(`salidas_codigo_kardex/${document.getElementById("id-form").value}?`+
-                                            `salidas_sucursal=${document.getElementById("fffff-sucursal").value}&`+
-                                            `year_actual=${anio_principal}`)
-        kardex_perdidas = await cargarDatos(`perdidas_codigo_kardex/${document.getElementById("id-form").value}?`+
-                                            `perdidas_sucursal=${document.getElementById("fffff-sucursal").value}&`+
-                                            `year_actual=${anio_principal}`)
-        kardex_transferencias = await cargarDatos(`transfrencias_codigo_kardex/${document.getElementById("id-form").value}?`+
-                                            `transferencias_sucursal=${document.getElementById("fffff-sucursal").value}&`+
-                                            `year_actual=${anio_principal}`)
-        cargarGraficos()
-        
-        llenadoTablaDetalle(kardex_entradas, "tabla-detalle-movimientos-entradas", "costo_unitario");
-        llenadoTablaDetalle(kardex_salidas, "tabla-detalle-movimientos-salidas", "costo_unitario");
-        llenadoTablaDetalle(kardex_perdidas, "tabla-detalle-movimientos-perdidas", "costo_unitario");
-        llenadoTablaDetalle(kardex_transferencias, "tabla-detalle-movimientos-transferencias", "costo_unitario");
-        llenarKardex();
-    };
-}
+
 const reiniciarTablas = document.getElementById("reiniciar-tablas");
 reiniciarTablas.addEventListener("click", () =>{
-    formularioDetalleMovimientos.reset();
+    document.getElementById("formulario-compras-uno").reset();
     reinicarKardex()
-    borrarAnalisis()
 });
-/* const reiniciarForm = document.getElementById("reset_form");
-reiniciarForm.addEventListener("click", () =>{
-    formularioDetalleMovimientos.reset();
-    reinicarKardex()
-    borrarAnalisis()
-}); */
+
 function reinicarKardex(){
     removerTablas()
     document.getElementById("total-existencias-detalle-entradas").textContent = "";
@@ -204,7 +176,6 @@ function cambioSucursalKardex(id){
         document.getElementById("id-form").value = "";
         document.getElementById("buscador-productos-detalle-movimientos").focus();
         reinicarKardex();
-        borrarAnalisis()
     });
 };
 function removerTablas(){
@@ -222,102 +193,51 @@ function removerTablas(){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////ANÁLISIS DE PRODUCTO//////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-function analisisProducto(){
-    let suma_costos_salidas = 0;
-    let suma_ventas = 0;
-    let suma_ventas_esperado = 0;
-    let num_ventas = 0;
-    let array_ventas_total = [];
-    let array_costos_total = [];
-    let masAlto = 0;
-    let mes_alto = 0;
-    let masBajo = Infinity;
-    let mes_bajo = 0;
-    let suma_mensual_ventas = 0
-    let venta_salidas_categoria = 0;
-    let conteo_ventas_categoria = 0;
-    let venta_salidas_sucursal = 0;
-    let conteo_ventas_sucursal = 0;
-
-
-    document.querySelectorAll(".f_l_g").forEach((event, i)=>{
-        event.textContent = `${meses_letras[i]}${anio_principal % 100}`;
-    });
-
+function graficoKardex(){
+    document.getElementById("contenedor_grafico_kardex").innerHTML = `<canvas id="grafico_kardex"></canvas>`
+    let array_entradas = [];
+    let array_salidas = [];
+    let array_transferencias = [];
+    let array_despacho = [];
     for(let i = 0; i < 12; i++){
-        array_ventas_total.push(0);
-        array_costos_total.push(0);
-        ventasMensuales.forEach((event)=>{
-            
-            if(event.mes == i + 1){
-                suma_mensual_ventas += event.suma_ventas
-                array_ventas_total[i] = event.suma_ventas;
-                array_costos_total[i] = event.suma_costos;
-            };
+        let suma_entradas = 0;
+        let suma_salidas = 0;
+        let suma_transferencias = 0;
+        let suma_despacho = 0;
+        kardex_entradas.forEach((event)=>{
+            if(new Date(event.fecha).getMonth() === i && !event.comprobante.startsWith("D")){
+                suma_entradas+=(event.existencias - event.existencias_devueltas);
+            }
         });
+        kardex_salidas.forEach((event)=>{
+            if(new Date(event.fecha).getMonth() === i && !event.comprobante.startsWith("D")){
+                suma_salidas-=(event.existencias - event.existencias_devueltas);
+            }
+        });
+        kardex_perdidas.forEach((event)=>{
+            if(new Date(event.fecha).getMonth() === i){
+                suma_despacho-=event.existencias;
+            }
+        });
+        kardex_transferencias.forEach((event)=>{
+            if(new Date(event.fecha).getMonth() === i && event.id_suc_origen === Number(document.getElementById("fffff-sucursal").value)){
+                suma_transferencias-=event.existencias;
+            }else if(new Date(event.fecha).getMonth() === i && event.id_suc_origen !== Number(document.getElementById("fffff-sucursal").value)){
+                suma_transferencias+=event.existencias;
+            }
+            console.log(suma_transferencias)
+        });
+        array_entradas.push(suma_entradas)
+        array_salidas.push(suma_salidas)
+        array_transferencias.push(suma_transferencias)
+        array_despacho.push(suma_despacho)
     };
-    for(let i = 0; i < array_ventas_total.length; i++){
-        if(masAlto < array_ventas_total[i]){// Encontramos el valor mas alto de array_ventas_total[i]
-            masAlto = array_ventas_total[i]
-            mes_alto = i + 1;
-        };
-        if(array_ventas_total[i] > 0 && masBajo >= array_ventas_total[i]){// Encontramos el valor mas bajo de array_ventas_total[i]
-            masBajo = array_ventas_total[i]
-            mes_bajo = i + 1;
-        };
-    };
-
-    document.getElementById("menor_venta").textContent = `${moneda()} ${(masBajo).toFixed(2)}`
-    document.getElementById("mayor_venta").textContent = `${moneda()} ${(masAlto).toFixed(2)}`
-    document.getElementById("promedio_venta").textContent = `${moneda()} ${(suma_mensual_ventas/ventasMensuales.length).toFixed(2)}`
-    document.querySelector(".mes_max").textContent = `${meses_letras[mes_alto - 1]}-${anio_referencia.value}`
-    document.querySelector(".mes_min").textContent = `${meses_letras[mes_bajo - 1]}-${anio_referencia.value}`
-    let masAltoDos = (226 * masAlto)/214;
-    document.querySelectorAll(".eje_y_numeracion").forEach((e)=>{
-        e.textContent = Number(masAltoDos).toFixed(2)
-        masAltoDos -= 0.20 * ((226 * masAlto)/214);
-    });
-    pintarGraficoPositivo(document.querySelectorAll(".cg_1_c"), array_ventas_total, masAlto, colorFondoBarra[0], document.querySelectorAll(".sg_1_c"), 8, moneda())
-    pintarGraficoPositivo(document.querySelectorAll(".cg_2_c"), array_costos_total, masAlto, colorFondoBarra[3], document.querySelectorAll(".sg_2_c"), 8, moneda())
-
-    kardex_salidas.forEach((event)=>{
-        if(event.comprobante.startsWith("Venta") && new Date(event.fecha).getFullYear() == anio_referencia.value){
-            suma_costos_salidas += event.costo_unitario * (event.existencias - event.existencias_devueltas);
-            suma_ventas += event.precio_venta_salidas * (event.existencias - event.existencias_devueltas);
-            suma_ventas_esperado += event.precio_venta * (event.existencias - event.existencias_devueltas);
-            num_ventas +=1;
-        }
-    });
-    //////////////////////////////////////////////////////////////////////////////////
-    if(kardex_salidas_categoria.length > 0){
-        kardex_salidas_categoria.forEach((event)=>{
-            venta_salidas_categoria += event.suma_ventas;
-            conteo_ventas_categoria += event.conteo;
-        });
-    }
-//////////////////////////////////////////////////////////////////////////////////
-    if(kardex_salidas_sucursal.length > 0){
-        kardex_salidas_sucursal.forEach((event)=>{
-            venta_salidas_sucursal += event.suma_ventas;
-            conteo_ventas_sucursal += event.conteo;
-        });
-    }
-    document.getElementById("kardex_margen").textContent = `${((1 - (suma_costos_salidas/suma_ventas)) * 100).toFixed(2)}%`
-    document.getElementById("kardex_margen_esperado").textContent = `${((1 - (suma_costos_salidas/suma_ventas_esperado)) * 100).toFixed(2)}%`
-    document.getElementById("kardex_num").textContent = `${num_ventas}  =>`
-    document.getElementById("kardex_venta").textContent = `${moneda()} ${suma_ventas.toFixed(2)}  =>`
-    document.getElementById("kardex_num_categoria").textContent = `${((num_ventas/conteo_ventas_categoria)*100).toFixed(2)}%`
-    document.getElementById("kardex_venta_categoria").textContent = `${((suma_ventas/venta_salidas_categoria)*100).toFixed(2)}%`
-    document.getElementById("kardex_num_sucursal").textContent = `${((num_ventas/conteo_ventas_sucursal)*100).toFixed(2)}%`
-    document.getElementById("kardex_venta_sucursal").textContent = `${((suma_ventas/venta_salidas_sucursal)*100).toFixed(2)}%`
-}
-function borrarAnalisis(){
-    document.getElementById("kardex_margen").textContent = ""
-    document.getElementById("kardex_margen_esperado").textContent = ""
-    document.getElementById("kardex_num").textContent = ""
-    document.getElementById("kardex_venta").textContent = ""
-
-    document.getElementById("kardex_num_categoria").textContent = ""
-    document.getElementById("kardex_venta_categoria").textContent = ""
+    graficoLineasVerticalUnid(  document.getElementById("grafico_kardex"), 
+                                array_entradas, 
+                                array_salidas, 
+                                array_transferencias, 
+                                array_despacho,
+                                [],
+                                mes_anio,
+                                ['Entradas', 'Salidas', 'Transferencias', 'Despacho'])
 };

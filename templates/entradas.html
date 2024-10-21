@@ -2,33 +2,7 @@
 
 {% block content %}
 <div class="entradas-form baja_opacidad">
-    <div class="tabla-proforma">
-        <h2 style="text-align: center; margin: 10px;">Volcado de datos (.csv)
-            <div class="tooltip_ayuda">
-                <span class="material-symbols-outlined">help</span>
-                <span class="tooltiptext_ayuda">Este apartado está destinado a migrar datos de una lista de productos externa.</span>
-            </div>
-        </h2>
-        <hr><br>
-        <p style="text-align: center;">Por favor, asegúrate de que los archivos que utilices estén en formato CSV.</p>
-        <div style="display: grid;justify-content: center; margin: 10px;">
-            <div style="display: flex; justify-content: center;">
-                <button id="exportar_formato">Descargar formato CSV</button>
-                <div class="tooltip_ayuda">
-                    <span class="material-symbols-outlined">download</span>
-                    <span class="tooltiptext_ayuda">Despues de hacer la descarga debe acomodar sus datos de acuerdo a este formato.</span>
-                </div>
-            </div>
-            <div style="display: flex; justify-content: center;">
-                <input type="file" id="carga_archivo" class="input_file_upload">
-                <div class="tooltip_ayuda">
-                    <span class="material-symbols-outlined">upload</span>
-                    <span class="tooltiptext_ayuda">Solo podrá volcar los datos si cumple con el formato previamente descargado.</span>
-                </div>
-            </div>
-            <button id="volcar_datos" class="myButtonEditar">Volcar</button>
-        </div>
-    </div>
+    
     <div id="acciones_rapidas_entradas" class="contenedor_pre">
     </div>
     <div class="contenedor_tabla_salidas">
@@ -105,6 +79,33 @@
                 </tr>
             </tfoot>
         </table>
+    </div>
+    <div class="tabla-proforma">
+        <h2 style="text-align: center; margin: 10px;">Volcado de datos (.csv)
+            <div class="tooltip_ayuda">
+                <span class="material-symbols-outlined">help</span>
+                <span class="tooltiptext_ayuda">Este apartado está destinado a migrar datos de una lista de productos externa.</span>
+            </div>
+        </h2>
+        <hr><br>
+        <p style="text-align: center;">Por favor, asegúrate de que los archivos que utilices estén en formato CSV.</p>
+        <div style="display: grid;justify-content: center; margin: 10px;">
+            <div style="display: flex; justify-content: center;">
+                <button id="exportar_formato">Descargar formato CSV</button>
+                <div class="tooltip_ayuda">
+                    <span class="material-symbols-outlined">download</span>
+                    <span class="tooltiptext_ayuda">Despues de hacer la descarga debe acomodar sus datos de acuerdo a este formato.</span>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: center;">
+                <input type="file" id="carga_archivo" class="input_file_upload">
+                <div class="tooltip_ayuda">
+                    <span class="material-symbols-outlined">upload</span>
+                    <span class="tooltiptext_ayuda">Solo podrá volcar los datos si cumple con el formato previamente descargado.</span>
+                </div>
+            </div>
+            <button id="volcar_datos" class="myButtonEditar">Volcar</button>
+        </div>
     </div>
     <details>
         <summary>Acciones</summary>

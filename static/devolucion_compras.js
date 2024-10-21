@@ -71,9 +71,6 @@ function ingresar(e){
     }
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function crearBodyDevoluciones(){
-
-}
 async function crearBodyDevoluciones(){
     let response = [];
     let operacion = `${document.getElementById("t_op").textContent}-${document.getElementById("buscador_operacion").value}`
@@ -322,28 +319,33 @@ removerTablaDevolucionesDos.addEventListener("click", () =>{
 });
 
 async function graficoDevolucionesCompras(){
-    devolucionesEntradas = await cargarDatos('entradas_suma_devoluciones_mes?'+
+    document.getElementById("contenedor_grafico_devoluciones").innerHTML = `<canvas id="grafico_devoluciones"></canvas>`
+    let devolucionesEntradas = await cargarDatos('entradas_suma_devoluciones_mes?'+
                                             `year_actual=${anio_principal}`)
-    let arrayDevolucionCompras = [];
-    let masAlto = 0;
+    let devolucionesSalidas = await cargarDatos(`salidas_suma_devoluciones_mes?`+
+                                            `year_actual=${anio_principal}`)
+    let array_entradas = [];
+    let array_salidas = [];
     document.querySelectorAll(".f_l_g").forEach((event, i)=>{
         event.textContent = `${meses_letras[i]}${anio_principal % 100}`;
     });
     for(let i = 0; i < 12; i++){
-        arrayDevolucionCompras.push(0);
+        let d_e = 0;
+        let d_s = 0;
         devolucionesEntradas.forEach((event)=>{
-            if(event.mes == i + 1){
-                arrayDevolucionCompras[i] = -event.suma_devoluciones_entradas;
-            }
-            if(masAlto < -event.suma_devoluciones_entradas){masAlto = -event.suma_devoluciones_entradas}
+            if(event.mes === i){
+                d_e = event.suma_devoluciones_entradas;
+            };
         });
+        devolucionesSalidas.forEach((event)=>{
+            if(event.mes === i){
+                d_s = event.suma_devoluciones_salidas;
+            };
+        });
+        array_entradas.push(d_e)
+        array_salidas.push(d_s)
     };
-    let masAltoDos = (226 * masAlto)/214;
-    document.querySelectorAll(".eje_y_numeracion").forEach((e)=>{
-        e.textContent = Number(masAltoDos).toFixed(2)
-        masAltoDos -= 0.20 * ((226 * masAlto)/214);
-    });
-    pintarGraficoPositivo(document.querySelectorAll(".cg_1_c"), arrayDevolucionCompras, masAlto, colorFondoBarra[0], document.querySelectorAll(".sg_1_c"), 8, moneda())
+    graficoBarrasVerticalUnid(document.getElementById("grafico_devoluciones"), array_entradas, array_salidas, ['Dev-Entradas', 'Dev-Salidas']);
 };
 
 document.getElementById("tipo_devolucion").addEventListener("change",()=>{
