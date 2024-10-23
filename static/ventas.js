@@ -1,7 +1,5 @@
 document.addEventListener("DOMContentLoaded", inicioVentas)
 function inicioVentas(){
-    indice_base = JSON.parse(localStorage.getItem("base_datos_consulta"))
-    indice_cli = JSON.parse(localStorage.getItem("base_datos_cli"))
     btnVentas = 1;
     cargarSucursalesEjecucion(document.getElementById("fffff-sucursal"))
     document.getElementById("buscador-productos-ventas").focus()
@@ -34,7 +32,6 @@ const existencias_almacen_ventas = document.getElementById("existencias-almacen-
 const saldo_existencias_almacen_ventas = document.getElementById("saldo-existencias-almacen-ventas")
 const total_ventas = document.getElementById("total-ventas")
 const formularioMetodoDePago = document.getElementById("contenedor-metodo-pago");
-let datos_usuario = JSON.parse(localStorage.getItem("datos_usuario"))
 btnCaja.addEventListener("click", (e) => {
     e.preventDefault();
     location.href = "/apertura_caja";
@@ -77,7 +74,7 @@ function buscarClienteVentas(cliente){// Función que busca clientes registrados
 };
 function funcionBusquedaCliente(opcion){
     let array_dato_cliente = ["nombre_cli", "dni_cli", "email_cli", "telefono_cli"];
-    let dato_cliente = indice_cli.find(y => y[array_dato_cliente[opcion - 1]].toLowerCase().includes(document.getElementById('buscar-cliente-ventas').value.toLowerCase()))
+    let dato_cliente = cli_db.find(y => y[array_dato_cliente[opcion - 1]].toLowerCase().includes(document.getElementById('buscar-cliente-ventas').value.toLowerCase()))
     if(dato_cliente !== undefined){
         document.getElementById("concurrencia_cliente").textContent = "";
         buscarClienteVentas(dato_cliente)
@@ -101,8 +98,8 @@ const registrarClienteVentas = document.getElementById("save-ventas-clientes");/
 registrarClienteVentas.addEventListener("click", saveClientesVentas)
 async function saveClientesVentas(e) {
     e.preventDefault();
-    let base_datos_clientes = JSON.parse(localStorage.getItem("base_datos_cli"))// Se carga la base de datos de clientes
-    let encontrado = base_datos_clientes.find(y => y.nombre_cli.toLowerCase().startsWith(document.getElementById("clientesv").value.toLowerCase()) && // Se busca alguna coincidencia de los datos ingresados con la base de datos de clientes
+    let clientes_consultaentes = JSON.parse(localStorage.getItem("clientes_consulta"))// Se carga la base de datos de clientes
+    let encontrado = clientes_consultaentes.find(y => y.nombre_cli.toLowerCase().startsWith(document.getElementById("clientesv").value.toLowerCase()) && // Se busca alguna coincidencia de los datos ingresados con la base de datos de clientes
                                             y.telefono_cli.toLowerCase().startsWith(document.getElementById("telefonov").value.toLowerCase()))
     if(encontrado === undefined){// Si no existen coincidencias de nombres y teléfono se procede al registro del nuevo cliente
         if(expregul.cliente.test(document.getElementById("clientesv").value) &&
@@ -122,8 +119,8 @@ async function saveClientesVentas(e) {
             let response = await funcionFetch(url, data);
             if(response.ok){
                 descolorearFormulario("#formularioClientesVentas input");
-                localStorage.setItem("base_datos_cli", JSON.stringify(await cargarDatos('clientes_ventas')))
-                indice_cli = JSON.parse(localStorage.getItem("base_datos_cli"))
+                localStorage.setItem("clientes_consulta", JSON.stringify(await cargarDatos('clientes_ventas')))
+                cli_db = JSON.parse(localStorage.getItem("clientes_consulta"))
                 buscarIdNuevo()
                 modal_proceso_abrir("Cliente registrado!!!.", "")
                 modal_proceso_salir_botones_focus("buscar-cliente-ventas")
@@ -148,7 +145,7 @@ async function saveClientesVentas(e) {
     };
 };
 function buscarIdNuevo(){// Busca datos de un cliente recien registrado 
-    let nuevo_id = indice_cli.find(x => x.nombre_cli === document.getElementById('clientesv').value &&
+    let nuevo_id = cli_db.find(x => x.nombre_cli === document.getElementById('clientesv').value &&
                                         x.dni_cli === document.getElementById('dniv').value &&
                                         x.email_cli === document.getElementById('emailv').value &&
                                         x.telefono_cli === document.getElementById('telefonov').value)
@@ -165,13 +162,13 @@ document.getElementById("boton_restablecer_form_clientes_ventas").addEventListen
 let sucursal_ventas = 0;
 let idx_suc = 0;
 buscador_codigo.addEventListener("keyup", async () =>{
-    let almacenCentral = indice_base.find(y => y.codigo.toLowerCase().startsWith(buscador_codigo.value.toLowerCase()))
+    let almacenCentral = buscarProductosDinamicamente(buscador_codigo.value.toLowerCase());
     if(almacenCentral){
         
         id_ventas.value = almacenCentral.idProd;
 
         sucursal_ventas = select_sucursal.value;
-        if(document.getElementById("puesto_usuario").textContent == obtenerIndiceSucursal("#fffff-sucursal")){
+        if(usu_db.puesto_usuario == obtenerIndiceSucursal("#fffff-sucursal")){
             idx_suc = obtenerIndiceSucursal("#fffff-sucursal");
         }else{
             idx_suc = obtenerIndiceSucursal("#fffff-sucursal");
@@ -487,7 +484,7 @@ async function funcionGeneralVentas(){
         });
     });
     function DatosDeVenta(){
-        this.id_num = datos_usuario[0].id;
+        this.id_num = neg_db[0].id;
         
         this.sucursal_v = suc__;
         this.item_ticket = input_tipo_comprobante.value;
@@ -498,7 +495,7 @@ async function funcionGeneralVentas(){
         this.canal_venta = document.getElementById("modo_pago_ventas").checked;
         this.dni_cliente = document.getElementById('txtIdv').value != "" ? 
                             document.getElementById('txtIdv').value : 
-                            indice_cli[0].id_cli;
+                            cli_db[0].id_cli;
         this.fecha = generarFecha();
         this.situacion = this.modo_credito > 0 ? "pendiente" : "liquidado";
 
@@ -673,9 +670,9 @@ function NuevaVentanaComprobanteDePago(nro_venta, ticket_venta) {
                         </style>
                         <div class="contenedor_ticket">
                         <div class="ticket">
-                            <p>${datos_usuario[0].nombre_empresa}</p>
-                            <p>${datos_usuario[0].direccion}</p>
-                            <p>RUC: ${datos_usuario[0].ruc}</p>
+                            <p>${neg_db[0].nombre_empresa}</p>
+                            <p>${neg_db[0].direccion}</p>
+                            <p>RUC: ${neg_db[0].ruc}</p>
                             <p>Sede: ${select_sucursal.children[select_sucursal.selectedIndex].textContent}</p>
                             <h2 class="tipo_comprobante">${tipo_comprobante}</h2>
                             <br>
@@ -728,7 +725,7 @@ function NuevaVentanaComprobanteDePago(nro_venta, ticket_venta) {
                                     </tr>
                                 </tfoot>   
                             </table>
-                            <p>USUARIO: ${document.getElementById("puesto_usuario").textContent}</p>
+                            <p>USUARIO: ${usu_db.puesto_usuario}</p>
                             <p>LADO: ORIGINAL   </p>
                                         <img class="codBarTicket" src="">
                             <br>
@@ -1009,8 +1006,6 @@ precioAdAVender.addEventListener("keyup", () =>{
 
 
 async function actualizarSaldos(){//Esto se usa cuando el producto ya está en la lista de productos y no cuenta con stock suficiente
-    indice_base = JSON.parse(localStorage.getItem("base_datos_consulta"))
-    indice_cli = JSON.parse(localStorage.getItem("base_datos_cli"))
     modal_proceso_abrir("Inspeccionando stock.", "")
     const id_rev = document.querySelectorAll(".id_proforma");
     let ids = Array.from(id_rev).map(element => element.textContent);// buscamos todos los códigos (id) de la tabla
@@ -1085,7 +1080,7 @@ function agregarBusquedaDetalleUno(button){
 
     id_ventas.value = linea.children[0].textContent;
     sucursal_ventas = select_sucursal.value;
-    if(document.getElementById("puesto_usuario").textContent == obtenerIndiceSucursal("#fffff-sucursal")){
+    if(usu_db.puesto_usuario == obtenerIndiceSucursal("#fffff-sucursal")){
         idx_suc = obtenerIndiceSucursal("#fffff-sucursal");
     }else{
         idx_suc = obtenerIndiceSucursal("#fffff-sucursal");
@@ -1110,7 +1105,7 @@ function busquedaDetalle(indice, termino){
                         `<span style="width: 80px;"><h3>Mandar a formulario</h3></span>`+
                     `</li>`;
     
-    for (let event of indice_base){
+    for (let event of inv_db){
         let parametro = [event.codigo, event.descripcion, ""]
         if (parametro[indice].toLowerCase().includes(terminoBusqueda.toLowerCase()) && terminoBusqueda !== "" &&
         (Number(document.getElementById("categoria_buscador_detalle").value) === event.categoria ||

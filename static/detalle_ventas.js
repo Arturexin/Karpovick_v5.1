@@ -153,8 +153,7 @@ function manejoDeFechas(){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 async function buscarTicketVenta(id_ventas) {
-    let datos_usuario = JSON.parse(localStorage.getItem("datos_usuario"))
-    let datos_cliente = JSON.parse(localStorage.getItem("base_datos_cli"))
+    let datos_cliente = JSON.parse(localStorage.getItem("clientes_consulta"))
     let numeracion_comprobante_venta = "";
     let importe_venta = 0;
     let nombre_cliente = "";
@@ -210,9 +209,9 @@ async function buscarTicketVenta(id_ventas) {
                         </style>
                         <div class="contenedor_ticket">
                         <div class="ticket">
-                            <p>${datos_usuario[0].nombre_empresa}</p>
-                            <p>${datos_usuario[0].direccion}</p>
-                            <p>RUC: ${datos_usuario[0].ruc}</p>
+                            <p>${neg_db[0].nombre_empresa}</p>
+                            <p>${neg_db[0].direccion}</p>
+                            <p>RUC: ${neg_db[0].ruc}</p>
                             <p>Sede: ${filaDetalleVenta.sucursal_nombre}</p>
                             <h2 class="tipo_comprobante">${numeracion_comprobante_venta}</h2>
                             <br>
@@ -268,7 +267,7 @@ async function buscarTicketVenta(id_ventas) {
                                     </tr>
                                 </tfoot>   
                             </table>
-                            <p>USUARIO: ${document.getElementById("puesto_usuario").textContent}</p>
+                            <p>USUARIO: ${usu_db.puesto_usuario}</p>
                             <p>LADO: COPIA</p>
                                         <img class="codBarTicket" src="">
                             <p>PRESENTACIÓN IMPRESA DE LA<p>

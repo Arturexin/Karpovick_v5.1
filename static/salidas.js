@@ -119,7 +119,7 @@ function manejoDeFechas(){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 async function accionRemove(id) {
     let salidas = base_datos.array.find(y => y.idSal == id)// obtenemos los datos de la fila
-    let db = JSON.parse(localStorage.getItem("base_datos_consulta"))
+    let db = JSON.parse(localStorage.getItem("inventarios_consulta"))
     let producto = db.find(x=> x.codigo === salidas.codigo)
 
     tabla_proforma_productos(producto, "Eliminar salida", salidas.categoria_nombre, salidas.comprobante);
@@ -157,9 +157,8 @@ let indice_sucursal_salidas = 0;
 
 function accionDevoluciones(id) {
     let salidas = base_datos.array.find(x => x.idSal == id)
-    console.log(salidas)
-    let db = JSON.parse(localStorage.getItem("base_datos_consulta"))
-    let sucursales_comparacion = JSON.parse(localStorage.getItem("sucursal_encabezado"))
+    let db = JSON.parse(localStorage.getItem("inventarios_consulta"))
+    let sucursales_comparacion = JSON.parse(localStorage.getItem("sucursal_consulta"))
     if(salidas.comprobante.startsWith("Venta")){
         let producto = db.find(x=> x.codigo === salidas.codigo)
         tabla_proforma_productos(producto, "Devoluciones", salidas.categoria_nombre, salidas.comprobante)
@@ -231,7 +230,7 @@ function tabla_body_productos(prod_, i, id_suc){
                     `<td>
                         <input class="input-tablas-dos-largo q_dev" onKeyup = "op_dev(this)">
                     </td>` + //Devolución
-                    `<td style="text-align: center; width: 90px" class="s_dev">${prod_.existencias_salidas}</td>` + // Saldo
+                    `<td style="text-align: center; width: 90px" class="s_dev">${prod_.existencias_salidas - prod_.existencias_devueltas}</td>` + // Saldo
                     `<td>   
                         <select id="accion_causa_devolucion_entradas" class="input-general-importante fondo-importante">
                             <option value="0" selected="">-- Causa de devolución --</option>                                    
@@ -268,7 +267,7 @@ function removerContenido(){
 };
 function op_dev(e){
     let row_ = e.closest("tr");
-    row_.children[6].textContent = Number(row_.children[3].textContent) - Number(row_.children[5].children[0].value )
+    row_.children[6].textContent = Number(row_.children[3].textContent) - (Number(row_.children[5].children[0].value) + Number(row_.children[4].textContent))
     Number(row_.children[6].textContent) < 0 || 
     isNaN(Number(row_.children[6].textContent)) ?   row_.children[6].style.background = "var(--boton-dos)": 
                                                     row_.children[6].style.background = "";
@@ -281,8 +280,11 @@ async function procesarDevolucion(){
     modal_proceso_abrir("Procesando la devolución de la venta!!!.", "")
     manejoDeFechas()
     let inputs = document.querySelectorAll(".q_dev");
+    let texts_saldos = document.querySelectorAll(".s_dev");
     let valores = Array.from(inputs).map(input => Number(input.value));
-    if (valores.every(valor => valor >= 0 && Number.isFinite(valor)) && valores.some(valor => valor > 0)){
+    let valores_saldos = Array.from(texts_saldos).map(texts_saldos => Number(texts_saldos.textContent));
+    if (valores.every(valor => valor >= 0 && Number.isFinite(valor)) && valores.some(valor => valor > 0) &&
+    valores_saldos.every(valor => valor >= 0 && Number.isFinite(valor))){
         try{
             await realizarDevolucion()
             await conteoFilas(subRutaA(1), filas_total_bd, indice_tabla, 
@@ -294,6 +296,9 @@ async function procesarDevolucion(){
             console.error("Ocurrió un error. ", error)
             modal_proceso_salir_botones()
         };
+    }else{
+        modal_proceso_abrir(`Uno o varios de los valores son incorrectos.`, ``)
+        modal_proceso_salir_botones()
     };
 };
 async function realizarDevolucion(){

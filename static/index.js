@@ -15,7 +15,6 @@ function generarFecha(){
     return fechaPrincipal;
 };
 let clave_form = 0;
-let array_sucursales = [];
 let colorFondoBarra = ["#E6CA7B","#91E69C","#6380E6","#E66E8D","#4D4D4D"];
 let sucursales_activas = ['existencias_ac', 'existencias_su', 'existencias_sd', 'existencias_st', 'existencias_sc'];
 let suc_add = ["Almacén Central", "Sucursal Uno", "Sucursal Dos", "Sucursal Tres", "Sucursal Cuatro"];
@@ -47,13 +46,14 @@ const monedas = {
                 }; 
 
 function moneda(){
-    return monedas[JSON.parse(localStorage.getItem("datos_usuario"))[0].moneda]
+    return monedas[JSON.parse(localStorage.getItem("datos_negocio"))[0].moneda]
 };
 function agregarMoneda(elemento){
     elemento.forEach((event)=>{
         event.textContent = `${moneda()}`;
     });
 };
+
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
 function cambiarAnio(){
@@ -86,35 +86,43 @@ document.getElementById("actualizar_bases").addEventListener("click", async (eve
 });
 async function cargarIndices(){
     try{
-        if(!localStorage.getItem("base_datos_consulta") || JSON.parse(localStorage.getItem("base_datos_consulta")).length === 0){
-            localStorage.setItem("base_datos_consulta", JSON.stringify(await cargarDatos('almacen_central_ccd')))
+        if(!localStorage.getItem("inventarios_consulta") || JSON.parse(localStorage.getItem("inventarios_consulta")).length === 0){
+            localStorage.setItem("inventarios_consulta", JSON.stringify(await cargarDatos('almacen_central_ccd')))
         };
-        if(!localStorage.getItem("sucursal_encabezado") || JSON.parse(localStorage.getItem("sucursal_encabezado")).length === 0){
-            localStorage.setItem("sucursal_encabezado", JSON.stringify(await cargarDatos('sucursales_index')))
+        if(!localStorage.getItem("sucursal_consulta") || JSON.parse(localStorage.getItem("sucursal_consulta")).length === 0){
+            localStorage.setItem("sucursal_consulta", JSON.stringify(await cargarDatos('sucursales_index')))
         };
         if(!localStorage.getItem("categoria_consulta") || JSON.parse(localStorage.getItem("categoria_consulta")).length === 0){
             localStorage.setItem("categoria_consulta", JSON.stringify(await cargarDatos('categorias')))
         };
-        if(!localStorage.getItem("base_datos_prov") || JSON.parse(localStorage.getItem("base_datos_prov")).length === 0){
-            localStorage.setItem("base_datos_prov", JSON.stringify(await cargarDatos('proveedores')))
+        if(!localStorage.getItem("proveedores_consulta") || JSON.parse(localStorage.getItem("proveedores_consulta")).length === 0){
+            localStorage.setItem("proveedores_consulta", JSON.stringify(await cargarDatos('proveedores')))
         };
-        if(!localStorage.getItem("base_datos_cli") || JSON.parse(localStorage.getItem("base_datos_cli")).length === 0){
-            localStorage.setItem("base_datos_cli", JSON.stringify(await cargarDatos('clientes_ventas')))
+        if(!localStorage.getItem("clientes_consulta") || JSON.parse(localStorage.getItem("clientes_consulta")).length === 0){
+            localStorage.setItem("clientes_consulta", JSON.stringify(await cargarDatos('clientes_ventas')))
+        };
+        if(!localStorage.getItem("datos_negocio") || JSON.parse(localStorage.getItem("datos_negocio")).length === 0){
+            localStorage.setItem("datos_negocio", JSON.stringify(await cargarDatos('numeracion_comprobante_datos')))
         };
         if(!localStorage.getItem("datos_usuario") || JSON.parse(localStorage.getItem("datos_usuario")).length === 0){
-            localStorage.setItem("datos_usuario", JSON.stringify(await cargarDatos('numeracion_comprobante_datos')))
+            localStorage.setItem("datos_usuario", JSON.stringify(await cargarDatos('datos_usuario')))
         };
     }catch (error){
         alert('Error al cargar índices:', error.message);
         console.error('Error al cargar índices:', error.message);
     };
 };
-let indice_base = [];
-let suc_db = JSON.parse(localStorage.getItem("sucursal_encabezado"))
-let cat_db = JSON.parse(localStorage.getItem("categoria_consulta"))
-let prv_db = JSON.parse(localStorage.getItem("base_datos_prov"))
 
-let indice_cli = [];
+let inv_db = JSON.parse(localStorage.getItem("inventarios_consulta"));
+let suc_db = JSON.parse(localStorage.getItem("sucursal_consulta"));
+let cat_db = JSON.parse(localStorage.getItem("categoria_consulta"));
+let prv_db = JSON.parse(localStorage.getItem("proveedores_consulta"));
+let cli_db = JSON.parse(localStorage.getItem("clientes_consulta"));
+let usu_db = JSON.parse(localStorage.getItem("datos_usuario"));
+let neg_db = JSON.parse(localStorage.getItem("datos_negocio"));
+
+
+
 async function cargarDatos(ruta){
     let url = URL_API_almacen_central + ruta
     try{
@@ -189,21 +197,26 @@ function cargarSucursalesEjecucion(elemento_id){// SE LLAMA AL CARGAR LA PAGINA 
     let html_sucursal = ''
     for(let i = 0; i < suc_db.length; i++){
         let fila = ""
-        if(array_sucursales.length < 5){
-            array_sucursales.push(suc_db[i].sucursal_nombre)
-        }
-        if(document.getElementById("puesto_usuario").textContent == 1){
+        if(usu_db.puesto_usuario == 1){
             fila = `<option value="${suc_db[1].id_sucursales }">${suc_db[1].sucursal_nombre}</option>`
-        }else if(document.getElementById("puesto_usuario").textContent == 2){
+            html_sucursal = html_sucursal + fila;
+            break
+        }else if(usu_db.puesto_usuario == 2){
             fila = `<option value="${suc_db[2].id_sucursales }">${suc_db[2].sucursal_nombre}</option>`
-        }else if(document.getElementById("puesto_usuario").textContent == 3){
+            html_sucursal = html_sucursal + fila;
+            break
+        }else if(usu_db.puesto_usuario == 3){
             fila = `<option value="${suc_db[3].id_sucursales }">${suc_db[3].sucursal_nombre}</option>`
-        }else if(document.getElementById("puesto_usuario").textContent == 4){
+            html_sucursal = html_sucursal + fila;
+            break
+        }else if(usu_db.puesto_usuario == 4){
             fila = `<option value="${suc_db[4].id_sucursales }">${suc_db[4].sucursal_nombre}</option>`
+            html_sucursal = html_sucursal + fila;
+            break
         }else{
             fila = `<option value="${suc_db[i].id_sucursales }">${suc_db[i].sucursal_nombre}</option>`
+            html_sucursal = html_sucursal + fila;
         }
-        html_sucursal = html_sucursal + fila;
     }
     elemento_id.innerHTML = html_sucursal
 };
@@ -217,7 +230,7 @@ function llenarCategoriaProductosEjecucion(){
     return html_cat;
 };
 function baseProv(){
-    prov_con = JSON.parse(localStorage.getItem("base_datos_prov"))
+    prov_con = JSON.parse(localStorage.getItem("proveedores_consulta"))
    let html = `<option value="0" selected>-- Seleccione un proveedor --</option>`;
     for(prov of prov_con) {
         let fila;
@@ -302,10 +315,19 @@ function sidebarMarcadito(){
 ///////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////
 const cerrarSesion = document.getElementById("cerrar-sesion");
-cerrarSesion.addEventListener("click", (event) => {
+cerrarSesion.addEventListener("click", async () => {
     localStorage.clear();
-    guardadoUsuario = ""
-    location.reload();
+    
+    let response  = await fetch('/logout', {
+        "method": 'GET',
+        "headers": {
+            "Content-Type": 'application/json'  
+        }
+    });
+    if(response.ok){
+        location.href = response.url
+        location.reload();
+    };
 });
 /////////////////////////////////////////////////////////////////////////////////////////////
 function menuVertical(){
@@ -348,14 +370,8 @@ function expancionTexto(){
         event.children[1].classList.remove("invisible")
     })
 }    
-/////////////////////////////////////////////////////////////////////////////////////
-document.querySelector(".usuario_cliente").addEventListener("click", ()=>{
-    document.querySelector(".usuario_cliente").classList.toggle("cambioColor")
-    document.querySelector(".usuario_opciones").classList.toggle("usuario_opciones_dos")
-})
-//////////////////////////////////////////////////////////////////////////////////////
-//////TEMPORIZADOR///////////////////////////////////////////////////////
 
+//////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
 const colores_fondo_web = {
     fondo_principal : ["#121212", "#d8a7eb", "#FFD700", "#FBF5EE"],
@@ -503,3 +519,61 @@ function imprimirListaTabla() {
     ventanaImpresion.document.close();
     document.querySelector("#check_comprobante").checked = false
 }
+////////////////////// Función para dividir productos en grupos según el primer carácter del código
+function dividirProductosDinamicamente(productos) {
+    let grupos = {};
+    
+    productos.forEach(producto => {
+        // Obtener el primer carácter del código en mayúscula
+        let primerCaracter = producto.codigo[0].toUpperCase();
+        
+        // Si el grupo no existe, se crea un nuevo array para ese carácter
+        if (!grupos[primerCaracter]) {
+            grupos[primerCaracter] = [];
+        }
+        
+        // Agregar el producto al grupo correspondiente
+        grupos[primerCaracter].push(producto);
+    });
+    return grupos;
+}
+
+let inv_db_grupo = dividirProductosDinamicamente(inv_db);
+
+// Función para buscar productos en los grupos generados
+function buscarProductosDinamicamente(texto) {
+    /* let productosPorGrupo = JSON.parse(localStorage.getItem('productosPorGrupo')); */
+    if(texto !== ""){
+
+        let textoBuscado = texto.toLowerCase();
+        let primerCaracter = textoBuscado[0].toUpperCase();
+        
+        // Buscar en el grupo correspondiente si existe
+        if (!inv_db_grupo[primerCaracter]) {
+            return []; // Si no existe el grupo, no hay resultados
+        }
+        
+        // Filtrar los productos en el grupo seleccionado
+        return inv_db_grupo[primerCaracter].find(y => y.codigo.toLowerCase().startsWith(texto.toLowerCase()))
+        /* return productosPorGrupo[primerCaracter].filter(producto => producto.codigo.toLowerCase().startsWith(textoBuscado)); */
+    }
+};
+function buscarProducto(textoBusqueda){
+    textoBusqueda.addEventListener("keyup", () =>{
+        
+        let prod_ = buscarProductosDinamicamente(textoBusqueda.value);
+        
+        if(prod_){
+            document.getElementById('id-form').value = prod_.idProd
+            document.getElementById('categoria-form').value = prod_.categoria
+            document.getElementById('codigo-form').value = prod_.codigo
+            document.getElementById('descripcion-form').value = prod_.descripcion
+            if(document.getElementById('buscador-productos-form').value == ""){
+                reseteoFormulario()
+            }
+        }else{
+            reseteoFormulario()
+        };
+    });
+}
+////////////////////////////////////////////////////////////////////////////////////////

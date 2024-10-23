@@ -2,6 +2,8 @@ from datetime import datetime, timedelta
 from flask import Blueprint, jsonify, request, session
 from flask_cors import cross_origin
 from flask_login import login_required
+from routes.numeracion_routes import incrementar_obtener_numeracion
+from routes.productos_routes import actualizar_almacen_central
 from db_connection import mysql
 
 # Definimos el blueprint para las rutas de transferencias
@@ -278,61 +280,9 @@ def operarTransferencia():
     except Exception as e:
         mysql.connection.rollback()
         return jsonify({"status": "error", "message": str(e)}), 500
-
-def incrementar_obtener_numeracion(cur, dato_uno, usuarioLlave, nombre, concepto):
-    # Actualizar la numeración
-    query_numeracion = ("UPDATE `numeracion_comprobante` SET transferencias = transferencias + %s "
-                        "WHERE `numeracion_comprobante`.`id` = %s AND identificador = %s")
-    data_numeracion = (dato_uno, request.json['id_num'], usuarioLlave)
-    cur.execute(query_numeracion, data_numeracion)
-    
-    # Obtener la numeración actualizada
-    query = ("SELECT id, compras, recompras, transferencias, ventas, nota_venta, boleta_venta, factura "
-             "FROM numeracion_comprobante WHERE `identificador` = %s")
-    cur.execute(query, (usuarioLlave,))
-    data = cur.fetchall()
-    
-    contenido = { 
-        'id': data[0][0],
-        'compras': data[0][1],
-        'recompras': data[0][2],
-        'transferencias': data[0][3],
-        'ventas': data[0][4],
-        'nota_venta': data[0][5],
-        'boleta_venta': data[0][6],
-        'factura': data[0][7]
-    }
-
-    return f"{nombre}-{contenido[concepto]}"
-
-def actualizar_almacen_central(cur, array_productos, usuarioLlave):
-    query = (   "UPDATE `almacen_central` SET "
-                "existencias_ac = existencias_ac + %s, "
-                "existencias_su = existencias_su + %s, "
-                "existencias_sd = existencias_sd + %s, "
-                "existencias_st = existencias_st + %s, "
-                "existencias_sc = existencias_sc + %s "
-                "WHERE `almacen_central`.`idProd` = %s "
-                "AND `almacen_central`.`estado` > 0 "
-                "AND identificadorProd = %s "
-                # Validación: asegurarse de que las existencias no queden negativas
-                "AND (existencias_ac + %s) >= 0 "
-                "AND (existencias_su + %s) >= 0 "
-                "AND (existencias_sd + %s) >= 0 "
-                "AND (existencias_st + %s) >= 0 "
-                "AND (existencias_sc + %s) >= 0")
-    data_productos =    [
-                            (p['existencias_ac'], p['existencias_su'], p['existencias_sd'],
-                            p['existencias_st'], p['existencias_sc'], p['idProd'], usuarioLlave,
-                            p['existencias_ac'], p['existencias_su'], p['existencias_sd'],
-                            p['existencias_st'], p['existencias_sc']) 
-                            for p in array_productos
-                        ]
-    cur.executemany(query, data_productos)
-
-    # Verificar si la cantidad de filas actualizadas es igual a la cantidad de productos
-    if cur.rowcount != len(array_productos):
-        raise Exception("Uno de los productos no cuenta con unidades suficientes, actualice los saldos.")
+###########################################################################################################
+###########################################################################################################
+###########################################################################################################
 
 def procesar_transferencias(cur, array_transferecnias, usuarioId, usuarioLlave, numeracion, dato_uno):
     query_transferencias =  ("INSERT INTO `transfrencias` "

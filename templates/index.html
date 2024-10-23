@@ -28,7 +28,7 @@
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
-    <link rel="icon" href="../static/images/Karpovick_logo_uno.png" type="image/x-icon">
+    <link rel="icon" href="../static/images/Karpovick_logo_dos.png" type="image/x-icon">
     <title>Karpovick</title>
     
 </head>
@@ -184,13 +184,7 @@
         
         {% block content %}
         {% endblock %}
-        <div class="usuario_opciones">
-            <ul>
-                <li><p id="puesto_usuario">{{ puesto }}</p></li>
-                <li><p id="identificacion_usuario_id">{{ identificacion_usuario }}</p></li>
-                <li><a href="{{ url_for('logout')}}" id="cerrar-sesion">Salir</a></li>
-            </ul>
-        </div>
+        
     </main>
 
     <div class="contenedor_cabecera_principal">
@@ -222,11 +216,12 @@
                 <div class="color_fondo" id="color_cafe"></div>
                 <div class="color_fondo" id="color_blanco"></div>
             </div>
-            <div class="usuario_cliente">
+            <div class="usuario-cabecera">
                 <span class="material-symbols-outlined">
                     person
                 </span>
-                <p id="usuario-cliente" class="usuario-cabecera">{{ usuario_nombre }}</p>
+                <span id="usuario-cliente">{{ usuario_nombre }}</span>
+                <span id="cerrar-sesion" class="usuario_cliente">Salir</span>
             </div>
             
         </div>
@@ -234,7 +229,6 @@
 
     <div id="myModal" class="modal">
     </div>
-
     
     <script src="../static/index.js"></script>
     <script src="../static/componentes_creados.js"></script>

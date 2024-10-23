@@ -2,6 +2,9 @@ from datetime import datetime, timedelta
 from flask import Blueprint, jsonify, request, session
 from flask_cors import cross_origin
 from flask_login import login_required
+from routes.numeracion_routes import incrementar_obtener_numeracion_v
+from routes.productos_routes import actualizar_almacen_central
+from routes.productos_routes import actualizar_almacen_central_suma
 from db_connection import mysql
 
 # Definimos el blueprint para las rutas de salidas
@@ -688,7 +691,7 @@ def gestionDeVenta():
         with mysql.connection.cursor() as cur:
 
             # Numeración
-            numeracion = incrementar_obtener_numeracion(cur, item_ticket, dato_uno, usuarioLlave, ticket)
+            numeracion = incrementar_obtener_numeracion_v(cur, item_ticket, dato_uno, usuarioLlave, ticket)
 
             try:
                 actualizar_almacen_central(cur, array_productos, usuarioLlave)
@@ -720,96 +723,9 @@ def gestionDeVenta():
         mysql.connection.rollback()# Hacer rollback en caso de cualquier error
         return jsonify({"status": "error", "message": str(e)})
 
-
-def incrementar_obtener_numeracion(cur, item_ticket, dato_uno, usuarioLlave, ticket):
-    # Actualizar la numeración
-    query_numeracion = (f"UPDATE `numeracion_comprobante` SET ventas = ventas + %s, {item_ticket} = {item_ticket} + %s "
-                        "WHERE `numeracion_comprobante`.`id` = %s AND identificador = %s")
-    data_numeracion = (dato_uno, dato_uno, request.json['id_num'], usuarioLlave)
-    cur.execute(query_numeracion, data_numeracion)
-    
-    # Obtener la numeración actualizada
-    query = ("SELECT id, compras, recompras, transferencias, ventas, nota_venta, boleta_venta, factura "
-             "FROM numeracion_comprobante WHERE `identificador` = %s")
-    cur.execute(query, (usuarioLlave,))
-    data = cur.fetchall()
-    
-    contenido = { 
-        'id': data[0][0],
-        'compras': data[0][1],
-        'recompras': data[0][2],
-        'transferencias': data[0][3],
-        'ventas': data[0][4],
-        'nota_venta': data[0][5],
-        'boleta_venta': data[0][6],
-        'factura': data[0][7]
-    }
-    
-    return [f"Venta-{contenido['ventas']}", f"{ticket}{contenido[item_ticket]}"]
-
-def actualizar_almacen_central_suma(cur, recompra_data, usuarioLlave, nombre_array):
-    """
-    Procesa los productos, agrupa los datos por sucursal y actualiza el inventario en la tabla 'almacen_central'.
-    """
-    # Diccionario para almacenar los datos de actualización agrupados por sucursal_post
-    data_productos_por_sucursal = {'existencias_ac': [], 'existencias_su': [], 'existencias_sd': [], 'existencias_st': [],
-                                   'existencias_sc':[]}
-    data_len = 0
-    # Procesar los productos
-    for producto in recompra_data[nombre_array]:
-        idProd = producto['idProd']
-        sucursal_post = producto['sucursal_post']
-        existencias_post = producto['existencias_post']
-
-        # Validar la sucursal
-        if sucursal_post not in data_productos_por_sucursal:
-            return jsonify({"status": "error", "message": f"Sucursal no válida: {sucursal_post}"}), 400
-
-        # Agregar los datos al grupo correspondiente
-        data_productos_por_sucursal[sucursal_post].append((existencias_post, idProd, usuarioLlave, existencias_post))
-
-    # Ejecutar las actualizaciones agrupadas por sucursal_post
-    for sucursal_post, data_productos in data_productos_por_sucursal.items():
-        if data_productos:  # Verificar si hay datos para esta sucursal_post
-            data_len = len(data_productos)
-            query = (f"UPDATE `almacen_central` SET {sucursal_post} = {sucursal_post} + %s "
-                     "WHERE `almacen_central`.`idProd` = %s "
-                     "AND identificadorProd = %s "
-                     "AND almacen_central.estado > 0 "
-                     f"AND {sucursal_post} >= %s")
-            cur.executemany(query, data_productos)
-
-    if cur.rowcount != data_len:
-        raise Exception("Uno de los productos no cuenta con unidades suficientes, actualice los saldos.")
-    
-def actualizar_almacen_central(cur, array_productos, usuarioLlave):
-    query = (   "UPDATE `almacen_central` SET "
-                "existencias_ac = existencias_ac + %s, "
-                "existencias_su = existencias_su + %s, "
-                "existencias_sd = existencias_sd + %s, "
-                "existencias_st = existencias_st + %s, "
-                "existencias_sc = existencias_sc + %s "
-                "WHERE `almacen_central`.`idProd` = %s "
-                "AND `almacen_central`.`estado` > 0 "
-                "AND identificadorProd = %s "
-                # Validación: asegurarse de que las existencias no queden negativas
-                "AND (existencias_ac + %s) >= 0 "
-                "AND (existencias_su + %s) >= 0 "
-                "AND (existencias_sd + %s) >= 0 "
-                "AND (existencias_st + %s) >= 0 "
-                "AND (existencias_sc + %s) >= 0")
-    data_productos =    [
-                            (p['existencias_ac'], p['existencias_su'], p['existencias_sd'],
-                            p['existencias_st'], p['existencias_sc'], p['idProd'], usuarioLlave,
-                            p['existencias_ac'], p['existencias_su'], p['existencias_sd'],
-                            p['existencias_st'], p['existencias_sc']) 
-                            for p in array_productos
-                        ]
-    cur.executemany(query, data_productos)
-
-    # Verificar si la cantidad de filas actualizadas es igual a la cantidad de productos
-    if cur.rowcount != len(array_productos):
-        raise Exception("Uno de los productos no cuenta con unidades suficientes, actualice los saldos.")
+####################################################################################################
+####################################################################################################
+####################################################################################################
 
 def insertar_salidas(cur, array_salidas, numeracion, usuarioId, usuarioLlave, dato_cero, dato_uno, fecha, cliente):
     query_salidas = ("INSERT INTO `salidas` "

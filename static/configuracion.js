@@ -170,6 +170,7 @@ async function saveCategoria(e) {
         if(response.ok){
             await buscarCategoria(data, Number(data.id))
             localStorage.setItem("categoria_consulta", JSON.stringify(await cargarDatos('categorias')))
+            cat_db = JSON.parse(localStorage.getItem("categoria_consulta"));
             modal_proceso_abrir("Categoría modificada exitosamente.", "")
             modal_proceso_salir_botones()
             formularioConfiguracionCategorias.reset();
@@ -198,7 +199,7 @@ async function buscarCategoria(objeto, categoria_id){
                             categoria_tabla.siete, categoria_tabla.ocho, categoria_tabla.nueve, categoria_tabla.diez, categoria_tabla.once, categoria_tabla.doce] 
         let filtro_medidas_tabla = _medidas_tabla.filter(elemento => elemento.trim() !== "")
 
-        let base_datos_busqueda = JSON.parse(localStorage.getItem("base_datos_consulta"))
+        let base_datos_busqueda = JSON.parse(localStorage.getItem("inventarios_consulta"))
         let base_filtro = base_datos_busqueda.filter(id => id.categoria === categoria_id)
 
         let iteracion = 0;
@@ -219,7 +220,7 @@ async function buscarCategoria(objeto, categoria_id){
             };
         };
         if(iteracion > 0){
-            localStorage.setItem("base_datos_consulta", JSON.stringify(base_datos_busqueda));
+            localStorage.setItem("inventarios_consulta", JSON.stringify(base_datos_busqueda));
             modal_proceso_abrir(`Datos actualizados exitosamente.`, "");
             modal_proceso_salir_botones();
         };
@@ -356,7 +357,8 @@ async function saveNumeracionDatos(e) {
     let url = URL_API_almacen_central + 'numeracion_comprobante_datos'
     await funcionFetch(url, data)
     searchDatosUsuario();
-    localStorage.setItem("datos_usuario", JSON.stringify(await cargarDatos('numeracion_comprobante_datos')))
+    localStorage.setItem("datos_negocio", JSON.stringify(await cargarDatos('numeracion_comprobante_datos')))
+    neg_db = JSON.parse(localStorage.getItem("datos_negocio"));
     agregarMoneda(document.querySelectorAll(".moneda_cabecera"))
     formularioConfiguracionNumeracionDatos.reset();
 };
@@ -504,7 +506,7 @@ async function reproducirUsuario(id){
         modal_proceso_abrir(`Reanudando usuario`, "")
         data = {
             'id': usuario.id,
-            'vinculacion': document.getElementById("identificacion_usuario_id").textContent,
+            'vinculacion': usu_db.id_usuario,
             'clave': 1,
             'num_sucursales': 0,
             'num_usuarios': 0
@@ -527,7 +529,7 @@ async function pausarUsuario(id){
         modal_proceso_abrir(`Pausando usuario`, "")
         data = {
             'id': usuario.id,
-            'vinculacion': document.getElementById("identificacion_usuario_id").textContent,
+            'vinculacion': usu_db.id_usuario,
             'clave': 4,
             'num_sucursales': 0,
             'num_usuarios': 0
@@ -550,7 +552,7 @@ async function desactivarUsuario(id){
         modal_proceso_abrir(`Desactivando usuario`, "")
         data = {
             'id': usuario.id,
-            'vinculacion': document.getElementById("identificacion_usuario_id").textContent,
+            'vinculacion': usu_db.id_usuario,
             'clave': 2,
             'num_sucursales': 0,
             'num_usuarios': 0
@@ -615,6 +617,8 @@ document.getElementById("agregar_sucursal").addEventListener("click", async (e)=
             let response = await funcionFetch(url, data)
             console.log(response.status)
             if(response.ok){
+                localStorage.setItem("sucursal_consulta", JSON.stringify(await cargarDatos('sucursales_index')))
+                suc_db = JSON.parse(localStorage.getItem("sucursal_consulta"));
                 modal_proceso_abrir(`${data.sucursal_nombre} ha sido creado.`, "")
                 modal_proceso_salir_botones()
             }

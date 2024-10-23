@@ -8,12 +8,14 @@ body{
     font-family: 'Roboto', sans-serif;
     font-size: 20px;
     color: #eee;
+    height: 100vh;
 }
 .contenedor-login{
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     background: #17171a;
+    height: 54vh;
 }
 
 .contenedor-login input{
@@ -27,53 +29,12 @@ body{
     margin: 20px;
 }
 .contenedor-formulario-uno {
-    display: none;
-    background: rgba(182, 182, 182, 0.226);
+    background: rgb(179 117 211 / 23%);
     border-radius: 14px;
     color: #eee;
-    opacity: 0;/* con esto ocultamos el modal */
-    pointer-events: none;
-    transition: opacity .5s;
-}
-.contenedor-formulario-uno-show {
-    display: grid;
-    opacity: 1;/* con esto ocultamos el modal */
-    pointer-events: unset;
-    transition: opacity .5s;
+    padding: 20px 10px;
 }
 .contenedor-formulario-uno label{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 16px;
-    gap: 10px;
-    padding: 0 20px;
-}
-.crear-cuenta {
-    margin-left: auto;
-    margin-right: 20px;
-    cursor: pointer;
-}
-.crear-cuenta:hover {
-    color: brown;
-    
-}
-.contenedor-formulario-dos {
-    display: none;
-    background: rgba(182, 182, 182, 0.226);
-    border-radius: 14px;
-    color: #eee;
-    opacity: 0;/* con esto ocultamos el modal */
-    pointer-events: none;
-    transition: opacity .5s;
-}
-.contenedor-formulario-dos-show {
-    display: grid;
-    opacity: 1;/* con esto ocultamos el modal */
-    pointer-events: unset;
-    transition: opacity .5s;
-}
-.contenedor-formulario-dos label{
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -89,8 +50,8 @@ body{
 .nav-portada {
     display: flex;
     justify-content: space-between;
-    background: rgb(19, 25, 29);
-    height: 50px;
+    background: rgb(30 38 45);
+    height: 15vh;
     align-items: center;
     padding: 20px;
 }
@@ -101,30 +62,29 @@ body{
 }
 .boton-iniciar-sesion{
     margin: 10px;
-    background: rgb(40, 184, 112);
+    background: rgb(102 151 64);
     text-decoration: none;
-    font-size: 14px;
     color: #eee;
     text-align: center;
-    font-size: 20px;
+    font-size: 16px;
     cursor: pointer;
 }
 .boton-iniciar-sesion-tres{
     margin: 10px;
-    background: rgb(107, 107, 107);
+    background: rgb(159 114 76);
     text-decoration: none;
-    font-size: 14px;
+    font-size: 16px;
     color: #eee;
     text-align: center;
-    font-size: 20px;
     cursor: pointer;
 }
 .footer-login{
-    background-color: rgb(19, 25, 29);
+    background-color: rgb(30 38 45);
     display: flex;
     justify-content: center;
     padding: 60px;
     color: #eee;
+    height: 15vh;
 }
 .footer-login ul li {
     list-style: none;

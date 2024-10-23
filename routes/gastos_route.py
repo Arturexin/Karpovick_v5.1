@@ -161,7 +161,7 @@ def getSumaGastosPorMes():
                      "SUM(CASE WHEN concepto LIKE %s THEN (monto + caja_bancos) ELSE 0 END) AS _alquiler, "
                      "SUM(CASE WHEN concepto LIKE %s THEN (monto + caja_bancos) ELSE 0 END) AS _mantenimientos, "
                      "SUM(CASE WHEN concepto LIKE %s THEN (monto + caja_bancos) ELSE 0 END) AS _publicidad, "
-                     "SUM(CASE WHEN concepto LIKE %s THEN (monto + caja_bancos) ELSE 0 END) AS _pago_prestamos, "
+                     "SUM(CASE WHEN concepto LIKE %s THEN (monto + caja_bancos) ELSE 0 END) AS _activo, "
                      "SUM(CASE WHEN concepto LIKE %s THEN (monto + caja_bancos) ELSE 0 END) AS _depositos, "
                      "SUM(CASE WHEN concepto LIKE %s THEN (monto + caja_bancos) ELSE 0 END) AS _otros "
                      "FROM gastos_varios "
@@ -169,7 +169,7 @@ def getSumaGastosPorMes():
                      "AND gastos_varios.estado > 0 "
                      "AND YEAR(fecha_gastos) = %s "
                      "GROUP BY sucursal_gastos")
-            data_params = ('2_%', '3_%', '4_%', '5_%', '6_%', '7_%', '8_%', '9_%', '12_%', '13_%', '14_%', usuarioLlave, year_actual)
+            data_params = ('2_%', '3_%', '4_%', '5_%', '6_%', '7_%', '8_%', '9_%', '10_%', '13_%', '14_%', usuarioLlave, year_actual)
             cur.execute(query, data_params)
             data = cur.fetchall()
 
@@ -185,7 +185,7 @@ def getSumaGastosPorMes():
                         '_alquiler': fila[6],
                         '_mantenimientos': fila[7],
                         '_publicidad': fila[8],
-                        '_pago_prestamos': fila[9],
+                        '_activo': fila[9],
                         '_depositos': fila[10],
                         '_otros': fila[11]
                         }

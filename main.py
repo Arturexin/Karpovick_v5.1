@@ -1,4 +1,4 @@
-from flask import Flask,render_template, request, redirect, url_for, flash, session
+from flask import Flask,render_template, request, redirect, url_for, flash, session, jsonify
 # from flask_mysqldb import MySQL
 from flask_cors import CORS, cross_origin
 from flask_login import LoginManager, login_user, logout_user, login_required
@@ -157,7 +157,6 @@ app.register_blueprint(ventas_.ventas_tabla_reporte)
 app.register_blueprint(ventas_.ventas_grafico)
 app.register_blueprint(ventas_.ventas_comprobante)
 app.register_blueprint(ventas_.ventas_cliente_conteo)
-# app.register_blueprint(ventas_.ventas_post)
 app.register_blueprint(ventas_.ventas_delete)
 ##########################################################################################################################################################################
 # Datos de la tabla USUARIOS
@@ -247,6 +246,19 @@ def logout():
     session.clear()
     logout_user()
     return redirect(url_for('login'))
+
+@app.route('/api/datos_usuario')
+@cross_origin()
+@login_required
+def datos_usuario():
+    puesto = session.get('puesto')
+    identificacion_usuario = session.get('identificacion_usuario')
+    usuario_nombre = session.get('usuario_nombre')
+    return jsonify({
+                        "id_usuario": identificacion_usuario,
+                        "nombre_usuario": usuario_nombre,
+                        "puesto_usuario": puesto,
+                    })
 
 @app.route('/index')
 @cross_origin()

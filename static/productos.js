@@ -7,13 +7,12 @@ let sucursales_comparacion = ""
 function inicioProductos(){
     inicioTablasProductos()
     btnProductos = 1;
-    sucursales_comparacion = JSON.parse(localStorage.getItem("sucursal_encabezado"))
+    sucursales_comparacion = JSON.parse(localStorage.getItem("sucursal_consulta"))
 
     sucursales_comparacion.forEach((event, i)=>{
         sucu_[i] = event.sucursal_nombre
     })
 };
-let datos_usuario = JSON.parse(localStorage.getItem("datos_usuario"))
 
 let filas_total_bd = {value: 0};
 let indice_tabla = {value : 1};
@@ -40,16 +39,7 @@ async function inicioTablasProductos(){
     restablecerTabla(document.getElementById("restablecerProductos"), 
                     indice_tabla, num_filas_tabla, filas_total_bd, 
                     document.getElementById("numeracionTabla"), 20, base_datos, "#tabla-productos")
-    stockSucursales = await cargarDatos(`almacen_central_stock_sucursal`)
-    let sucursales_monto = [ stockSucursales[0].almacen_central, 
-                        stockSucursales[0].sucursal_uno, 
-                        stockSucursales[0].sucursal_dos, 
-                        stockSucursales[0].sucursal_tres]
-    sucursales_comparacion.forEach((event, i)=>{
-        sucu_[i] = event.sucursal_nombre
-    })
-    graficoDonaColores("circulo_stock_sucursal", "Total Stock", sucursales_monto, ".nombre_circulo_sucursal", ".valor_circulo_sucursal", ".porcentaje_circulo_sucursal",
-                    sucu_, colorFondoBarra, "", "")
+    await graficoStock()
 };
 /////////////////////////////////////////////////////////
 function subRutaA(){
@@ -141,7 +131,7 @@ async function procesarRemove(idProd){
         await conteoFilas(subRutaA(), filas_total_bd, indice_tabla, 
                         document.getElementById("numeracionTabla"), 20)
         await searchDatos(subRutaB(num_filas_tabla.value), base_datos,"#tabla-productos")
-        localStorage.setItem("base_datos_consulta", JSON.stringify(await cargarDatos('almacen_central_ccd')))
+        localStorage.setItem("inventarios_consulta", JSON.stringify(await cargarDatos('almacen_central_ccd')))
         modal_proceso_abrir(`${response.message}.`)
         modal_proceso_salir_botones()
         removerContenido()
@@ -294,7 +284,7 @@ async function realizarRecompra(){
     })
 
     function DataRecompras(){
-        this.id_num = datos_usuario[0].id;
+        this.id_num = neg_db[0].id;
         this.fecha = generarFecha();
         this.array_productos_dos = array_productos_dos;
         this.array_entradas_dos = array_entradas_dos;
@@ -320,7 +310,7 @@ function tabla_transferencias_body(e, i, id_suc){
                     `<td>
                         <input class="input-tablas-dos-largo q_tran" onKeyup = "op_transferencias(this)">
                     </td>` +
-                    `<td style="text-align: center; width: 90px">${e[sucursales_activas[i]]}</td>` +
+                    `<td style="text-align: center; width: 90px" class="s_tran">${e[sucursales_activas[i]]}</td>` +
                     `<td class="invisible">${id_suc}</td>` + // id de la cucursal
                     `<td><input class="suc_tran" type="radio" name="radioMetodoDePago" onClick="sucursalOrigen()"></td>` + // 
                     `<td class="invisible">${i}</td>` + // indice de la sucursal
@@ -382,9 +372,11 @@ function sucursalOrigen(){// Inhabilita el input de la sucursal de orígen de la
 async function procesarTransferencia(){
     modal_proceso_abrir("Procesando la transferencia!!!.", "")
     let inputs = document.querySelectorAll(".q_tran");
+    let texts_saldos = document.querySelectorAll(".s_tran");
     let valores = Array.from(inputs).map(input => Number(input.value));
-
-    if (valores.every(valor => valor >= 0 && Number.isFinite(valor)) && valores.some(valor => valor > 0)){
+    let valores_saldos = Array.from(texts_saldos).map(texts_saldos => Number(texts_saldos.textContent));
+    if (valores.every(valor => valor >= 0 && Number.isFinite(valor)) && valores.some(valor => valor > 0) &&
+    valores_saldos.every(valor => valor >= 0 && Number.isFinite(valor))){
         try{
             await realizarTransferencia()
             await conteoFilas(subRutaA(), filas_total_bd, indice_tabla, 
@@ -438,7 +430,7 @@ async function realizarTransferencia(){
     function DatosTransferencia(){
         this.array_data_prod = array_data_prod;
         this.array_data_tran = array_data_tran;
-        this.id_num = datos_usuario[0].id;
+        this.id_num = neg_db[0].id;
         this.fecha = generarFecha();
     }
 
@@ -446,7 +438,7 @@ async function realizarTransferencia(){
     let url = URL_API_almacen_central + 'procesar_transferencia'
     let response = await funcionFetchDos(url, fila)
     if(response.status === "success"){
-        modal_proceso_abrir(`La trnasferencia "${response.message}" fue procesada satisfactoriamente!!!.`, ``)
+        modal_proceso_abrir(`La transferencia "${response.message}" fue procesada satisfactoriamente!!!.`, ``)
         modal_proceso_salir_botones()
         removerContenido()
     };
@@ -608,3 +600,23 @@ extraccion_.addEventListener("click", async ()=>{
     console.log(csvContent)
     downloadCSV(csvContent, 'dataProductos.csv');
 });
+////////////////////////////////////////////////////////////////////////////////////
+async function graficoStock(){
+    stockSucursales = await cargarDatos(`almacen_central_stock_sucursal`);
+
+    let sucursales_monto = [ stockSucursales[0].almacen_central, 
+                        stockSucursales[0].sucursal_uno, 
+                        stockSucursales[0].sucursal_dos, 
+                        stockSucursales[0].sucursal_tres, 
+                        stockSucursales[0].sucursal_cuatro]
+    let sumaTotal = sucursales_monto.reduce((acc, curr) => acc + curr, 0);
+    graficoBarrasHorizontalTres(document.getElementById("grafico_stock"), 
+                                ['Stock'], 
+                                suc_add, 
+                                [sucursales_monto[0]], 
+                                [sucursales_monto[1]], 
+                                [sucursales_monto[2]], 
+                                [sucursales_monto[3]], 
+                                [sucursales_monto[4]], 
+                                [sumaTotal])
+}

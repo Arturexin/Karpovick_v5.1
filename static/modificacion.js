@@ -5,12 +5,10 @@ function inicioModificacion(){
     cargarDatosAnio()
     btnModificacion = 1;
     /* mostrarFormRegistro() */
-    indice_base = JSON.parse(localStorage.getItem("base_datos_consulta"))
 
     document.getElementById("categoria_buscador_detalle").innerHTML = llenarCategoriaProductosEjecucion();
 };
 const barras_modificacion = [".cg_1_t", ".cg_2_t", ".cg_3_t", ".cg_4_t", ".cg_5_t"]
-let datos_usuario = JSON.parse(localStorage.getItem("datos_usuario"))
 let array_saldos = [];
 /////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
@@ -115,7 +113,6 @@ function agregarAtablaModal(){
     if(validarFormulario()){
         let array_cod_db = [];
         let array_cod_a_s = [];
-        let db_ = JSON.parse(localStorage.getItem("base_datos_consulta"))
         ///////////////////////////////////////////////////////////////////////////////
         document.querySelector(".contenedor-pre-modificacion").classList.add("modal-show-modificacion");//Mostrmos el modal
         let arrayCreacionCategoriaTallas = categoriaProductosCreacion(document.getElementById("categoria-form"));//Evaluamos la categoría
@@ -124,7 +121,7 @@ function agregarAtablaModal(){
         contenedorBotonesModal(`mandarATablaPrincipalRegistro()`, "Enviar a la lista");
         arrayCreacionCategoriaTallas.forEach((event) =>{
             //Buscamos coincidencias en la base de datos y en array_saldos
-            let cod_db = db_.find(x=> x.codigo === `${document.getElementById("codigo-form").value}-${event}-${document.getElementById("lote-form").value}`)
+            let cod_db = buscarProductosDinamicamente(`${document.getElementById("codigo-form").value}-${event}-${document.getElementById("lote-form").value}`);
             let cod_a_s = array_saldos.find(x=> x.codigo === `${document.getElementById("codigo-form").value}-${event}-${document.getElementById("lote-form").value}`)
 
             //Si no hay coincidencias se prosigue con el proceso
@@ -277,7 +274,10 @@ async function funcionGeneralRegistro(){
     let objeto_registro = new DatosRegistro();
     let response = await funcionFetchDos(url_registro, objeto_registro);
     if(response.status === "success"){
-        localStorage.setItem("base_datos_consulta", JSON.stringify(await cargarDatos('almacen_central_ccd')))
+        localStorage.setItem("inventarios_consulta", JSON.stringify(await cargarDatos('almacen_central_ccd')))
+        inv_db = JSON.parse(localStorage.getItem("inventarios_consulta"))
+        inv_db_grupo = dividirProductosDinamicamente(inv_db);
+        console.log(inv_db_grupo)
         modal_proceso_abrir(`${response.message}`, "")
         modal_proceso_salir_botones()
     };
@@ -304,7 +304,7 @@ botonEditarProducto.addEventListener("click", () =>{
     document.querySelector("#tabla_modal").createTBody()
     document.querySelector("#tabla_principal > tbody").remove()
     document.querySelector("#tabla_principal").createTBody()
-
+    buscarProducto(document.getElementById('buscador-productos-form'))
     clave_form = 1;
     array_saldos = [];
 });
@@ -324,24 +324,7 @@ function reseteoFormulario(){
         document.getElementById("buscador-productos-form").focus();
     };
 };
-document.addEventListener("keyup", () =>{
-    if(clave_form == 0){
-        return;
-    }else{
-        let almacenCentral = indice_base.find(y => y.codigo.toLowerCase().startsWith(document.getElementById('buscador-productos-form').value.toLowerCase()))
-        if(almacenCentral){
-            document.getElementById('id-form').value = almacenCentral.idProd
-            document.getElementById('categoria-form').value = almacenCentral.categoria
-            document.getElementById('codigo-form').value = almacenCentral.codigo
-            document.getElementById('descripcion-form').value = almacenCentral.descripcion
-            if(document.getElementById('buscador-productos-form').value == ""){
-                reseteoFormulario()
-            }
-        }else{
-            reseteoFormulario()
-        };
-    };
-});
+
 function crearHeadModificacion(){
     let tablaCompras= document.querySelector("#tabla_modal > thead");
     let nuevaFilaTablaCompras = tablaCompras.insertRow(-1);
@@ -396,7 +379,7 @@ function crearBodyModificacion(codigoModificacion, id_prod){
 
 async function agregarATablaPreModificacion(){
 
-    let db_ = JSON.parse(localStorage.getItem("base_datos_consulta"))
+    let db_ = JSON.parse(localStorage.getItem("inventarios_consulta"))
     let array_id_a_s = 0;
     crearHeadModificacion()
     let arrayCreacionCategoriaTallas = categoriaProductosCreacion(document.getElementById("categoria-form"));
@@ -409,7 +392,7 @@ async function agregarATablaPreModificacion(){
                 codigo_form = codigo_form.replace("-" + arrayCreacionCategoriaTallas[j], "-" + arrayCreacionCategoriaTallas[i])
             }
         };
-        let base = db_.find(y => y.codigo === codigo_form)// Buscamos en la base de datos la existencia del código
+        let base = buscarProductosDinamicamente(`${codigo_form}`);// Buscamos en la base de datos la existencia del código
         if(base){
             let id_a_s = array_saldos.find(x=> x.idProd === Number(base.idProd))
             if(id_a_s !== undefined){// Si el nuevo id ya se encuentra en el array_saldos no pasará a la pre lista
@@ -641,7 +624,7 @@ async function funcionGeneralModificacion(){
     let objeto_mod = new DatosModificacion();
     let response = await funcionFetchDos(url_mod, objeto_mod);
     if(response.status === "success"){
-        localStorage.setItem("base_datos_consulta", JSON.stringify(await cargarDatos('almacen_central_ccd')))
+        localStorage.setItem("inventarios_consulta", JSON.stringify(await cargarDatos('almacen_central_ccd')))
         modal_proceso_abrir(`${response.message}`, "")
         modal_proceso_salir_botones()
     };

@@ -165,6 +165,7 @@ function operarQDevolucion(e){
     fila.in_q(e)
     row_.children[8].textContent = Number(row_.children[3].textContent) - 
                                     (Number(row_.children[4].children[0].value) + Number(row_.children[7].textContent));
+    row_.children[8].style.background = row_.children[8].textContent < 0 ? "var(--boton-dos)" : "";//pintamos si es negativo
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -177,7 +178,7 @@ async function crearBodyDevolucionesFinal(){
         let coincidencia_id = id_prof.find(x=> x === obj_dev.id)
         if(coincidencia_id === undefined){
             
-            if(obj_dev.c_d > 0){
+            if(obj_dev.c_d > 0 && obj_dev.existencias >= (obj_dev.c_d + obj_dev.existencias_devueltas)){
                 let nueva_fila = fila_principal.insertRow(-1);
                 let fila = `<tr>`+
                                 `<td class="id_proforma invisible">${obj_dev.id}</td>`+// Columna 0 > id entradas
@@ -281,7 +282,7 @@ async function realizarDevolucionCompras(){
 
     function DataDevoluciones(){
         this.array_devolucion = array_devolucion;
-        this.id_det_ventas = det_venta[0].id_det_ventas;
+        det_venta !== "" ? this.id_det_ventas = det_venta[0].id_det_ventas: "";
         this.modo_perdida = Number(suma_monto_dev);
         this.fecha = generarFecha();
     }

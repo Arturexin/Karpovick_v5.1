@@ -229,6 +229,27 @@ class ObjGeneral {
         })
         return resultado
     }
+    val_exs(){ 
+        return [   
+                    this.existencias_ac,
+                    this.existencias_su,
+                    this.existencias_sd,
+                    this.existencias_st,
+                    this.existencias_sc
+                ]
+    }
+    suma_val_exs(){
+        return this.val_exs().reduce((acumulador, valorActual) => acumulador + valorActual, 0);
+    }
+    val_sal(){
+        return [   
+                    this.in_ac - this.existencias_ac,
+                    this.in_su - this.existencias_su,
+                    this.in_sd - this.existencias_sd,
+                    this.in_st - this.existencias_st,
+                    this.in_sc - this.existencias_sc
+                ]
+    }
 };
 function formatoMoneda(valor_numerico){
     let value = valor_numerico.toString();

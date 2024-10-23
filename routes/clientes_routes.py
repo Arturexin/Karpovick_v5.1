@@ -5,7 +5,6 @@ from flask_login import login_required
 from db_connection import mysql
 # Definimos el blueprint para las rutas de clientes
 clientes_conteo = Blueprint('clientes_conteo', __name__)
-
 clientes_tabla = Blueprint('clientes_tabla', __name__)
 clientes_LS = Blueprint('clientes_LS', __name__)
 clientes_proveedores = Blueprint('clientes_proveedores', __name__)

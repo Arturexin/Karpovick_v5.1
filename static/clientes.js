@@ -149,9 +149,9 @@ async function remove(id) {
                             document.getElementById("numeracionTablaClientes"), 20)
         await searchDatos(subRutaB(num_filas_tabla.value, 1), base_datos, "#tabla-clientes")
         if(document.querySelector("#filtro-tabla-clientes-clase").value == 0){
-            localStorage.setItem("base_datos_cli", JSON.stringify(await cargarDatos('clientes_ventas')))                       
+            localStorage.setItem("clientes_consulta", JSON.stringify(await cargarDatos('clientes_ventas')))                       
         }else if(document.querySelector("#filtro-tabla-clientes-clase") == 1){
-            localStorage.setItem("base_datos_prov", JSON.stringify(await cargarDatos('proveedores')))
+            localStorage.setItem("proveedores_consulta", JSON.stringify(await cargarDatos('proveedores')))
         };
         modal_proceso_abrir(`${response.message}`)
         modal_proceso_salir_botones()
@@ -164,8 +164,8 @@ registrarCliente.addEventListener("click", saveClientes)
 async function saveClientes(e) {
     e.preventDefault();
     modal_proceso_abrir("Procesando el registro!!!.", "")
-    let base_datos_clientes = JSON.parse(localStorage.getItem("base_datos_cli"))
-    let encontrado = base_datos_clientes.find(y => y.nombre_cli.toLowerCase().startsWith(document.getElementById("nombre").value.toLowerCase()) && 
+    let clientes_consultaentes = JSON.parse(localStorage.getItem("clientes_consulta"))
+    let encontrado = clientes_consultaentes.find(y => y.nombre_cli.toLowerCase().startsWith(document.getElementById("nombre").value.toLowerCase()) && 
                                             y.telefono_cli.toLowerCase().startsWith(document.getElementById("telefono").value.toLowerCase()))
     if(encontrado === undefined){
         if(expregul.cliente.test(document.getElementById("nombre").value) &&
@@ -187,19 +187,21 @@ async function saveClientes(e) {
                 dataS.id_cli = id
             };
             let url = URL_API_almacen_central + 'clientes'
-            let response = await funcionFetch(url, dataS)
-            if(response.status === 200){
+            let response = await funcionFetchDos(url, dataS)
+            if(response.status === "success"){
                 await conteoFilas(subRutaA(1), filas_total_bd, indice_tabla, 
                                 document.getElementById("numeracionTablaClientes"), 20)
                 await searchDatos(subRutaB((document.getElementById("numeracionTablaClientes").value - 1) * 20, 1), 
                                 base_datos, "#tabla-clientes")
                 if(document.getElementById('clase_cli').value == 0){
-                    localStorage.setItem("base_datos_cli", JSON.stringify(await cargarDatos('clientes_ventas')))
-                    modal_proceso_abrir("Cliente registrado.", "")
+                    localStorage.setItem("clientes_consulta", JSON.stringify(await cargarDatos('clientes_ventas')))
+                    cli_db = JSON.parse(localStorage.getItem("clientes_consulta"));
+                    modal_proceso_abrir(`${response.message}`, "")
                     modal_proceso_salir_botones()
                 }else if(document.getElementById('clase_cli').value == 1){
-                    localStorage.setItem("base_datos_prov", JSON.stringify(await cargarDatos('proveedores')))
-                    modal_proceso_abrir("Proveedor registrado.", "")
+                    localStorage.setItem("proveedores_consulta", JSON.stringify(await cargarDatos('proveedores')))
+                    prv_db = JSON.parse(localStorage.getItem("proveedores_consulta"));
+                    modal_proceso_abrir(`${response.message}`, "")
                     modal_proceso_salir_botones() 
                 }
                 formClientes.reset();
@@ -325,7 +327,7 @@ document.getElementById("volcar_datos").addEventListener("click", (e)=>{
 
 let array_producto_repetido = [];
 function comprobarDatosRepetidos(){
-    let _proveedor_ = JSON.parse(localStorage.getItem("base_datos_prov"));
+    let _proveedor_ = JSON.parse(localStorage.getItem("proveedores_consulta"));
 
     array_proveedores.forEach((event)=>{
         let prov = _proveedor_.find(y => y.nombre_cli === event.nombre_cli);
@@ -373,7 +375,8 @@ async function procesarVolcadoProveedores(){
     };
     if(sum_volcado === array_proveedores.length){
         await inicioTablasClientes();
-        localStorage.setItem("base_datos_prov", JSON.stringify(await cargarDatos('proveedores')))
+        localStorage.setItem("proveedores_consulta", JSON.stringify(await cargarDatos('proveedores')))
+        prv_db = JSON.parse(localStorage.getItem("proveedores_consulta"));
         cargarDatosAnio();
         modal_proceso_abrir(`Operación completada exitosamente en proveedores.`, "");
         modal_proceso_salir_botones();

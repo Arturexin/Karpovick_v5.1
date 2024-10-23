@@ -12,7 +12,6 @@ ventas_tabla_reporte = Blueprint('ventas_tabla_reporte', __name__)
 ventas_grafico = Blueprint('ventas_grafico', __name__)
 ventas_comprobante = Blueprint('ventas_comprobante', __name__)
 ventas_cliente_conteo = Blueprint('ventas_cliente_conteo', __name__)
-# ventas_post = Blueprint('ventas_post', __name__)
 ventas_delete = Blueprint('ventas_delete', __name__)
 
 

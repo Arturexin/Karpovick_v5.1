@@ -120,7 +120,7 @@ function manejoDeFechas(){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 async function accionRemove(id) {
     let entradas = base_datos.array.find(y => y.idEntr == id)// obtenemos los datos de la fila
-    let db = JSON.parse(localStorage.getItem("base_datos_consulta"))
+    let db = JSON.parse(localStorage.getItem("inventarios_consulta"))
     let producto = db.find(x=> x.codigo === entradas.codigo)
 
     tabla_proforma_productos(producto, "Eliminar entrada", entradas.categoria_nombre, entradas.comprobante);
@@ -153,8 +153,8 @@ async function procesarRemove(idEntr){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function accionDevoluciones(id) {
     let entradas = base_datos.array.find(x => x.idEntr == id)
-    let db = JSON.parse(localStorage.getItem("base_datos_consulta"))
-    let sucursales_comparacion = JSON.parse(localStorage.getItem("sucursal_encabezado"))
+    let db = JSON.parse(localStorage.getItem("inventarios_consulta"))
+    let sucursales_comparacion = JSON.parse(localStorage.getItem("sucursal_consulta"))
     if(entradas.comprobante.startsWith("Compra") || entradas.comprobante.startsWith("Recompra")){
         let producto = db.find(x=> x.codigo === entradas.codigo)
         tabla_proforma_productos(producto, "Devoluciones", entradas.categoria_nombre, entradas.comprobante)
@@ -226,7 +226,7 @@ function tabla_body_productos(prod_, i, id_suc){
                     `<td>
                         <input class="input-tablas-dos-largo q_dev" onKeyup = "op_dev(this)">
                     </td>` + //Devolución
-                    `<td style="text-align: center; width: 90px" class="s_dev">${prod_.existencias_entradas}</td>` + // Saldo
+                    `<td style="text-align: center; width: 90px" class="s_dev">${prod_.existencias_entradas - prod_.existencias_devueltas}</td>` + // Saldo
                     `<td>   
                         <select id="accion_causa_devolucion_entradas" class="input-general-importante fondo-importante">
                             <option value="0" selected="">-- Causa de devolución --</option>                                    
@@ -248,7 +248,7 @@ function tabla_body_productos(prod_, i, id_suc){
 };
 function op_dev(e){
     let row_ = e.closest("tr");
-    row_.children[6].textContent = Number(row_.children[3].textContent) - Number(row_.children[5].children[0].value )
+    row_.children[6].textContent = Number(row_.children[3].textContent) - (Number(row_.children[5].children[0].value) + Number(row_.children[4].textContent))
     Number(row_.children[6].textContent) < 0 || 
     isNaN(Number(row_.children[6].textContent)) ?   row_.children[6].style.background = "var(--boton-dos)": 
                                                     row_.children[6].style.background = "";
@@ -273,8 +273,11 @@ async function procesarDevolucion(){
     manejoDeFechas();
     modal_proceso_abrir("Procesando la devolución!!!.", "")
     let inputs = document.querySelectorAll(".q_dev");
+    let texts_saldos = document.querySelectorAll(".s_dev");
     let valores = Array.from(inputs).map(input => Number(input.value));
-    if (valores.every(valor => valor >= 0 && Number.isFinite(valor)) && valores.some(valor => valor > 0)){
+    let valores_saldos = Array.from(texts_saldos).map(texts_saldos => Number(texts_saldos.textContent));
+    if (valores.every(valor => valor >= 0 && Number.isFinite(valor)) && valores.some(valor => valor > 0) &&
+    valores_saldos.every(valor => valor >= 0 && Number.isFinite(valor))){
         try{
             modal_proceso_abrir("Procesando la devolución de la compra!!!.", "")
             await realizarDevolucion()
@@ -389,8 +392,8 @@ function convertirCSVaJSON(contenidoCSV) {
 };
 function modificarArrayVolcado(array){
     let _categorias_ = JSON.parse(localStorage.getItem("categoria_consulta"));
-    let _proveedor_ = JSON.parse(localStorage.getItem("base_datos_prov"));
-    let _sucursal_ = JSON.parse(localStorage.getItem("sucursal_encabezado"));
+    let _proveedor_ = JSON.parse(localStorage.getItem("proveedores_consulta"));
+    let _sucursal_ = JSON.parse(localStorage.getItem("sucursal_consulta"));
     function preparandoArray(e){
         let categor = _categorias_.find(y => y.categoria_nombre === e.categoria);
         let prov = _proveedor_.find(y => y.nombre_cli === e.proveedor);
@@ -432,7 +435,7 @@ function modificarArrayVolcado(array){
 document.getElementById("carga_archivo").addEventListener("change", leerArchivo);
 
 function agregarId(array){
-    let _productos_ = JSON.parse(localStorage.getItem("base_datos_consulta"));
+    let _productos_ = JSON.parse(localStorage.getItem("inventarios_consulta"));
     array.forEach((event)=>{
         let prod = _productos_.find(y => y.codigo === event.codigo)
         event.idProd = prod.idProd;
@@ -452,7 +455,7 @@ document.getElementById("volcar_datos").addEventListener("click", (e)=>{
 
 let array_producto_repetido = [];
 function comprobarDatosRepetidos(){
-    let _productos_ = JSON.parse(localStorage.getItem("base_datos_consulta"));
+    let _productos_ = JSON.parse(localStorage.getItem("inventarios_consulta"));
 
     array_productos.forEach((event)=>{
         let codig = _productos_.find(y => y.codigo === event.codigo);
@@ -503,7 +506,7 @@ async function procesarVolcadoProductos(){
         };
     };
     if(sum_volcado === array_productos.length){
-        localStorage.setItem("base_datos_consulta", JSON.stringify(await cargarDatos('almacen_central_ccd')))
+        localStorage.setItem("inventarios_consulta", JSON.stringify(await cargarDatos('almacen_central_ccd')))
         agregarId(array_productos)
         procesarVolcadoEntradas()
         modal_proceso_abrir(`Operación completada exitosamente.`, "");
@@ -519,7 +522,7 @@ async function procesarVolcadoProductos(){
 };
 
 async function procesarVolcadoEntradas(){
-    let _sucursal_ = JSON.parse(localStorage.getItem("sucursal_encabezado"));
+    let _sucursal_ = JSON.parse(localStorage.getItem("sucursal_consulta"));
     let suma_volcado_entradas = 0;
     function EnviarAEntradas(id_prod, id_suc, existencias){
         this.idProd = id_prod;//Hay que buscar hacer una consilta para este dato

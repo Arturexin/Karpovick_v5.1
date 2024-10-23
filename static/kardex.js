@@ -9,9 +9,8 @@ function inicioKardex(){
     document.getElementById("categoria-form").innerHTML = llenarCategoriaProductosEjecucion();
     cargarSucursalesEjecucion(document.getElementById("fffff-sucursal"))
     cambioSucursalKardex("fffff-sucursal")
-
+    buscarProducto(document.getElementById('buscador-productos-form'))
     cargarDatosAnio()
-    indice_base = JSON.parse(localStorage.getItem("base_datos_consulta"))
 };
 let ventasMensuales = [];
 
@@ -42,20 +41,7 @@ function reseteoFormulario(){
     document.getElementById('codigo-form').value = "";
     document.getElementById('descripcion-form').value = "";
 };
-document.addEventListener("keyup", () => {
-    let almacenCentral = indice_base.find(y => y.codigo.toLowerCase().startsWith(document.getElementById('buscador-productos-form').value.toLocaleLowerCase()))
-    if(almacenCentral){
-        document.getElementById('id-form').value = almacenCentral.idProd
-        document.getElementById('categoria-form').value = almacenCentral.categoria
-        document.getElementById('codigo-form').value = almacenCentral.codigo
-        document.getElementById('descripcion-form').value = almacenCentral.descripcion
-        if(document.getElementById('buscador-productos-form').value == ""){
-            reseteoFormulario();
-        };
-    }else{
-        reseteoFormulario();
-    };
-});
+
 async function procesarKardex(){
     if(document.querySelector("#codigo-form").value !== ""){
         anio_principal = anio_referencia.value;
@@ -91,7 +77,7 @@ function llenadoTablaDetalle(array, id_tabla, nombre_propiedad_objeto_valor){
                     `<td>${event.comprobante}</td>`+
                     `<td style="text-align:center;">${dato}</td>`+
                     `<td style="text-align:center;">${(Number(dato * event[nombre_propiedad_objeto_valor])).toFixed(2)}</td>`+
-                    `<td>${event.fecha}</td>`+
+                    `<td>${new Date(event.fecha).getDay()}-${new Date(event.fecha).getMonth()+1}-${new Date(event.fecha).getFullYear()}</td>`+
                 `</tr>`;
     }
     array.forEach((event) => {

@@ -175,3 +175,56 @@ def editNumeracionDatos():
     except Exception as e:
         mysql.connection.rollback()
         return jsonify({"status": "error", "message": str(e)})
+
+##############################################################################
+def incrementar_obtener_numeracion(cur, dato_uno, usuarioLlave, nombre, concepto):
+    # Actualizar la numeración
+    query_numeracion = (f"UPDATE `numeracion_comprobante` SET {concepto} = {concepto} + %s "
+                        "WHERE `numeracion_comprobante`.`id` = %s AND identificador = %s")
+    data_numeracion = (dato_uno, request.json['id_num'], usuarioLlave)
+    cur.execute(query_numeracion, data_numeracion)
+    
+    # Obtener la numeración actualizada
+    query = ("SELECT id, compras, recompras, transferencias, ventas, nota_venta, boleta_venta, factura "
+             "FROM numeracion_comprobante WHERE `identificador` = %s")
+    cur.execute(query, (usuarioLlave,))
+    data = cur.fetchall()
+    
+    contenido = { 
+        'id': data[0][0],
+        'compras': data[0][1],
+        'recompras': data[0][2],
+        'transferencias': data[0][3],
+        'ventas': data[0][4],
+        'nota_venta': data[0][5],
+        'boleta_venta': data[0][6],
+        'factura': data[0][7]
+    }
+
+    return f"{nombre}-{contenido[concepto]}"
+
+def incrementar_obtener_numeracion_v(cur, item_ticket, dato_uno, usuarioLlave, ticket):
+    # Actualizar la numeración
+    query_numeracion = (f"UPDATE `numeracion_comprobante` SET ventas = ventas + %s, {item_ticket} = {item_ticket} + %s "
+                        "WHERE `numeracion_comprobante`.`id` = %s AND identificador = %s")
+    data_numeracion = (dato_uno, dato_uno, request.json['id_num'], usuarioLlave)
+    cur.execute(query_numeracion, data_numeracion)
+    
+    # Obtener la numeración actualizada
+    query = ("SELECT id, compras, recompras, transferencias, ventas, nota_venta, boleta_venta, factura "
+             "FROM numeracion_comprobante WHERE `identificador` = %s")
+    cur.execute(query, (usuarioLlave,))
+    data = cur.fetchall()
+    
+    contenido = { 
+        'id': data[0][0],
+        'compras': data[0][1],
+        'recompras': data[0][2],
+        'transferencias': data[0][3],
+        'ventas': data[0][4],
+        'nota_venta': data[0][5],
+        'boleta_venta': data[0][6],
+        'factura': data[0][7]
+    }
+    
+    return [f"Venta-{contenido['ventas']}", f"{ticket}{contenido[item_ticket]}"]

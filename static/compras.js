@@ -3,16 +3,13 @@ let anio_principal = ""
 async function inicioCompras(){
     anio_principal = new Date().getFullYear()
     cargarDatosAnio()
-    indice_base = JSON.parse(localStorage.getItem("base_datos_consulta"))
     btnCompras = 1;
 
-    /* mostrarFormNuevoProducto() */
     agregarMoneda(document.querySelectorAll(".moneda_compras"));
     busquedaStock()
     document.getElementById("categoria_buscador_detalle").innerHTML = llenarCategoriaProductosEjecucion();
 };
 
-let datos_usuario = JSON.parse(localStorage.getItem("datos_usuario"))
 let array_saldos = [];
 /////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
@@ -141,7 +138,6 @@ function agregarAtablaModal(){
     if(validarFormulario()){
         let array_cod_db = [];
         let array_cod_a_s = [];
-        let db_ = JSON.parse(localStorage.getItem("base_datos_consulta"))
         document.querySelector(".contenedor-pre-recompra").classList.add("modal-show")
         let arrayCreacionCategoriaTallas = categoriaProductosCreacion(document.getElementById("categoria-form"));
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -150,7 +146,7 @@ function agregarAtablaModal(){
         cargarSucursalesEjecucion(document.getElementById("sun_opc"))
         arrayCreacionCategoriaTallas.forEach((event) =>{
             //Buscamos coincidencias en la base de datos y en array_saldos
-            let cod_db = db_.find(x=> x.codigo === `${document.getElementById("codigo-form").value}-${event}-${document.getElementById("lote-form").value}`)
+            let cod_db = buscarProductosDinamicamente(`${document.getElementById("codigo-form").value}-${event}-${document.getElementById("lote-form").value}`);
             let cod_a_s = array_saldos.find(x=> x.codigo === `${document.getElementById("codigo-form").value}-${event}-${document.getElementById("lote-form").value}`)
 
             //Si no hay coincidencias se prosigue con el proceso
@@ -220,17 +216,9 @@ function filaBodyProformaPincipalCompras(){
     array_saldos.forEach((obj_compra)=>{
         let coincidencia_codigo = codigo_prof.find(x=> x === obj_compra.codigo)
         if(coincidencia_codigo === undefined){
-            const existencias = [   
-                                    obj_compra.existencias_ac,
-                                    obj_compra.existencias_su,
-                                    obj_compra.existencias_sd,
-                                    obj_compra.existencias_st,
-                                    obj_compra.existencias_sc
-                                ]
-            const suma = existencias.reduce((acumulador, valorActual) => acumulador + valorActual, 0);
 
-            if(existencias.every(valor => valor >= 0 && Number.isFinite(valor)) && 
-            existencias.some(valor => valor > 0) && 
+            if(obj_compra.val_exs().every(valor => valor >= 0 && Number.isFinite(valor)) && 
+            obj_compra.val_exs().some(valor => valor > 0) && 
             obj_compra.costo > 0 && obj_compra.precio > 0){
                 let d_proveedor = prv_db.find(x => x.id_cli === Number(obj_compra.proveedor))
                 let d_categoria = cat_db.find(x => x.id === Number(obj_compra.categoria))
@@ -246,7 +234,7 @@ function filaBodyProformaPincipalCompras(){
                                 `<td class="s_4" style="text-align: right">${obj_compra.existencias_st}</td>`+// Columna 7 > cantidad
                                 `<td class="s_5" style="text-align: right">${obj_compra.existencias_sc}</td>`+// Columna 8 > cantidad
                                 `<td style="text-align: right">${formatoMoneda(obj_compra.costo)}</td>`+// Columna 9 > costo de compra
-                                `<td class="t_0" style="text-align: right">${formatoMoneda(suma * obj_compra.costo)}</td>`+// Columna 10 > Costo Total
+                                `<td class="t_0" style="text-align: right">${formatoMoneda(obj_compra.suma_val_exs() * obj_compra.costo)}</td>`+// Columna 10 > Costo Total
                                 `<td style="text-align: right">${formatoMoneda(obj_compra.precio)}</td>`+// Columna 11 > precio de venta
                                 `<td style="text-align: right">${obj_compra.lote}</td>`+// Columna 12 > lote
                                 `<td style="text-align: right">${d_proveedor.nombre_cli}</td>`+// Columna 13 > proveedor
@@ -348,7 +336,7 @@ async function funcionGeneralCompras(){
     });
 
     function DatosCompras(){
-        this.id_num = datos_usuario[0].id;//Para la numeración
+        this.id_num = neg_db[0].id;//Para la numeración
         this.fecha = generarFecha();
         this.array_productos = array_productos;
         this.array_entradas = array_entradas;
@@ -358,7 +346,10 @@ async function funcionGeneralCompras(){
     let response = await funcionFetchDos(url_compra, objeto_compra);
 
     if(response.status === "success"){
-        localStorage.setItem("base_datos_consulta", JSON.stringify(await cargarDatos('almacen_central_ccd')))
+        localStorage.setItem("inventarios_consulta", JSON.stringify(await cargarDatos('almacen_central_ccd')))
+        inv_db = JSON.parse(localStorage.getItem("inventarios_consulta"))
+        inv_db_grupo = dividirProductosDinamicamente(inv_db);
+        console.log(inv_db_grupo)
         modal_proceso_abrir(`Operación "${response.message}" completada exitosamente.`)
         modal_proceso_salir_botones()
     };
@@ -389,10 +380,11 @@ function mostrarFormrecompraProductoPlus(){
     document.querySelector("#tabla_modal").createTBody()
     document.querySelector("#tabla_principal > tbody").remove()
     document.querySelector("#tabla_principal").createTBody()
+    buscarProducto(document.getElementById('buscador-productos-form'))
     clave_form = 1;
     array_saldos = [];
 }
-///////////////////BUSCADOR DE PRODUCTOS EN FORMULARIO COMPRAS/////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
 function reseteoFormulario(){
     document.getElementById("id-form").value = "";
     document.getElementById('categoria-form').value = "0";
@@ -408,24 +400,6 @@ function reseteoFormulario(){
         document.getElementById("buscador-productos-form").focus();
     };
 };
-document.addEventListener("keyup", () =>{
-    if(clave_form == 0){
-        return;
-    }else{
-        let almacenCentral = indice_base.find(y => y.codigo.toLowerCase().startsWith(document.getElementById('buscador-productos-form').value.toLowerCase()))
-        if(almacenCentral){
-            document.getElementById('id-form').value = almacenCentral.idProd
-            document.getElementById('categoria-form').value = almacenCentral.categoria
-            document.getElementById('codigo-form').value = almacenCentral.codigo
-            document.getElementById('descripcion-form').value = almacenCentral.descripcion
-            if(document.getElementById('buscador-productos-form').value == ""){
-                reseteoFormulario()
-            }
-        }else{
-            reseteoFormulario()
-        };
-    };
-});
 
 function crearHeadRecompra(){
     let tablaCompras= document.querySelector("#tabla_modal > thead");
@@ -492,7 +466,6 @@ function accionSelectDos(){// cambios al efectuar un cambio en select de sucursa
 };
 async function agregarATablaPreRecompras(){
     if(document.getElementById("id-form").value > 0){
-        let db_ = JSON.parse(localStorage.getItem("base_datos_consulta"))
         let array_id_a_s = [];//array de códigos repetidos
         crearHeadRecompra()
         cargarSucursalesEjecucion(document.getElementById("sun_opc"))
@@ -506,7 +479,7 @@ async function agregarATablaPreRecompras(){
                     codigo_form = codigo_form.replace("-" + arrayCreacionCategoriaTallas[j], "-" + arrayCreacionCategoriaTallas[i])
                 }
             };
-            let base = db_.find(y => y.codigo === codigo_form)// Buscamos en la base de datos la existencia del código
+            let base = buscarProductosDinamicamente(`${codigo_form}`);
             if(base){
                 let id_a_s = array_saldos.find(x=> x.idProd === Number(base.idProd))
                 if(id_a_s !== undefined){// Si el nuevo id ya se encuentra en el array_saldos no pasará a la pre lista
@@ -596,16 +569,9 @@ function filaBodyProformaPincipalRecompras(){
     array_saldos.forEach((obj_recompra)=>{
         let coincidencia_id = id_prof.find(x=> x === obj_recompra.idProd)
         if(coincidencia_id === undefined){
-            const existencias = [   
-                                    obj_recompra.existencias_ac,
-                                    obj_recompra.existencias_su,
-                                    obj_recompra.existencias_sd,
-                                    obj_recompra.existencias_st,
-                                    obj_recompra.existencias_sc
-                                ]
-            const suma = existencias.reduce((acumulador, valorActual) => acumulador + valorActual, 0);
-            if(existencias.every(valor => valor >= 0 && Number.isFinite(valor)) && 
-            existencias.some(valor => valor > 0)){
+
+            if(obj_recompra.val_exs().every(valor => valor >= 0 && Number.isFinite(valor)) && 
+            obj_recompra.val_exs().some(valor => valor > 0)){
                 let d_proveedor = prv_db.find(x => x.id_cli === Number(obj_recompra.proveedor))
                 let d_categoria = cat_db.find(x => x.id === Number(obj_recompra.categoria))
                 let nueva_fila = fila_principal.insertRow(-1);
@@ -620,7 +586,7 @@ function filaBodyProformaPincipalRecompras(){
                                 `<td class="s_4" style="text-align: right">${obj_recompra.existencias_st}</td>`+// Columna 7 > cantidad
                                 `<td class="s_5" style="text-align: right">${obj_recompra.existencias_sc}</td>`+// Columna 8 > cantidad
                                 `<td style="text-align: right">${formatoMoneda(obj_recompra.costo)}</td>`+// Columna 9 > costo de compra
-                                `<td class="t_0" style="text-align: right">${formatoMoneda(suma * obj_recompra.costo)}</td>`+// Columna 10 > Costo Total
+                                `<td class="t_0" style="text-align: right">${formatoMoneda(obj_recompra.suma_val_exs() * obj_recompra.costo)}</td>`+// Columna 10 > Costo Total
                                 `<td style="text-align: right">${formatoMoneda(obj_recompra.precio)}</td>`+// Columna 11 > precio de venta
                                 `<td style="text-align: right">${obj_recompra.lote}</td>`+// Columna 12 > lote
                                 `<td style="text-align: right">${d_proveedor.nombre_cli}</td>`+// Columna 13 > proveedor
@@ -704,7 +670,7 @@ async function funcionGeneralRecompras(){
         });
     });
     function DatosRecompra(){
-        this.id_num = datos_usuario[0].id;
+        this.id_num = neg_db[0].id;
         this.fecha = generarFecha();
         this.array_productos_dos = array_productos_dos;
         this.array_entradas_dos = array_entradas_dos;

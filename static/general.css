@@ -260,7 +260,7 @@ caption {
   }
   .contenedor_stock_productos{
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr;
     justify-items: center;
     background: linear-gradient(45deg, var(--fondo-principal), var(--fondo-quinto));
     width: 1100px;
@@ -363,9 +363,9 @@ caption {
 /*  */
 .contenedor-codigo-barras{
     overflow-y: scroll;
-    max-height: 40vh;
+    max-height: 80vh;
     padding: 0px 10px;
-    width: 500px;
+    width: 1000px;
 }
 .contenedor-codigo-barras::-webkit-scrollbar {
     width: 8px; /* Ancho de la barra de desplazamiento */
@@ -383,6 +383,32 @@ caption {
     top: 0px;
 }
 .elemento_estatico_inferior{
+    position: sticky;
+    bottom: 0px;
+}
+/* /////////////////////////////// */
+.contenedor-codigo-barras_dos{
+    overflow-y: scroll;
+    max-height: 60vh;
+    padding: 0px 10px;
+    width: 500px;
+}
+.contenedor-codigo-barras_dos::-webkit-scrollbar {
+    width: 8px; /* Ancho de la barra de desplazamiento */
+}
+
+.contenedor-codigo-barras_dos::-webkit-scrollbar-thumb {
+    background-color: var(--boton-dos); /* Color de la barra */
+    border-radius: 5px;
+}
+.contenedor-codigo-barras_dos::-webkit-scrollbar-track {
+    background-color: var(--fondo-principal); /* Color del fondo de la barra */
+}
+.elemento_estatico_superior_dos{
+    position: sticky;
+    top: 0px;
+}
+.elemento_estatico_inferior_dos{
     position: sticky;
     bottom: 0px;
 }

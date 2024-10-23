@@ -128,7 +128,6 @@ function totalVentasPorMes(){
     
     let array_ventas_total = [];
     let array_costos_total = [];
-    let array_meses= [];
     let masAlto = 0;
     let mes_alto = 0;
     let masBajo = Infinity;
@@ -141,37 +140,34 @@ function totalVentasPorMes(){
     for(let i = 0; i < 12; i++){
         let suma_t_v = 0;
         let suma_t_c = 0;
-        let suma_t_m = 0;
         ventasMensualesSucursales.forEach((event)=>{
             if(event.mes == i + 1){
                 suma_mensual_ventas += event.suma_ventas
                 suma_t_v +=event.suma_ventas;
                 suma_t_c +=event.suma_costos;
-                suma_t_m +=event.mes;
             };
         });
         array_ventas_total.push(suma_t_v);
         array_costos_total.push(suma_t_c);
-        array_meses.push(suma_t_m);
 
         array_ventas_total[i] > 0 ? suma_meses+=1 : "";
     };
     for(let i = 0; i < array_ventas_total.length; i++){
         if(masAlto < array_ventas_total[i]){// Encontramos el valor mas alto de array_ventas_total[i]
             masAlto = array_ventas_total[i]
-            mes_alto = array_meses[i]
+            mes_alto = i
         };
         if(array_ventas_total[i] > 0 && masBajo >= array_ventas_total[i]){// Encontramos el valor mas bajo de array_ventas_total[i]
             masBajo = array_ventas_total[i]
-            mes_bajo = array_meses[i]
+            mes_bajo = i
         };
     };
 
     document.getElementById("menor_venta").textContent = `${moneda()} ${(masBajo).toFixed(2)}`
     document.getElementById("mayor_venta").textContent = `${moneda()} ${(masAlto).toFixed(2)}`
     document.getElementById("promedio_venta").textContent = `${moneda()} ${(suma_mensual_ventas/suma_meses).toFixed(2)}`
-    document.querySelector(".mes_max").textContent = `${meses_letras[mes_alto - 1]}-${anio_referencia.value}`
-    document.querySelector(".mes_min").textContent = `${meses_letras[mes_bajo - 1]}-${anio_referencia.value}`
+    document.querySelector(".mes_max").textContent = `${meses_letras[mes_alto]}-${anio_referencia.value}`
+    document.querySelector(".mes_min").textContent = `${meses_letras[mes_bajo]}-${anio_referencia.value}`
 
     graficoBarrasVertical(document.getElementById('ventas_mensuales'), array_ventas_total, array_costos_total, ['Ventas Mensuales', 'Costos Mensuales'])
 };
@@ -196,7 +192,7 @@ async function graficoDonaEfectivo(){
     cls, 
     cls_dos, true
     )
-    graficoDona(document.getElementById("grafico_circulo_margen"), ['Margen esperado', 'Margen real'], [(sumaTotal.suma_costos/sumaTotal.suma_ventas_esperado)*100, (sumaTotal.suma_costos/sumaTotal.suma_ventas)*100], 
+    graficoDona(document.getElementById("grafico_circulo_margen"), ['Margen esperado', 'Margen real'], [(1-(sumaTotal.suma_costos/sumaTotal.suma_ventas_esperado))*100, (1-(sumaTotal.suma_costos/sumaTotal.suma_ventas))*100], 
     cls[0], 
     cls_dos[1], true, '%'
     )

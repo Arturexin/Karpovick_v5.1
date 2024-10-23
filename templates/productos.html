@@ -2,57 +2,17 @@
 
 {% block content %}
 <div class="productos-form baja_opacidad">
-    <div class="contenedor_stock_productos">
-        <div id="circulo_stock_sucursal">
-            <div class="cirulo_interior">
-                <span class="nombre_circulo_sucursal"></span>
-                <span class="valor_circulo_sucursal"></span>
-                <span class="porcentaje_circulo_sucursal"></span>
-            </div>
-        </div>
-        <div>
-            <div class="contenedor-input-radio-inventario">
-                <h2>Impresión de etiquetas</h2>
-            </div>
-            <div class="contenedor-codigo-barras">
-                <table id="tabla-codigo-barras" class="tabla-proforma">
-                    <thead class="elemento_estatico_superior">
-                        <tr>
-                            <th scope="row" colspan="7">Tabla de Etiquetas</th>
-                        </tr>
-                        <tr>
-                            <th>Código</th>
-                            <th>Descripción</th>
-                            <th>Precio</th>
-                            <th>Cantidad</th>
-                            <th style="width: 200px;">Cod. Barras</th>
-                            <th style="width: 200px;">Cod. QR</th>
-                            <th>X</th>
-                        </tr>
-                    </thead>
-                    <tbody class="contenedor_body">
-                    </tbody>
-                    <tfoot class="elemento_estatico_inferior">
-                        <tr>
-                            <th scope="row" colspan="7">
-                                <button id="crear-codigo-barras" class="myButtonAgregar">Crear Código De Barras</button>
-                                <button id="crear-codigo-qr" class="myButtonAgregar">Crear Código QR</button>
-                            </th>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-        </div>
-        
-    </div>
-
-    <div id="acciones_rapidas" class="contenedor_pre">
-    </div>
-    <div>
+    
+    <div class="contenedor_tabla_salidas">
         <table id="tabla-productos" class="tabla-proforma">
             <thead>
                 <tr>
-                    <th scope="row" colspan="16"><h2>Inventario Productos</h2></th>
+                    <th scope="row" colspan="16">
+                        <h2>Inventario Productos</h2>
+                        <div id="contenedor_grafico_stock" style="width: 1100px;height: 100px;">
+                            <canvas id="grafico_stock" style="width: 1100px;height: 100px;"></canvas>
+                        </div>
+                    </th>
                 </tr>
                 <tr>
                     <th scope="row" colspan="15">
@@ -96,6 +56,45 @@
             </tfoot>
         </table>
     </div>
+    <div class="contenedor_stock_productos">
+        <div>
+            <div class="contenedor-input-radio-inventario">
+                <h2>Impresión de etiquetas</h2>
+            </div>
+            <div class="contenedor-codigo-barras">
+                <table id="tabla-codigo-barras" class="tabla-proforma">
+                    <thead class="elemento_estatico_superior">
+                        <tr>
+                            <th scope="row" colspan="7">Tabla de Etiquetas</th>
+                        </tr>
+                        <tr>
+                            <th>Código</th>
+                            <th>Descripción</th>
+                            <th>Precio</th>
+                            <th>Cantidad</th>
+                            <th style="width: 200px;">Cod. Barras</th>
+                            <th style="width: 200px;">Cod. QR</th>
+                            <th>X</th>
+                        </tr>
+                    </thead>
+                    <tbody class="contenedor_body">
+                    </tbody>
+                    <tfoot class="elemento_estatico_inferior">
+                        <tr>
+                            <th scope="row" colspan="7">
+                                <button id="crear-codigo-barras" class="myButtonAgregar">Crear Código De Barras</button>
+                                <button id="crear-codigo-qr" class="myButtonAgregar">Crear Código QR</button>
+                            </th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        
+    </div>
+
+    <div id="acciones_rapidas" class="contenedor_pre">
+    </div>
     <details>
         <summary>Acciones</summary>
         <div>
@@ -111,6 +110,10 @@
     </details>
     
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script src="../static/productos.js"></script>
 <script src="../static/tablas.js"></script>
+<script src="../static/graficos.js"></script>
 {% endblock %}

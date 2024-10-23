@@ -200,6 +200,7 @@ select:focus{ outline: none;}
     align-items: center;
     transition: background .4s, box-shadow .4s, transform .4s;
     text-decoration: none;
+    gap: 20px;
 }
 
 .encabezado {

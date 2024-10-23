@@ -12,35 +12,47 @@ const expresiones = {
     descripcion: /^[A-ZÑa-zñáéíóúÁÉÍÓÚ'°\-_/:()\d ]+$/,
     password: /(?=(.*[0-9]))(?=.*[\!@#$%^&*()\\[\]{}\-_+=|:;"'<>,./?])(?=.*[a-z])(?=(.*[A-Z]))(?=(.*)).{8,}/
 };
-
-const botonFomulario = document.getElementById("boton-iniciar-sesion-formulario");
-botonFomulario.addEventListener("click", () => {
-    document.querySelector(".contenedor-formulario-uno").classList.toggle("contenedor-formulario-uno-show")
-    document.querySelector(".contenedor-formulario-dos").classList.remove("contenedor-formulario-dos-show")
-});
-const botonFomularioDos = document.querySelector(".boton-iniciar-sesion-dos");
-botonFomularioDos.addEventListener("click", (event) => {
-    event.preventDefault()
-    document.querySelector(".contenedor-formulario-uno").classList.toggle("contenedor-formulario-uno-show")
-    document.querySelector(".contenedor-formulario-dos").classList.remove("contenedor-formulario-dos-show")
-});
-
-const crearCuenta = document.querySelector(".crear-cuenta");
-crearCuenta.addEventListener("click", (event) => {
-    event.preventDefault()
-    document.querySelector(".contenedor-formulario-uno").classList.remove("contenedor-formulario-uno-show")
-    document.querySelector(".contenedor-formulario-dos").classList.add("contenedor-formulario-dos-show")
-});
-
-const botonPrueba = document.getElementById("boton_prueba");
-botonPrueba.addEventListener("click", (e) => {
-    e.preventDefault();
-    document.querySelector(".contenedor-formulario-uno").classList.remove("contenedor-formulario-uno-show")
-    document.querySelector(".contenedor-formulario-dos").classList.toggle("contenedor-formulario-dos-show")
-});
-const formularioLogin = document.getElementById("formulario-loggin");
-document.querySelector(".boton-iniciar-sesion").addEventListener("click", async (event) => {
-    event.preventDefault()
+formLogin()
+function formLogin(){
+    let form = `<form id="formulario-loggin" action="/login" method="POST">
+                    <div class="contenedor-formulario-uno">
+                        <h2 style="text-align: center;">Iniciar Sesión</h2>
+                        <label >Usuario
+                            <input id="username" type="text" name="username">
+                        </label>
+                        <label>Constraseña
+                            <input id="password" type="password" name="password">
+                        </label>
+                        
+                        </div>
+                    </form>
+                    <dir class="centrado_form">
+                        <button class="boton-iniciar-sesion" onClick="initSession()">Iniciar Sesión</button>
+                        <button class="boton-iniciar-sesion-tres" onCLick="formCreate()">Crear cuenta</button>
+                    </dir>`;
+    document.querySelector(".contenedor_form").innerHTML = form
+}
+function formCreate(){
+    let form = `<form id="formulario-create">
+                    <div class="contenedor-formulario-uno">
+                        <h2 style="text-align: center;">Crear Cuenta</h2>
+                        <label>Nombres<input id="nombres-create" name="nombres-create" type="text"></label>
+                        <label>Apellidos<input id="apellidos-create" name="apellidos-create" type="text"></label>
+                        <label>DNI<input id="dni-create" name="dni-create" type="text"></label>
+                        <label>Email<input id="email-create" name="email-create" type="text"></label>
+                        <label>Teléfono<input id="telefono-create" name="telefono-create" type="text"></label>
+                        <label>Password<input id="password-create" name="password-create" type="password"></label>
+                        <label>Confirmar Password<input id="password-confirmar-create" name="password-confirmar-create" type="password"></label>
+                        
+                    </div>
+                </form>
+                <div class="centrado_form">
+                    <button class="boton-iniciar-sesion" onClick="initRegister()">Registrar Cuenta</button>
+                    <button class="boton-iniciar-sesion-tres" onCLick="formLogin()">Iniciar Sesión</button>
+                </div>`;
+    document.querySelector(".contenedor_form").innerHTML = form
+};
+async function initSession(){
     if(expresiones.email.test(document.getElementById("username").value) &&
         expresiones.password.test(document.getElementById("password").value)){
         const response = await fetch('/login',{
@@ -54,12 +66,8 @@ document.querySelector(".boton-iniciar-sesion").addEventListener("click", async 
             })
         });    
         if(response.ok){
-            location.href = "/index"
-        }else{
-            alert("Usuario o conatraseña no correcta.")
-        }
-
-        localStorage.setItem("usuario", document.getElementById("username").value)
+            location.href = response.url
+        };
         document.querySelector("#formulario-loggin").reset();
         document.getElementById("username").style.background =""
         document.getElementById("password").style.background ="" 
@@ -68,11 +76,8 @@ document.querySelector(".boton-iniciar-sesion").addEventListener("click", async 
     }else if(expresiones.email.test(document.getElementById("password").value) == false){
         document.getElementById("password").style.background ="#b36659"
     };
-});
-const btn = document.getElementById('button');
-const registro = document.getElementById('formulario-create');
-registro.addEventListener('submit',async (event)=>{
-    event.preventDefault();
+};
+async function initRegister(){
     if(document.getElementById("password-create").value === document.getElementById("password-confirmar-create").value &&
         expresiones.cliente.test(document.getElementById("nombres-create").value) &&
         expresiones.cliente.test(document.getElementById("apellidos-create").value) &&
@@ -96,7 +101,7 @@ registro.addEventListener('submit',async (event)=>{
                 },
             body:JSON.stringify(data)
         });
-        console.log(response.status)
+
         if(response.ok){
             alert("Usuario creado correctamente, se le enviará un mensaje de confirmación a su correo electrónico.")
             document.getElementById("formulario-create").reset()
@@ -116,4 +121,4 @@ registro.addEventListener('submit',async (event)=>{
     }else if(expresiones.email.test(document.getElementById("password-create").value) == false){
         document.getElementById("password-create").style.background ="#b36659"
     };
-});
+}

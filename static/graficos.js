@@ -196,13 +196,113 @@ function graficoBarrasHorizontalDos(elemento, labels, label, array_uno, array_do
         }
     });
 }
-function graficoBarrasVertical(elemento, array_uno, array_dos, array_nombres){
-    const ctx = elemento.getContext('2d');
+function graficoBarrasHorizontalTres(elemento, labels, label, array_uno, array_dos, array_tres, array_cuatro, array_cinco, arr_conteo){
+    let ctx = elemento.getContext('2d');
     return new Chart(ctx, {
         type: 'bar',
         data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: label[0],
+                    data: array_uno,
+                    backgroundColor: cls[0],
+                    borderColor: cls_dos[0],
+                    borderWidth: 1,
+                    barThickness: 30
+                },
+                {
+                    label: label[1],
+                    data: array_dos,
+                    backgroundColor: cls[1],
+                    borderColor: cls_dos[1],
+                    borderWidth: 1,
+                    barThickness: 30
+                },
+                {
+                    label: label[2],
+                    data: array_tres,
+                    backgroundColor: cls[2],
+                    borderColor: cls_dos[2],
+                    borderWidth: 1,
+                    barThickness: 30
+                },
+                {
+                    label: label[3],
+                    data: array_cuatro,
+                    backgroundColor: cls[3],
+                    borderColor: cls_dos[3],
+                    borderWidth: 1,
+                    barThickness: 30
+                },
+                {
+                    label: label[4],
+                    data: array_cinco,
+                    backgroundColor: cls[4],
+                    borderColor: cls_dos[4],
+                    borderWidth: 1,
+                    barThickness: 30
+                }
+            ]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            
+            scales: {
+                x: {
+                    display: true,  // Esta línea elimina las etiquetas del eje x
+                    stacked: true,
+                    beginAtZero: true,
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        color: '#eee'
+                    }
+                },
+                y: {
+                    display: true,  // Esta línea elimina las etiquetas del eje x
+                    stacked: true,
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        color: '#eee'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    labels: {
+                        color: '#eee'
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            let value = context.raw;
+                            let index = context.dataIndex;
+                            let conteo = arr_conteo[index];
+                            return `${label}: S/ ${value.toFixed(2)}, ${Math.round((value/conteo)*100)}% de S/ ${conteo.toFixed(2)}`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+function graficoBarrasVertical(elemento, array_uno, array_dos, array_nombres){
+    const ctx = elemento.getContext('2d');
+    return new Chart(ctx, {
+        
+        data: {
             labels: mes_anio,
             datasets: [{
+                type: 'bar',
                 label: array_nombres[0],
                 data: array_uno, 
                 backgroundColor: "rgb(230, 202, 123)",
@@ -210,6 +310,7 @@ function graficoBarrasVertical(elemento, array_uno, array_dos, array_nombres){
                 borderWidth: 1,
                 barThickness: 10  // Ajusta este valor para cambiar el grosor de las barras
             }, {
+                type: 'bar',
                 label: array_nombres[1],
                 data: array_dos, 
                 backgroundColor: "rgb(230, 110, 141)",
@@ -568,7 +669,7 @@ function graficoPolarDoble(elemento, array_uno, array_dos, label){
                         centerPointLabels: true,
                         color: '#eee',
                         font: {
-                            size: 10 // Ajusta el tamaño de la fuente de los labels para que ocupen menos espacio
+                            size: 12 // Ajusta el tamaño de la fuente de los labels para que ocupen menos espacio
                         }
                     }
                 }

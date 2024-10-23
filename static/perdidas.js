@@ -6,12 +6,11 @@ function inicioPerdidas(){
     document.querySelector(".baja_opacidad_interior").classList.add("alta_opacidad_interior")
     document.getElementById("button_contenedor").innerHTML = formButton("Agregar a pre lista", "agregarAtablaModal()", "reseteoFormulario()")
     document.getElementById("categoria-form").innerHTML = llenarCategoriaProductosEjecucion();
-
+    buscarProducto(document.getElementById('buscador-productos-form'))
     cargarDatosAnio()
     btnPerdidas = 1;
 
     document.getElementById("categoria_buscador_detalle").innerHTML = llenarCategoriaProductosEjecucion();
-    indice_base = JSON.parse(localStorage.getItem("base_datos_consulta"))
 };
 /////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
@@ -37,20 +36,7 @@ function reseteoFormulario(){
     document.getElementById('codigo-form').value = "";
     document.getElementById('descripcion-form').value = "";
 };
-document.addEventListener("keyup", (e) =>{
-    let almacenCentral = indice_base.find(y => y.codigo.toLowerCase().startsWith(document.getElementById('buscador-productos-form').value.toLocaleLowerCase()))
-    if(almacenCentral){
-        document.getElementById('id-form').value = almacenCentral.idProd
-        document.getElementById('categoria-form').value = almacenCentral.categoria
-        document.getElementById('codigo-form').value = almacenCentral.codigo
-        document.getElementById('descripcion-form').value = almacenCentral.descripcion
-        if(document.getElementById('buscador-productos-form').value == ""){
-            reseteoFormulario();
-        };
-    }else{
-        reseteoFormulario();
-    };
-});
+
 function crearHeadDespacho(){
     let tablaDespacho= document.querySelector("#tabla_modal > thead");
     let nuevaFilaTablaDespacho = tablaDespacho.insertRow(-1);
@@ -125,7 +111,6 @@ function accionSelectDos(){// cambios al efectuar un cambio en select de sucursa
 };
 async function agregarAtablaModal(){
     if(document.getElementById("id-form").value > 0 && document.getElementById("motivo_salida").value !== "0"){
-        let db_ = JSON.parse(localStorage.getItem("base_datos_consulta"))
         let array_id_a_s = [];
         crearHeadDespacho()
         cargarSucursalesEjecucion(document.getElementById("sun_opc"))
@@ -139,7 +124,7 @@ async function agregarAtablaModal(){
                     codigo_form = codigo_form.replace("-" + arrayCreacionCategoriaTallas[j], "-" + arrayCreacionCategoriaTallas[i])
                 }
             };
-            let base = db_.find(y => y.codigo === codigo_form)// Buscamos en la base de datos la existencia del código
+            let base = buscarProductosDinamicamente(`${codigo_form}`)// Buscamos en la base de datos la existencia del código
             if(base){
                 let id_a_s = array_saldos.find(x=> x.idProd === Number(base.idProd))
                 if(id_a_s !== undefined){// Si el nuevo id ya se encuentra en el array_saldos no pasará a la pre lista
@@ -180,6 +165,7 @@ function op_cantidad(e){
     obj_.in_q(e, indice_suc)
     row_.children[7].textContent = Number(row_.children[5].textContent) - Number(e.value)
     row_.children[9].textContent = formatoMoneda(obj_.total_costo(indice_suc))
+    row_.children[7].style.background = row_.children[7].textContent < 0 ? "var(--boton-dos)" : "";//pintamos si es negativo
 };
 async function buscarPorCodido(){
     const id_rec = document.querySelectorAll(".id_modal");
@@ -229,16 +215,9 @@ function filaBodyProformaPincipal(){
     array_saldos.forEach((obj_des)=>{
         let coincidencia_id = id_prof.find(x=> x === obj_des.idProd)
         if(coincidencia_id === undefined){
-            const existencias = [   
-                                    obj_des.existencias_ac,
-                                    obj_des.existencias_su,
-                                    obj_des.existencias_sd,
-                                    obj_des.existencias_st,
-                                    obj_des.existencias_sc
-                                ]
-            const suma = existencias.reduce((acumulador, valorActual) => acumulador + valorActual, 0);
-            if(existencias.every(valor => valor >= 0 && Number.isFinite(valor)) && 
-            existencias.some(valor => valor > 0)){
+
+            if(obj_des.val_sal().every(valor => valor >= 0 && Number.isFinite(valor)) && 
+            obj_des.val_exs().some(valor => valor > 0)){
                 let d_categoria = cat_db.find(x => x.id === Number(obj_des.categoria))
                 let nueva_fila = fila_principal.insertRow(-1);
                 let fila = `<tr>`+
@@ -252,7 +231,7 @@ function filaBodyProformaPincipal(){
                             `<td class="s_4" style="text-align: right">${obj_des.existencias_st}</td>`+// Columna 7 > existencias
                             `<td class="s_5" style="text-align: right">${obj_des.existencias_sc}</td>`+// Columna 8 > existencias
                             `<td style="text-align: right">${formatoMoneda(obj_des.costo)}</td>`+// Columna 9 > costo
-                            `<td style="text-align: right">${formatoMoneda(suma * obj_des.costo)}</td>`+// Columna 10 > costo total
+                            `<td style="text-align: right">${formatoMoneda(obj_des.suma_val_exs() * obj_des.costo)}</td>`+// Columna 10 > costo total
                             `<td style="text-align: right">${obj_des.motivo}</td>`+// Columna 11 > motivo
                             `<td style="text-align: center">
                                 <div class="tooltip">

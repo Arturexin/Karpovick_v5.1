@@ -144,7 +144,8 @@ def getSumaStockSucursal():
             query = ("SELECT SUM(existencias_ac * costo_unitario) AS almacen_central, "
                      "SUM(existencias_su * costo_unitario ) AS sucursal_uno, "
                      "SUM(existencias_sd * costo_unitario) AS sucursal_dos, "
-                     "SUM(existencias_st * costo_unitario) AS sucursal_tres "
+                     "SUM(existencias_st * costo_unitario) AS sucursal_tres, "
+                     "SUM(existencias_sc * costo_unitario) AS sucursal_cuatro "
                      "FROM `almacen_central` "
                      "WHERE `identificadorProd` = %s "
                      "AND almacen_central.estado > 0 ")
@@ -156,7 +157,8 @@ def getSumaStockSucursal():
                 'almacen_central': fila[0],
                 'sucursal_uno': fila[1],
                 'sucursal_dos': fila[2],
-                'sucursal_tres': fila[3]
+                'sucursal_tres': fila[3],
+                'sucursal_cuatro': fila[4]
                 }
             resultado.append(contenido)
         return jsonify(resultado)
@@ -537,7 +539,9 @@ def gestionDeModificacion():
         mysql.connection.rollback()
         return jsonify({"status": "error", "message": str(e)})
     
-
+######################################################################################
+######################################################################################
+######################################################################################
 def insertar_almacen_central(cur, array_productos, usuarioLlave, dato_uno):
     query_productos = ( "INSERT INTO `almacen_central` "
                         "(`categoria`, `codigo`, `descripcion`, `talla`, "
@@ -557,7 +561,7 @@ def insertar_almacen_central(cur, array_productos, usuarioLlave, dato_uno):
 
     # Verificar si la cantidad de filas actualizadas es igual a la cantidad de productos
     if cur.rowcount != len(array_productos):
-        raise Exception("Uno de los productos no se insertó.")
+        raise Exception("Uno de los productos no cuenta con unidades suficientes, actualice los saldos.")
     
 def actualizar_almacen_central_data(cur, array_productos, usuarioLlave):
     query_productos = ( "UPDATE `almacen_central` SET `categoria` = %s, `codigo` = %s, `descripcion` = %s, `talla` = %s, "
@@ -576,3 +580,102 @@ def actualizar_almacen_central_data(cur, array_productos, usuarioLlave):
     # Verificar si la cantidad de filas actualizadas es igual a la cantidad de productos
     if cur.rowcount != len(array_productos):
         raise Exception("Uno de los productos no se actualizó.")
+    
+def actualizar_almacen_central(cur, array_productos, usuarioLlave):
+    query = (   "UPDATE `almacen_central` SET "
+                "existencias_ac = existencias_ac + %s, "
+                "existencias_su = existencias_su + %s, "
+                "existencias_sd = existencias_sd + %s, "
+                "existencias_st = existencias_st + %s, "
+                "existencias_sc = existencias_sc + %s "
+                "WHERE `almacen_central`.`idProd` = %s "
+                "AND `almacen_central`.`estado` > 0 "
+                "AND identificadorProd = %s "
+                # Validación: asegurarse de que las existencias no queden negativas
+                "AND (existencias_ac + %s) >= 0 "
+                "AND (existencias_su + %s) >= 0 "
+                "AND (existencias_sd + %s) >= 0 "
+                "AND (existencias_st + %s) >= 0 "
+                "AND (existencias_sc + %s) >= 0")
+    data_productos =    [
+                            (p['existencias_ac'], p['existencias_su'], p['existencias_sd'],
+                            p['existencias_st'], p['existencias_sc'], p['idProd'], usuarioLlave,
+                            p['existencias_ac'], p['existencias_su'], p['existencias_sd'],
+                            p['existencias_st'], p['existencias_sc']) 
+                            for p in array_productos
+                        ]
+    cur.executemany(query, data_productos)
+
+    # Verificar si la cantidad de filas actualizadas es igual a la cantidad de productos
+    if cur.rowcount != len(array_productos):
+        raise Exception("Uno de los productos no cuenta con unidades suficientes, actualice los saldos.")
+
+def actualizar_almacen_central_suma(cur, recompra_data, usuarioLlave, nombre_array):
+    """
+    Procesa los productos, agrupa los datos por sucursal y actualiza el inventario en la tabla 'almacen_central'.
+    """
+    # Diccionario para almacenar los datos de actualización agrupados por sucursal_post
+    data_productos_por_sucursal = {'existencias_ac': [], 'existencias_su': [], 'existencias_sd': [], 'existencias_st': [],
+                                   'existencias_sc':[]}
+    data_len = 0
+    # Procesar los productos
+    for producto in recompra_data[nombre_array]:
+        idProd = producto['idProd']
+        sucursal_post = producto['sucursal_post']
+        existencias_post = producto['existencias_post']
+
+        # Validar la sucursal
+        if sucursal_post not in data_productos_por_sucursal:
+            return jsonify({"status": "error", "message": f"Sucursal no válida: {sucursal_post}"}), 400
+
+        # Agregar los datos al grupo correspondiente
+        data_productos_por_sucursal[sucursal_post].append((existencias_post, idProd, usuarioLlave, existencias_post))
+
+    # Ejecutar las actualizaciones agrupadas por sucursal_post
+    for sucursal_post, data_productos in data_productos_por_sucursal.items():
+        if data_productos:  # Verificar si hay datos para esta sucursal_post
+            data_len = len(data_productos)
+            query = (f"UPDATE `almacen_central` SET {sucursal_post} = {sucursal_post} + %s "
+                     "WHERE `almacen_central`.`idProd` = %s "
+                     "AND identificadorProd = %s "
+                     "AND almacen_central.estado > 0 "
+                     f"AND {sucursal_post} >= %s")
+            cur.executemany(query, data_productos)
+
+    if cur.rowcount != data_len:
+        raise Exception("Uno de los productos no cuenta con unidades suficientes, actualice los saldos.")
+
+def actualizar_almacen_central_resta(cur, recompra_data, usuarioLlave, nombre_array):
+    """
+    Procesa los productos, agrupa los datos por sucursal y actualiza el inventario en la tabla 'almacen_central'.
+    """
+    # Diccionario para almacenar los datos de actualización agrupados por sucursal_post
+    data_productos_por_sucursal = {'existencias_ac': [], 'existencias_su': [], 'existencias_sd': [], 'existencias_st': [],
+                                   'existencias_sc':[]}
+    data_len = 0
+    # Procesar los productos
+    for producto in recompra_data[nombre_array]:
+        idProd = producto['idProd']
+        sucursal_post = producto['sucursal_post']
+        existencias_post = producto['existencias_post']
+
+        # Validar la sucursal
+        if sucursal_post not in data_productos_por_sucursal:
+            return jsonify({"status": "error", "message": f"Sucursal no válida: {sucursal_post}"}), 400
+
+        # Agregar los datos al grupo correspondiente
+        data_productos_por_sucursal[sucursal_post].append((existencias_post, idProd, usuarioLlave, existencias_post))
+
+    # Ejecutar las actualizaciones agrupadas por sucursal_post
+    for sucursal_post, data_productos in data_productos_por_sucursal.items():
+        if data_productos:  # Verificar si hay datos para esta sucursal_post
+            data_len = len(data_productos)
+            query = (f"UPDATE `almacen_central` SET {sucursal_post} = {sucursal_post} - %s "
+                     "WHERE `almacen_central`.`idProd` = %s "
+                     "AND identificadorProd = %s "
+                     "AND almacen_central.estado > 0 "
+                     f"AND {sucursal_post} >= %s")
+            cur.executemany(query, data_productos)
+ 
+    if cur.rowcount != data_len:
+        raise Exception("Uno de los productos no cuenta con unidades suficientes, actualice los saldos.")

@@ -6,17 +6,15 @@ function inicioTransferencias(){
     document.querySelector(".baja_opacidad_interior").classList.add("alta_opacidad_interior")
     document.getElementById("button_contenedor").innerHTML = formButton("Agregar a pre lista", "agregarAtablaModal()", "reseteoFormulario()")
     document.getElementById("categoria-form").innerHTML = llenarCategoriaProductosEjecucion();
- 
+    buscarProducto(document.getElementById('buscador-productos-form'))
     cargarDatosAnio()
     btnTransferencias = 1;
 
     busquedaStock()
     document.getElementById("categoria_buscador_detalle").innerHTML = llenarCategoriaProductosEjecucion();
-    indice_base = JSON.parse(localStorage.getItem("base_datos_consulta"))
 };
 let array_saldos = [];
 const in_existencias = ["in_ac", "in_su", "in_sd", "in_st", "in_sc"];
-let datos_usuario = JSON.parse(localStorage.getItem("datos_usuario"))
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function cargarDatosAnio(){
@@ -45,21 +43,6 @@ function reseteoFormulario(){
     document.getElementById('codigo-form').value = "";
     document.getElementById('descripcion-form').value = "";
 };
-
-document.addEventListener("keyup", () =>{
-    let almacenCentral = indice_base.find(y => y.codigo.toLowerCase().startsWith(document.getElementById('buscador-productos-form').value.toLocaleLowerCase()))
-    if(almacenCentral){
-        document.getElementById('id-form').value = almacenCentral.idProd
-        document.getElementById('categoria-form').value = almacenCentral.categoria
-        document.getElementById('codigo-form').value = almacenCentral.codigo
-        document.getElementById('descripcion-form').value = almacenCentral.descripcion
-        if(document.getElementById('buscador-productos-form').value == ""){
-            reseteoFormulario();
-        };
-    }else{
-        reseteoFormulario();
-    };
-});
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////TRANSFERENCIAS PLUS////////////////////////////////////////////////////////////////
@@ -194,7 +177,6 @@ function clicKEliminarFila(e){
 
 async function agregarAtablaModal(){
     if(document.getElementById("id-form").value > 0){
-        let db_ = JSON.parse(localStorage.getItem("base_datos_consulta"))
         let array_id_a_s = [];
         crearHeadTransferencias()
         cargarSucursalesEjecucion(document.getElementById("sun_opc"))
@@ -209,7 +191,7 @@ async function agregarAtablaModal(){
                     codigo_form = codigo_form.replace("-" + arrayCreacionCategoriaTallas[j], "-" + arrayCreacionCategoriaTallas[i])
                 }
             };
-            let base = db_.find(y => y.codigo === codigo_form)// Buscamos en la base de datos la existencia del código
+            let base = buscarProductosDinamicamente(`${codigo_form}`);// Buscamos en la base de datos la existencia del código
             if(base){
                 let id_a_s = array_saldos.find(x=> x.idProd === Number(base.idProd))
                 if(id_a_s !== undefined){// Si el nuevo id ya se encuentra en el array_saldos no pasará a la pre lista
@@ -308,15 +290,9 @@ function filaBodyTransferenciasProformaPincipal(){
     array_saldos.forEach((obj_tran)=>{
         let coincidencia_id = id_prof.find(x=> x === obj_tran.idProd)
         if(coincidencia_id === undefined){
-            const existencias = [   
-                                    obj_tran.existencias_ac,
-                                    obj_tran.existencias_su,
-                                    obj_tran.existencias_sd,
-                                    obj_tran.existencias_st,
-                                    obj_tran.existencias_sc
-                                ];
-            if(existencias.every(valor => Number.isFinite(valor)) && 
-            existencias.some(valor => valor !== 0) && obj_tran.condicion() === true){
+
+            if(obj_tran.val_exs().every(valor => Number.isFinite(valor)) && 
+            obj_tran.val_exs().some(valor => valor !== 0) && obj_tran.condicion() === true){
                 let d_categoria = cat_db.find(x => x.id === Number(obj_tran.categoria))
                 let nueva_fila = fila_principal.insertRow(-1);
                 let fila = `<tr>`+
@@ -420,7 +396,7 @@ async function realizarTransferencia(){
     function DataTransferencias(){
         this.array_data_prod = array_data_prod;
         this.array_data_tran = array_data_tran;
-        this.id_num = datos_usuario[0].id;
+        this.id_num = neg_db[0].id;
         this.fecha = generarFecha();
     }
     let fila = new DataTransferencias();

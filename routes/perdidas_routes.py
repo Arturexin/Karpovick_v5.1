@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from flask import Blueprint, jsonify, request, session
 from flask_cors import cross_origin
 from flask_login import login_required
+from routes.productos_routes import actualizar_almacen_central
 from db_connection import mysql
 
 # Definimos el blueprint para las rutas de perdidas
@@ -176,36 +177,9 @@ def operarPerdida():
         mysql.connection.rollback()
         return jsonify({"status": "error", "message": str(e)})
 
-
-def actualizar_almacen_central(cur, array_productos, usuarioLlave):
-    query = (   "UPDATE `almacen_central` SET "
-                "existencias_ac = existencias_ac + %s, "
-                "existencias_su = existencias_su + %s, "
-                "existencias_sd = existencias_sd + %s, "
-                "existencias_st = existencias_st + %s, "
-                "existencias_sc = existencias_sc + %s "
-                "WHERE `almacen_central`.`idProd` = %s "
-                "AND `almacen_central`.`estado` > 0 "
-                "AND identificadorProd = %s "
-                # Validación: asegurarse de que las existencias no queden negativas
-                "AND (existencias_ac + %s) >= 0 "
-                "AND (existencias_su + %s) >= 0 "
-                "AND (existencias_sd + %s) >= 0 "
-                "AND (existencias_st + %s) >= 0 "
-                "AND (existencias_sc + %s) >= 0")
-    data_productos =    [
-                            (p['existencias_ac'], p['existencias_su'], p['existencias_sd'],
-                            p['existencias_st'], p['existencias_sc'], p['idProd'], usuarioLlave,
-                            p['existencias_ac'], p['existencias_su'], p['existencias_sd'],
-                            p['existencias_st'], p['existencias_sc']) 
-                            for p in array_productos
-                        ]
-    cur.executemany(query, data_productos)
-
-    # Verificar si la cantidad de filas actualizadas es igual a la cantidad de productos
-    if cur.rowcount != len(array_productos):
-        raise Exception("Uno de los productos no cuenta con unidades suficientes, actualice los saldos.")
-    
+###################################################################################################
+###################################################################################################
+###################################################################################################
 def insertar_despacho(cur, array_despacho, usuarioId, usuarioLlave, dato_uno, fecha):
     query_despacho_insert = (   "INSERT INTO `perdidas` "
                                 "(`id_perdidas`, `suc_perdidas`, `id_productos`, `cantidad`, `causa`, "

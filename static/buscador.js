@@ -10,7 +10,7 @@ function busquedaDetalle(indice, termino){
                         `<span style="width: 80px;"><h3>Mandar a formulario</h3></span>`+
                     `</li>`;
     
-    for (let event of indice_base){
+    for (let event of inv_db){
         let parametro = [event.codigo, event.descripcion, ""]
         if (parametro[indice].toLowerCase().includes(terminoBusqueda.toLowerCase()) && terminoBusqueda !== "" &&
         (Number(document.getElementById("categoria_buscador_detalle").value) === event.categoria ||
@@ -126,11 +126,15 @@ function removerMarcaBotonDos(){
     let miUl_detalle = document.getElementById("lista_detalle");
     miUl_cabecera.innerHTML = "";
     miUl_detalle.innerHTML = "";
-    document.querySelectorAll(".stock_sucursal")[0].classList.remove("marcaBotonDos")
-    document.querySelectorAll(".stock_sucursal")[1].classList.remove("marcaBotonDos")
-    document.querySelectorAll(".stock_sucursal")[2].classList.remove("marcaBotonDos")
-    document.querySelectorAll(".stock_sucursal")[3].classList.remove("marcaBotonDos")
-    document.querySelectorAll(".stock_sucursal")[4].classList.remove("marcaBotonDos")
+
+    if(document.querySelectorAll(".stock_sucursal").children !== undefined){
+        document.querySelectorAll(".stock_sucursal")[0].classList.remove("marcaBotonDos")
+        document.querySelectorAll(".stock_sucursal")[1].classList.remove("marcaBotonDos")
+        document.querySelectorAll(".stock_sucursal")[2].classList.remove("marcaBotonDos")
+        document.querySelectorAll(".stock_sucursal")[3].classList.remove("marcaBotonDos")
+        document.querySelectorAll(".stock_sucursal")[4].classList.remove("marcaBotonDos")
+
+    }
 }
 
 function imprimirContenido() {
@@ -215,3 +219,7 @@ function llenadoDatosFormDos(button){
     document.getElementById('codigo-form').value = linea.children[3].textContent;
     document.getElementById('descripcion-form').value = linea.children[4].textContent;
 }
+
+
+
+

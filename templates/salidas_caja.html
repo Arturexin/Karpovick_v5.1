@@ -56,7 +56,7 @@
             <div>
                 <label class="label-general"> Concepto
                     <select name="concepto-gastos" id="concepto-gastos" class="input-general fondo" style="cursor: pointer;">
-                        <option value="" selected disabled>Selecciona un concepto</option>
+                        <option value="0" selected disabled>Selecciona un concepto</option>
                         <option value="2_nomina">Pago nómina</option>
                         <option value="3_seguridad_social">Pago seguridad social</option>
                         <option value="4_proveedores">Pago proveedores</option>
@@ -85,7 +85,6 @@
             
             <div class="boton-cli">
                 <button id="procesar-gastos" class="myButtonAgregar">Procesar Gastos</button>
-                <button id="resgistrarPrestamo" class="myButtonAgregar">Registrar Préstamo</button>
                 <input type="reset" class="myButtonEliminar">
             </div>
         </form>
@@ -142,7 +141,6 @@
                     <th style="width: 60px;">Total</th>
                     <th style="width: 90px;">Usuario<input id="filtro-tabla-gastosVarios-usuario" type="text" class="input-filtro" placeholder="Usuario"></th>
                     <th style="width: 90px;">Fecha</th>
-                    <th style="width: 60px;">Acciones</th>
                 </tr>
             </thead>
             <tbody>
