@@ -78,7 +78,7 @@ function subRutaB(num, index){
 function cuerpoFilaTabla(e){
     return  `<tr class="fila-caja">
                 <td class="invisible">${e.id_caja}</td>
-                <td>${e.sucursal_nombre}</td>
+                <td style="border-left: 7px solid ${CS(e.sucursal_nombre)};">${e.sucursal_nombre}</td>
                 <td style="text-align: right;">${e.saldo_apertura.toFixed(2)}</td>
                 <td style="text-align: right;">${e.ingresos.toFixed(2)}</td>
                 <td style="text-align: right;">${e.egresos.toFixed(2)}</td>

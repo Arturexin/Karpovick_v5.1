@@ -11,6 +11,7 @@ from db_connection import mysql
 salidas_conteo = Blueprint('salidas_conteo', __name__)
 salidas_tabla = Blueprint('salidas_tabla', __name__)
 salidas_tabla_reporte = Blueprint('salidas_tabla_reporte', __name__)
+salidas_reporte_usuarios = Blueprint('salidas_reporte_usuarios', __name__)
 salidas_suma_ventas_mes = Blueprint('salidas_suma_ventas_mes', __name__)
 salidas_suma_total_sucursal_mes = Blueprint('salidas_suma_total_sucursal_mes', __name__)
 salidas_suma_ventas_dia_sucursal = Blueprint('salidas_suma_ventas_dia_sucursal', __name__)
@@ -152,6 +153,51 @@ def getAllSalidasReporte():
         for fila in data:
             contenido = { 
                 'sucursal_nombre': fila[0],
+                'codigo': fila[1],
+                'existencias_salidas':fila[2],
+                'precio_venta_salidas':fila[3],
+                'comprobante': fila[4],
+                'fecha': fila[5].strftime('%d-%m-%Y'),
+                'existencias_devueltas': fila[6],
+                'descripcion': fila[7]
+                }
+            resultado.append(contenido)
+        return jsonify(resultado)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+@salidas_reporte_usuarios.route('/api/salidas_reporte_usuarios')#Salidas, Ventas
+@cross_origin()
+@login_required
+def getAllReporteUsuarios():
+    try:
+        usuarioLlave = session.get('usernameDos')
+
+        comprobante_salidas = request.args.get('comprobante_salidas')
+        fecha_inicio_salidas_str = request.args.get('fecha_inicio_salidas')
+        fecha_fin_salidas_str = request.args.get('fecha_fin_salidas')
+        
+        fecha_inicio_salidas = datetime.strptime(fecha_inicio_salidas_str, '%Y-%m-%d')
+        fecha_fin_salidas = datetime.strptime(fecha_fin_salidas_str, '%Y-%m-%d')
+        
+        with mysql.connection.cursor() as cur:
+            query = ("SELECT nombres, codigo, existencias_salidas, precio_venta_salidas, comprobante, salidas.fecha AS fecha, existencias_devueltas, descripcion "
+                        "FROM salidas "
+                        "JOIN almacen_central ON `salidas`.`idProd` = `almacen_central`.`idProd` "
+                        "JOIN usuarios ON `salidas`.`usuario` = `usuarios`.`id` "
+                        "WHERE identificadorSal = %s "
+                        "AND comprobante LIKE %s "
+                        "AND salidas.estado > 0 "
+                        "AND salidas.fecha >= %s AND salidas.fecha < %s "
+                        "ORDER BY usuario, salidas.fecha ASC ")
+            data_params = (usuarioLlave, f"{comprobante_salidas}%", fecha_inicio_salidas, fecha_fin_salidas + timedelta(days=1))
+            cur.execute(query, data_params)
+            data = cur.fetchall()
+
+        resultado = []
+        for fila in data:
+            contenido = { 
+                'nombres': fila[0],
                 'codigo': fila[1],
                 'existencias_salidas':fila[2],
                 'precio_venta_salidas':fila[3],

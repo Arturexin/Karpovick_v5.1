@@ -165,13 +165,13 @@ async function saveCategoria(e) {
         };
 
         let url = URL_API_almacen_central + 'categorias'
-        let response = await funcionFetch(url, data);
+        let response = await funcionFetchDos(url, data);
         console.log("Respuesta Categorías "+response.status)
-        if(response.ok){
+        if(response.status === 'success'){
             await buscarCategoria(data, Number(data.id))
             localStorage.setItem("categoria_consulta", JSON.stringify(await cargarDatos('categorias')))
             cat_db = JSON.parse(localStorage.getItem("categoria_consulta"));
-            modal_proceso_abrir("Categoría modificada exitosamente.", "")
+            modal_proceso_abrir(`${response.message}`, "")
             modal_proceso_salir_botones()
             formularioConfiguracionCategorias.reset();
             document.getElementById('id-configuracion').value = "";
@@ -221,6 +221,7 @@ async function buscarCategoria(objeto, categoria_id){
         };
         if(iteracion > 0){
             localStorage.setItem("inventarios_consulta", JSON.stringify(base_datos_busqueda));
+            inv_db = JSON.parse(localStorage.getItem("inventarios_consulta"));
             modal_proceso_abrir(`Datos actualizados exitosamente.`, "");
             modal_proceso_salir_botones();
         };
@@ -306,9 +307,14 @@ async function saveNumeracion(e) {
         "factura": document.getElementById('factura-numeracion').value      
     }
     let url = URL_API_almacen_central + 'numeracion_comprobante'
-    await funcionFetch(url, data)
-    await searchNumeracion();
-    formularioConfiguracionNumeracion.reset();
+    let response = await funcionFetchDos(url, data)
+    if(response.status === 'success'){
+        await searchNumeracion();
+        formularioConfiguracionNumeracion.reset();
+        modal_proceso_abrir(`${response.message}`, "");
+        modal_proceso_salir_botones();
+
+    }
 }
 async function searchDatosUsuario(){
     datos = await cargarDatos('numeracion_comprobante_datos')
@@ -355,12 +361,16 @@ async function saveNumeracionDatos(e) {
         "web": document.getElementById('web-datos').value    
     }
     let url = URL_API_almacen_central + 'numeracion_comprobante_datos'
-    await funcionFetch(url, data)
-    searchDatosUsuario();
-    localStorage.setItem("datos_negocio", JSON.stringify(await cargarDatos('numeracion_comprobante_datos')))
-    neg_db = JSON.parse(localStorage.getItem("datos_negocio"));
-    agregarMoneda(document.querySelectorAll(".moneda_cabecera"))
-    formularioConfiguracionNumeracionDatos.reset();
+    let response = await funcionFetch(url, data)
+    if(response.status === 'success'){
+        searchDatosUsuario();
+        localStorage.setItem("datos_negocio", JSON.stringify(await cargarDatos('numeracion_comprobante_datos')))
+        neg_db = JSON.parse(localStorage.getItem("datos_negocio"));
+        agregarMoneda(document.querySelectorAll(".moneda_cabecera"))
+        formularioConfiguracionNumeracionDatos.reset();
+        modal_proceso_abrir(`${response.message}`, "");
+        modal_proceso_salir_botones();
+    }
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////USUARIOS//////////////////////////////////////////////////////////////////////////////////////////////
@@ -387,40 +397,27 @@ registro.addEventListener('submit',async (event)=>{
                         "fecha": generarFecha()
                     }
         let id = document.getElementById('id_usuarios').value
-        if (id != '') {
-            data.id = id
-        };
         let response = ""
+        let url = URL_API_almacen_central + 'registroInterno'
         if(id != ''){
-            response = await fetch('/registroInterno',{
-                "method":'POST',
-                "headers":{
-                    'Content-Type': 'application/json'
-                },
-                "body":JSON.stringify(data)
-            });
+            data.id = id
+            response = await funcionFetchDos(url, data);
         }else{
-            let respuesta = confirm(`La tarifa de un nuevo usuario es de USD$2.00 por mes. ¿Desea continuar?.`)
+            let respuesta = confirm(`La tarifa de un nuevo usuario es de USD$ 2.00 por mes. ¿Desea continuar?.`)
             if(respuesta){
                 modal_proceso_abrir("Registrando usuario.", "")
                 if(data.cargo != 201){
-                    response = await fetch('/registroInterno',{
-                        "method":'POST',
-                        "headers":{
-                            'Content-Type': 'application/json'
-                        },
-                        "body":JSON.stringify(data)
-                    });
+                    response = await funcionFetchDos(url, data);
                 }else{
                     modal_proceso_abrir("No se puede crear un usuario con cargo de administrador.", "")
                     modal_proceso_salir_botones()
                 }
             };
         };
-        if(response.ok){
-            modal_proceso_abrir("Usuario registrado satisfactoriamente.", "")
-            modal_proceso_salir_botones()
+        if(response.status === 'success'){
             await searchUsuarios()
+            modal_proceso_abrir(`${response.message}`, "")
+            modal_proceso_salir_botones()
             document.getElementById("formulario-create-usuarios").reset()
             document.getElementById("id_usuarios").value = ""
             document.getElementById("nombres-create-usuario").style.background =""
@@ -601,7 +598,7 @@ document.getElementById("agregar_sucursal").addEventListener("click", async (e)=
     if(respuesta){
         modal_proceso_abrir(`Creando sucursal.`, "")
         let num_filas = document.querySelector('#tabla_sucursales > tbody').children
-        if(num_filas.length < 4){
+        if(num_filas.length < 5){
             
             let sucursal_opcion = "";
             for(let i = 0; i <= num_filas.length; i++){
@@ -634,7 +631,7 @@ async function searchSucursales(){
     for(sucursal of sucursales) {
         let fila = `<tr>
                         <td class="invisible">${sucursal.id_sucursales}</td>
-                        <td>${sucursal.sucursal_nombre}</td>
+                        <td style="border-left: 7px solid ${CS(sucursal.sucursal_nombre)};">${sucursal.sucursal_nombre}</td>
                         <td class="invisible estado_sucursal">${sucursal.estado}</td>
                         <td></td>
                         <td>${sucursal.fecha_suc}</td>

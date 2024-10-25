@@ -95,11 +95,12 @@ function subRutaB(num, index){
             `fecha_fin_det_venta=${fecha_fin[index]}`
 };
 function cuerpoFilaTabla(e){
-    let color_fondo = e.situacion === "pendiente" ? "var(--fondo-marca-uno)": e.situacion === "pérdida" ? "rgb(113, 89, 142)": "";
+    let color_fondo = e.situacion === "pendiente" ? "rgb(153, 77, 64, 0.4)": e.situacion === "pérdida" ? "rgb(113, 89, 142, 0.4)": "";
     let dev_ = e.modo_perdida - e.modo_efectivo - e.modo_tarjeta
+
     return  `<tr class="ventas-fila" style="background: ${color_fondo}">
                 <td class="invisible">${e.id_det_ventas}</td>
-                <td>${e.sucursal_nombre}</td>
+                <td style="border-left: 7px solid ${CS(e.sucursal_nombre)};">${e.sucursal_nombre}</td>
                 <td>${e.comprobante}</td>
                 <td>${e.tipo_comprobante}</td>
                 <td>${e.nombre_cli}</td>

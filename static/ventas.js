@@ -300,12 +300,14 @@ document.getElementById("restablecerFormVentas").addEventListener("click", () =>
     buscador_codigo.focus();
 });
 function crearBodyVentas (existencias, cantidad, precio_venta, talla){
+    let sucursal_col = suc_db.find(x=> x.id_sucursales === Number(sucursal_ventas));// buscamos el nombre de la sucursal "sucursal_col.sucursal_nombre"
+
     let tablaVentas= document.querySelector("#tabla-ventas > tbody");
     let nuevaFilaTablaVentas = tablaVentas.insertRow(-1);
     let fila = `<tr>`+
                     `<td class="id_proforma invisible">${id_ventas.value}</td>`+// Columna 0 > id
                     `<td class="invisible">${sucursal_ventas}</td>`+// Columna 1 > sucursal
-                    `<td>${codigo_ventas.value}</td>`+// Columna 2 > código
+                    `<td style="border-left: 7px solid ${CS(sucursal_col.sucursal_nombre)};">${codigo_ventas.value}</td>`+// Columna 2 > código
                     `<td>${descripcion_ventas.value}</td>`+// Columna 3 > descripción
                     `<td>${talla}</td>`+// Columna 4 > talla
                     `<td class="invisible">${existencias}</td>`+// Columna 5 > existencias

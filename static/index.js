@@ -577,3 +577,17 @@ function buscarProducto(textoBusqueda){
     });
 }
 ////////////////////////////////////////////////////////////////////////////////////////
+let cls = [ "rgb(230, 202, 123)",
+    "rgb(145, 230, 156)",
+    "rgb(99, 128, 230)",
+    "rgb(230, 110, 141)",
+    "rgb(77, 77, 77)"]
+let cls_dos = [ "rgb(230, 202, 123, 0.1)",
+        "rgb(145, 230, 156, 0.1)",
+        "rgb(99, 128, 230, 0.1)",
+        "rgb(230, 110, 141, 0.1)",
+        "rgb(77, 77, 77, 0.1)"]
+ function CS(nombre_sucursal){
+    let index = suc_add.findIndex(el => el === nombre_sucursal)
+    return cls[index]
+ }

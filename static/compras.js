@@ -82,7 +82,7 @@ function crearBodyCompras (tallaAComprar, loteAComprar){
     let tablaCompras= document.querySelector("#tabla_modal > tbody");
     let nuevaFilaTablaCompras = tablaCompras.insertRow(-1);
     let fila = `<tr>`+
-                    `<td class="suc_modal">${suc_add[obtenerIndiceSucursal("#sun_opc")]}</td>`+// Columna 0 > sucursal
+                    `<td style="border-left: 7px solid ${CS(suc_add[obtenerIndiceSucursal("#sun_opc")])};" class="suc_modal">${suc_add[obtenerIndiceSucursal("#sun_opc")]}</td>`+// Columna 0 > sucursal
                     `<td>${document.getElementById("categoria-form").children[document.getElementById("categoria-form").selectedIndex].textContent}</td>`+// Columna 1 > categoría
                     `<td class="codigo_modal input-tablas fondo" style="background: rgb(105, 211, 35)">${document.getElementById("codigo-form").value}-${tallaAComprar}-${loteAComprar}</td>`+// Columna 2 > codigo
                     `<td><input class="input-tablas-texto-largo" value="${document.getElementById("descripcion-form").value}" placeholder="Rellene esta casilla" onKeyup="op_descri(this)"></td>`+// Columna 3 > descripción
@@ -122,6 +122,7 @@ function accionSelect(){// cambios al efectuar un cambio en select de sucursales
         let obj_ = array_saldos.find(x=> x.codigo === row_.children[2].textContent);// buscamos una coincidencia por código
         if(obj_){
             row_.children[0].textContent = document.getElementById("sun_opc")[obtenerIndiceSucursal("#sun_opc")].textContent
+            row_.children[0].style.borderLeft = `7px solid ${CS(row_.children[0].textContent)}`;// color de la sucursal
             row_.children[12].textContent = document.getElementById("sun_opc").value
             row_.children[14].textContent = obtenerIndiceSucursal("#sun_opc")
             row_.children[5].children[0].value = obj_[sucursales_activas[row_.children[14].textContent]]// cantidad segun la sucursal
@@ -427,7 +428,7 @@ function crearBodyRecompras (codigoMovimientos, id_prod){
     let nuevaFilaTablaRecompras = tablaRecompras.insertRow(-1);
     let fila = `<tr>`+
                     `<td class="id_modal invisible">${id_prod}</td>`+// Columna 0 > id
-                    `<td class="suc_modal">${suc_add[obtenerIndiceSucursal("#sun_opc")]}</td>`+// Columna 1 > sucursal
+                    `<td style="border-left: 7px solid ${CS(suc_add[obtenerIndiceSucursal("#sun_opc")])};" class="suc_modal">${suc_add[obtenerIndiceSucursal("#sun_opc")]}</td>`+// Columna 1 > sucursal
                     `<td>${document.getElementById("categoria-form").children[document.getElementById("categoria-form").selectedIndex].textContent}</td>`+// Columna 2 > categoría
                     `<td class="codigo_modal" style="border-radius: 5px">${codigoMovimientos}</td>`+// Columna 3 > código
                     `<td></td>`+// Columna 4 > descripción
@@ -457,6 +458,7 @@ function accionSelectDos(){// cambios al efectuar un cambio en select de sucursa
             row_.children[11].textContent = obtenerIndiceSucursal("#sun_opc")
 
             row_.children[1].textContent = document.getElementById("sun_opc")[obtenerIndiceSucursal("#sun_opc")].textContent;
+            row_.children[1].style.borderLeft = `7px solid ${CS(row_.children[1].textContent)}`;// color de la sucursal
             row_.children[6].textContent = obj_[in_existencias[row_.children[11].textContent]]// existencias según sucursal
             row_.children[7].children[0].value = obj_[sucursales_activas[row_.children[11].textContent]]// cantidad ingresada segun la sucursal
             row_.children[8].textContent = obj_[in_existencias[row_.children[11].textContent]] + Number(row_.children[7].children[0].value)

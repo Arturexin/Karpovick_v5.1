@@ -171,7 +171,7 @@ def editNumeracionDatos():
                     request.json['web'], request.json['id'], usuarioLlave)
             cur.execute(query, data)
             mysql.connection.commit()
-        return jsonify({"status": "success", "message": "Numeración actualizada correctamente."})
+        return jsonify({"status": "success", "message": "Datos de negocio actualizados correctamente."})
     except Exception as e:
         mysql.connection.rollback()
         return jsonify({"status": "error", "message": str(e)})

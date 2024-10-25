@@ -71,7 +71,7 @@ function subRutaB(num, index){
 function cuerpoFilaTabla(e){
     return `<tr class="busqueda-entradas">
                 <td class="invisible">${e.idEntr}</td>
-                <td>${e.sucursal_nombre}</td>
+                <td style="border-left: 7px solid ${CS(e.sucursal_nombre)};">${e.sucursal_nombre}</td>
                 <td>${e.categoria_nombre}</td>
                 <td>${e.codigo}</td>
                 <td style="text-align: end;">${e.existencias_entradas}</td>

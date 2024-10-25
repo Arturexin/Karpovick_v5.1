@@ -92,6 +92,7 @@ app.register_blueprint(entradas_.entradas_compras_grupal_get_post)
 app.register_blueprint(salidas_.salidas_conteo)
 app.register_blueprint(salidas_.salidas_tabla)
 app.register_blueprint(salidas_.salidas_tabla_reporte)
+app.register_blueprint(salidas_.salidas_reporte_usuarios)
 app.register_blueprint(salidas_.salidas_suma_ventas_mes)
 app.register_blueprint(salidas_.salidas_suma_total_sucursal_mes)
 app.register_blueprint(salidas_.salidas_suma_ventas_dia_sucursal)
@@ -265,12 +266,10 @@ def datos_usuario():
 @login_required
 def index():
     puesto = session.get('puesto')
-    identificacion_usuario = session.get('identificacion_usuario')
-    usuario_nombre = session.get('usuario_nombre')
     if puesto == 200:
         return redirect(url_for('control'))
-    else:
-        return render_template('index.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
+    return render_template('index.html')
+
 @app.route('/control')
 @cross_origin()
 @login_required
@@ -278,193 +277,141 @@ def control():
     puesto = session.get('puesto')
     if puesto == 200:
         return render_template('control.html')
-    else:
-        return render_template('index.html')
+    return render_template('index.html')
 ###########################################
 @app.route('/ventas')
 @cross_origin()
 @login_required
 def ventas():
-    puesto = session.get('puesto')
-    identificacion_usuario = session.get('identificacion_usuario')
-    usuario_nombre = session.get('usuario_nombre')
-    return render_template('ventas.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
+    return render_template('ventas.html')
 @app.route('/compras')
 @cross_origin()
 @login_required
 def compras():
     puesto = session.get('puesto')
-    identificacion_usuario = session.get('identificacion_usuario')
-    usuario_nombre = session.get('usuario_nombre')
-    if puesto != 201 and puesto != 202:
-        return render_template('index.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
-    else:
-        return render_template('compras.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
+    if puesto not in (201, 202):
+        return render_template('index.html')
+    return render_template('compras.html')
 @app.route('/transferencias')
 @cross_origin()
 @login_required
 def transferencias():
     puesto = session.get('puesto')
-    identificacion_usuario = session.get('identificacion_usuario')
-    usuario_nombre = session.get('usuario_nombre')
-    if puesto != 201 and puesto != 202:
-        return render_template('index.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
-    else:
-        return render_template('transferencias.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
+    if puesto not in (201, 202):
+        return render_template('index.html')
+    return render_template('transferencias.html')
 @app.route('/kardex')
 @cross_origin()
 @login_required
 def kardex():
     puesto = session.get('puesto')
-    identificacion_usuario = session.get('identificacion_usuario')
-    usuario_nombre = session.get('usuario_nombre')
-    if puesto != 201 and puesto != 202:
-        return render_template('index.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
-    else:
-        return render_template('kardex.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
+    if puesto not in (201, 202):
+        return render_template('index.html')
+    return render_template('kardex.html')
 @app.route('/detalle_ventas')
 @cross_origin()
 @login_required
 def detalle_ventas():
     puesto = session.get('puesto')
-    identificacion_usuario = session.get('identificacion_usuario')
-    usuario_nombre = session.get('usuario_nombre')
     if puesto != 201:
-        return render_template('index.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
-    else:
-        return render_template('detalle_ventas.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
+        return render_template('index.html')
+    return render_template('detalle_ventas.html')
 @app.route('/modificacion')
 @cross_origin()
 @login_required
 def modificacion():
     puesto = session.get('puesto')
-    identificacion_usuario = session.get('identificacion_usuario')
-    usuario_nombre = session.get('usuario_nombre')
     if puesto != 201:
-        return render_template('index.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
-    else:
-        return render_template('modificacion.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
+        return render_template('index.html')
+    return render_template('modificacion.html')
 @app.route('/devolucion_compras')
 @cross_origin()
 @login_required
 def devolucion_compras():
     puesto = session.get('puesto')
-    identificacion_usuario = session.get('identificacion_usuario')
-    usuario_nombre = session.get('usuario_nombre')
-    if puesto != 201 and puesto != 202:
-        return render_template('index.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
-    else:
-        return render_template('devolucion_compras.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
+    if puesto not in (201, 202):
+        return render_template('index.html')
+    return render_template('devolucion_compras.html')
 @app.route('/analisis')
 @cross_origin()
 @login_required
 def analisis():
     puesto = session.get('puesto')
-    identificacion_usuario = session.get('identificacion_usuario')
-    usuario_nombre = session.get('usuario_nombre')
-    if puesto != 201 and puesto != 202:
-        return render_template('index.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
-    else:
-        return render_template('analisis.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
+    if puesto not in (201, 202):
+        return render_template('index.html')
+    return render_template('analisis.html')
 @app.route('/perdidas')
 @cross_origin()
 @login_required
 def perdidas():
     puesto = session.get('puesto')
-    identificacion_usuario = session.get('identificacion_usuario')
-    usuario_nombre = session.get('usuario_nombre')
-    if puesto != 201 and puesto != 202:
-        return render_template('index.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
-    else:
-        return render_template('perdidas.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
+    if puesto not in (201, 202):
+        return render_template('index.html')
+    return render_template('perdidas.html')
 @app.route('/productos')
 @cross_origin()
 @login_required
 def productos():
     puesto = session.get('puesto')
-    identificacion_usuario = session.get('identificacion_usuario')
-    usuario_nombre = session.get('usuario_nombre')
-    if puesto != 201 and puesto != 202:
-        return render_template('index.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
-    else:
-        return render_template('productos.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
+    if puesto not in (201, 202):
+        return render_template('index.html')
+    return render_template('productos.html')
 @app.route('/entradas')
 @cross_origin()
 @login_required
 def entradas():
     puesto = session.get('puesto')
-    identificacion_usuario = session.get('identificacion_usuario')
-    usuario_nombre = session.get('usuario_nombre')
     if puesto != 201:
-        return render_template('index.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
-    else:
-        return render_template('entradas.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
+        return render_template('index.html')
+    return render_template('entradas.html')
 @app.route('/salidas')
 @cross_origin()
 @login_required
 def salidas():
     puesto = session.get('puesto')
-    identificacion_usuario = session.get('identificacion_usuario')
-    usuario_nombre = session.get('usuario_nombre')
     if puesto != 201:
-        return render_template('index.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
-    else:
-        return render_template('salidas.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
+        return render_template('index.html')
+    return render_template('salidas.html')
 @app.route('/clientes')
 @cross_origin()
 @login_required
 def clientes():
     puesto = session.get('puesto')
-    identificacion_usuario = session.get('identificacion_usuario')
-    usuario_nombre = session.get('usuario_nombre')
-    if puesto != 201 and puesto != 202:
-        return render_template('index.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
-    else:
-        return render_template('clientes.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
+    if puesto not in (201, 202):
+        return render_template('index.html')
+    return render_template('clientes.html')
 @app.route('/configuracion')
 @cross_origin()
 @login_required
 def configuracion():
     puesto = session.get('puesto')
-    identificacion_usuario = session.get('identificacion_usuario')
-    usuario_nombre = session.get('usuario_nombre')
-    if puesto != 201 and puesto != 202:
-        return render_template('index.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
-    else:
-        return render_template('configuracion.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
+    if puesto not in (201, 202):
+        return render_template('index.html')
+    return render_template('configuracion.html')
 @app.route('/home')
 @cross_origin()
 @login_required
 def home():
     puesto = session.get('puesto')
-    identificacion_usuario = session.get('identificacion_usuario')
-    usuario_nombre = session.get('usuario_nombre')
     if puesto != 201:
-        return render_template('index.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
-    else:
-        return render_template('home.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
+        return render_template('index.html')
+    return render_template('home.html')
 @app.route('/apertura_caja')
 @cross_origin()
 @login_required
 def apertura_caja():
     puesto = session.get('puesto')
-    identificacion_usuario = session.get('identificacion_usuario')
-    usuario_nombre = session.get('usuario_nombre')
-    if puesto != 201 and puesto != 202:
-        return render_template('index.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
-    else:
-        return render_template('apertura_caja.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
+    if puesto not in (201, 202):
+        return render_template('index.html')
+    return render_template('apertura_caja.html')
 @app.route('/salidas_caja')
 @cross_origin()
 @login_required
 def salidas_caja():
     puesto = session.get('puesto')
-    identificacion_usuario = session.get('identificacion_usuario')
-    usuario_nombre = session.get('usuario_nombre')
-    if puesto != 201 and puesto != 202:
-        return render_template('index.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
-    else:
-        return render_template('salidas_caja.html', puesto=puesto, identificacion_usuario=identificacion_usuario, usuario_nombre=usuario_nombre)
+    if puesto not in (201, 202):
+        return render_template('index.html')
+    return render_template('salidas_caja.html')
 ###########################################
 def status_401(error):
     if error:

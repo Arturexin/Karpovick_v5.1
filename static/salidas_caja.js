@@ -92,7 +92,7 @@ function subRutaB(num, index){
 function cuerpoFilaTabla(e){
     return  `<tr class="fila-gastos-varios">
                 <td class="invisible">${e.id_gastos}</td>
-                <td>${e.sucursal_nombre}</td>
+                <td style="border-left: 7px solid ${CS(e.sucursal_nombre)};">${e.sucursal_nombre}</td>
                 <td>${e.concepto}</td>
                 <td>${e.comprobante}</td>
                 <td style="text-align: right">${e.monto.toFixed(2)}</td>

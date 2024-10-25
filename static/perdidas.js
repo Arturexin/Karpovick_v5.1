@@ -64,7 +64,7 @@ function crearBodyDespacho (codigo, id_prod){
     let nuevaFilaTabladespacho = tabladespacho.insertRow(-1);
     let fila = `<tr>`+
                     `<td class="id_modal invisible">${id_prod}</td>`+// Columna 0 > id
-                    `<td class="suc_modal">${suc_add[obtenerIndiceSucursal("#sun_opc")]}</td>`+// Columna 1 > sucursal
+                    `<td style="border-left: 7px solid ${CS(suc_add[obtenerIndiceSucursal("#sun_opc")])};" class="suc_modal">${suc_add[obtenerIndiceSucursal("#sun_opc")]}</td>`+// Columna 1 > sucursal
                     `<td>${document.getElementById("categoria-form").children[document.getElementById("categoria-form").selectedIndex].textContent}</td>`+// Columna 2 > categoría
                     `<td class="codigo_despacho_modal" style="border-radius: 5px">${codigo}</td>`+// Columna 3 > código
                     `<td></td>`+// Columna 4 > descripción
@@ -102,6 +102,7 @@ function accionSelectDos(){// cambios al efectuar un cambio en select de sucursa
             row_.children[10].textContent = obtenerIndiceSucursal("#sun_opc")
 
             row_.children[1].textContent = document.getElementById("sun_opc")[obtenerIndiceSucursal("#sun_opc")].textContent;
+            row_.children[1].style.borderLeft = `7px solid ${CS(row_.children[1].textContent)}`;// color de la sucursal
             row_.children[5].textContent = obj_[in_existencias[row_.children[10].textContent]]// existencias según sucursal
             row_.children[6].children[0].value = obj_[sucursales_activas[row_.children[10].textContent]]// cantidad ingresada segun la sucursal
             row_.children[7].textContent = obj_[in_existencias[row_.children[10].textContent]] - Number(row_.children[6].children[0].value)

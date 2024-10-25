@@ -109,7 +109,7 @@ async function crearBodyDevoluciones(){
             let nueva_fila = tabla.insertRow(-1);
             let fila = `<tr>`+
                 `<td class="id_modal invisible">${event.id}</td>`+//Columna 0 > id entradas
-                `<td>${event.sucursal_nombre}</td>`+//Columna 1 > sucursal
+                `<td style="border-left: 7px solid ${CS(event.sucursal_nombre)};">${event.sucursal_nombre}</td>`+//Columna 1 > sucursal
                 `<td class="codigoDevoluciones" style="background: rgb(105, 211, 35); border-radius: 5px">${event.codigo}</td>`+//Columna 2 >código
                 `<td style="text-align: right">${event.existencias}</td>`+//Columna 3 > existencias compradas
                 `<td><input class="cantidadADevolver input-tablas-dos-largo" onkeyup = "operarQDevolucion(this)"></td>`+//Columna 4 > cantidad a devolver
@@ -182,7 +182,7 @@ async function crearBodyDevolucionesFinal(){
                 let nueva_fila = fila_principal.insertRow(-1);
                 let fila = `<tr>`+
                                 `<td class="id_proforma invisible">${obj_dev.id}</td>`+// Columna 0 > id entradas
-                                `<td>${obj_dev.sucursal_nombre}</td>`+// Columna 1 > sucursal
+                                `<td style="border-left: 7px solid ${CS(obj_dev.sucursal_nombre)};">${obj_dev.sucursal_nombre}</td>`+// Columna 1 > sucursal
                                 `<td>${obj_dev.codigo}</td>`+// Columna 2 > código
                                 `<td>${obj_dev.descripcion}</td>`+// Columna 2 > código
                                 `<td>${obj_dev.existencias}</td>`+// Columna 3 > existencias compradas

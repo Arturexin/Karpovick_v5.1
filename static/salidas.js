@@ -71,7 +71,7 @@ function subRutaB(num, index){
 function cuerpoFilaTabla(e){
     return  `<tr class="busqueda-salidas">
                 <td class="invisible">${e.idSal}</td>
-                <td>${e.sucursal_nombre}</td>
+                <td style="border-left: 7px solid ${CS(e.sucursal_nombre)};">${e.sucursal_nombre}</td>
                 <td>${e.categoria_nombre}</td>
                 <td>${e.codigo}</td>
                 <td style="text-align: end;">${e.existencias_salidas}</td>
@@ -479,6 +479,84 @@ document.getElementById("reporte_ventas").addEventListener("click", async ()=>{
                             document.querySelector("#tabla_reportes > tfoot").children[0].children[5].textContent = ${sum_to.toFixed(2)};
 
                             document.querySelector(".imprimir_reporte_salidas").addEventListener("click", (event) => {
+                                event.preventDefault()
+                                window.print()
+                            });
+                        </script>`
+    
+
+    let nuevaVentana = window.open('');
+    nuevaVentana.document.write(reporteHTML);
+});
+document.getElementById("reporte_usuarios").addEventListener("click", async ()=>{
+    manejoDeFechas()
+
+    let resporte_usuarios = await cargarDatos(`salidas_reporte_usuarios?`+
+                                            `comprobante_salidas=Venta&`+
+                                            `fecha_inicio_salidas=${inicio}&`+
+                                            `fecha_fin_salidas=${fin}`)
+    console.log(resporte_usuarios)
+    let reporteHTML = `<style>
+                            body{
+                                display: grid;
+                                align-items: center;
+                                align-content: space-between;
+                                justify-content: center;
+                                gap: 20px;
+                            }
+                            td, th{
+                                border: 1px solid black;
+                            }
+                            .titulo_resporte{
+                                display: grid;
+                                justify-items: center;
+                            }
+                        </style>
+                        <div class="titulo_resporte">
+                            <h2>Reporte de ventas por usuario</h2>
+                            <h3>Fecha de reporte: ${inicio} a ${fin}</h3>
+                        </div>
+                        <div id="contenedor_grafico_reporte_usuarios">
+                            <canvas id="grafico_reporte_usuarios"></canvas>
+                        </div>
+                        <table id="tabla_salidas">
+                            <thead>
+                                <tr>
+                                    <th scope="row" colspan="16"><h2>Detalle de operaciones</h2></th>
+                                </tr>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Sucursal</th>
+                                    <th>Código</th>
+                                    <th>Descripción</th>
+                                    <th>Comprobantes</th>
+                                    <th>Unidades</th>
+                                    <th>Monto</th>
+                                </tr>
+                            </thead>
+                            <tbody>`
+    for(sal of resporte_usuarios){
+        let fila = `
+                    <tr>
+                        <td>${sal.fecha}</td>
+                        <td>${sal.nombres}</td>
+                        <td>${sal.codigo}</td>
+                        <td>${sal.descripcion}</td>
+                        <td>${sal.comprobante}</td>
+                        <td style="text-align: end;">${sal.existencias_salidas}</td>
+                        <td style="text-align: end;">${(sal.existencias_salidas * sal.precio_venta_salidas).toFixed(2)}</td>
+                    </tr>`
+        reporteHTML = reporteHTML + fila; 
+    }                        
+                            
+    reporteHTML += `
+                            </tbody>
+                        </table>
+                        <div>
+                            <button class="imprimir_reporte_usuarios">Imprimir</button>
+                        </div>
+                        <script>
+                            document.querySelector(".imprimir_reporte_usuarios").addEventListener("click", (event) => {
                                 event.preventDefault()
                                 window.print()
                             });

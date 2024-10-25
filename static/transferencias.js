@@ -77,7 +77,7 @@ function crearBodyTransferencias(codigoTransferencia, id_prod){
     let nuevaFilaTablaTransferencias = tablaTransferencias.insertRow(-1);
     let fila = `<tr>`+
                     `<td class="id_modal invisible">${id_prod}</td>`+// Columna 0 > id producto
-                    `<td class="suc_modal">${suc_add[obtenerIndiceSucursal("#sun_opc")]}</td>`+// Columna 1 > sucursal origen
+                    `<td style="border-left: 7px solid ${CS(suc_add[obtenerIndiceSucursal("#sun_opc")])};" class="suc_modal">${suc_add[obtenerIndiceSucursal("#sun_opc")]}</td>`+// Columna 1 > sucursal origen
                     `<td>${document.getElementById("categoria-form").children[document.getElementById("categoria-form").selectedIndex].textContent}</td>`+// Columna 2 > categoría
                     `<td class="insertar input-tablas" style="border-radius: 5px">${codigoTransferencia}</td>`+// Columna 3 > código
                     `<td></td>`+// Columna 4 > descripción
@@ -117,6 +117,7 @@ function accionSelectUno(){// cambios al efectuar un cambio en select de sucursa
             row_.children[12].textContent = obtenerIndiceSucursal("#sun_opc")
 
             row_.children[1].textContent = document.getElementById("sun_opc")[obtenerIndiceSucursal("#sun_opc")].textContent;
+            row_.children[1].style.borderLeft = `7px solid ${CS(row_.children[1].textContent)}`;// color de la sucursal
             row_.children[5].textContent = obj_[in_existencias[row_.children[12].textContent]]// existencias sucursal origen
             row_.children[6].textContent = obj_[in_existencias[row_.children[12].textContent]]// saldo sucursal origen
             row_.children[11].textContent = 0// total unidades transferidas
@@ -128,6 +129,7 @@ function accionSelectUno(){// cambios al efectuar un cambio en select de sucursa
             document.getElementById("sun_opc_dos").options[obtenerIndiceSucursal("#sun_opc")].disabled = true;
             if(row_.children[12].textContent === row_.children[13].textContent){
                 row_.children[8].textContent = ""
+                row_.children[8].style.borderLeft = ``;// color de la sucursal
                 row_.children[9].textContent = ""
                 row_.children[10].textContent = ""
                 row_.children[7].children[0].value = 0
@@ -160,6 +162,7 @@ function accionSelectDos(){// cambios al efectuar un cambio en select de sucursa
             row_.children[13].textContent = obtenerIndiceSucursal("#sun_opc_dos")
 
             row_.children[8].textContent = document.getElementById("sun_opc_dos")[obtenerIndiceSucursal("#sun_opc_dos")].textContent;
+            row_.children[8].style.borderLeft = `7px solid ${CS(row_.children[8].textContent)}`;// color de la sucursal
             row_.children[9].textContent = obj_[in_existencias[row_.children[13].textContent]]// existencias sucursal origen
             row_.children[10].textContent = Number(obj_[in_existencias[row_.children[13].textContent]]) +
                                             obj_[sucursales_activas[row_.children[13].textContent]]// saldo sucursal origen

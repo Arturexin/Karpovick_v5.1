@@ -18,16 +18,7 @@ let colores_dos =   [
     "rgb(255, 210, 143, 0.2)",
     "rgb(177, 222, 166, 0.2)"
 ];
-let cls = [ "rgb(230, 202, 123)",
-            "rgb(145, 230, 156)",
-            "rgb(99, 128, 230)",
-            "rgb(230, 110, 141)",
-            "rgb(77, 77, 77)"]
-let cls_dos = [ "rgb(230, 202, 123, 0.2)",
-                "rgb(145, 230, 156, 0.2)",
-                "rgb(99, 128, 230, 0.2)",
-                "rgb(230, 110, 141, 0.2)",
-                "rgb(77, 77, 77, 0.2)"]
+
 
 function formatoMoneda(valor_numerico){
     let value = valor_numerico.toString();
