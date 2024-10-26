@@ -11,37 +11,17 @@
     width: 1100px;
     align-content: space-around;
     padding: 20px 0;
-    background: linear-gradient(45deg, var(--fondo-principal), var(--fondo-quinto));
-    border-radius: 14px;
+    background: linear-gradient(45deg, var(--fondo-primero), var(--fondo-quinto));
+    
 }
 
-.etiquetas_graficos_colores{
-    display: flex;
-    justify-content: space-around;
-    padding: 5px;
-}
-.etiquetas_graficos_colores div{
-    display: flex;
-    align-items: center;
-    margin: 3px 5px;
-}
-.color_item_grafico_compra{
-    width: 20px;
-    height: 10px;
-    background: #E6CA7B;    
-}
-.color_item_grafico_recompra{
-    width: 20px;
-    height: 10px;
-    background: #6380E6;
-}
 .contenedor_tabla{
     display: grid;
     justify-items: center;
     align-items: center;
-    background: linear-gradient(45deg, var(--fondo-principal), var(--fondo-quinto));
+    background: linear-gradient(45deg, var(--fondo-primero), var(--fondo-quinto));
     width: 1100px;
-    border-radius: 14px;
+    
 }
 .into_form{
     display: grid;
@@ -56,11 +36,7 @@
     justify-items: center;
     gap: 20px;
 }
-.contenedor_formulario_tr{
-    display: grid;
-    gap: 20px;
-    justify-items: center;
-}
+
 #formulario-transferencias{
     display: grid;
     gap: 20px;
@@ -113,14 +89,9 @@
     margin: 0px auto;
     width: 1100px;
     align-items: center;
-    background-color: var(--fondo-principal);
-    border-radius: 14px;
+    background-color: var(--fondo-primero);
 }
-.botones-transferencias{
-    display: flex;
-    margin: 0px auto;
-    justify-content: center; 
-}
+
 /*MODAL */
 .contenedor-pre-recompra{
     position: fixed;
@@ -141,8 +112,6 @@
     transition: opacity .5s;
 }
 .contenido-tabla{
-    /* margin: auto;
-    width: 90%; */
     max-width: 1500px;
     max-height: 90%;
 }
@@ -164,54 +133,7 @@
     pointer-events: unset;
     transition: opacity .5s;
 }
-.formulario-transicion-compras{
-    background-color: #111111bd;
-    opacity: 0;/* con esto ocultamos el modal */
-    pointer-events: none;
-    transition: opacity .5s;
-}
-.formulario-transicion-compras-show{/* con esto mostramos el modal */
-    opacity: 1;
-    pointer-events: unset;
-    transition: opacity .5s;
-}
-.tabla-transicion-compras{
-    background-color: #111111bd;
-    opacity: 0;/* con esto ocultamos el modal */
-    pointer-events: none;
-    transition: opacity .5s;
-}
-.tabla-transicion-compras-show{/* con esto mostramos el modal */
-    opacity: 1;
-    pointer-events: unset;
-    transition: opacity .5s;
-}
-.formulario-transicion-transferencias{
-    background-color: #111111bd;
-    opacity: 0;/* con esto ocultamos el modal */
-    pointer-events: none;
-    transition: opacity .5s;
-}
-.formulario-transicion-transferencias-show{/* con esto mostramos el modal */
-    opacity: 1;
-    pointer-events: unset;
-    transition: opacity .5s;
-}
-.tabla-transicion-transferencias{
-    background-color: #111111bd;
-    opacity: 0;/* con esto ocultamos el modal */
-    pointer-events: none;
-    transition: opacity .5s;
-}
-.tabla-transicion-transferencias-show{/* con esto mostramos el modal */
-    opacity: 1;
-    pointer-events: unset;
-    transition: opacity .5s;
-}
-.graficos-compras {
-    width: 300px;
-    height: 50%;
-}
+
 .baja_opacidad{
     opacity: 0;
     transition: opacity .5s;
@@ -229,126 +151,14 @@
     transition: opacity .5s;
 }
 
-.contenedor_circulo_det{
-    width: 180px;
-    height: 150px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 5px 10px;
-    gap: 10px;
-}
-#circulo_stock_uno{
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0px 0px 5px 0px #6f6e6ee0;
-    font-size: 12px;
-}
-#circulo_stock_dos{
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0px 0px 5px 0px #6f6e6ee0;
-    font-size: 12px;
-}
-#circulo_stock_tres{
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0px 0px 5px 0px #6f6e6ee0;
-    font-size: 12px;
-}
-#circulo_stock_cuatro{
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0px 0px 5px 0px #6f6e6ee0;
-    font-size: 12px;
-}
-.contenedor_detalle_circulos{
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    justify-items: center;
-}
-#circulo_porcentaje_compra_recompra{
-    width: 250px;
-    height: 250px;
-    border-radius: 50%;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0px 0px 5px 0px #6f6e6ee0;
-    font-size: 14px;
-}
-.cirulo_interior_porcentaje_c_r{
-    width: 90%;
-    height: 90%;
-    border-radius: 50%;
-    background: var(--fondo-principal);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-    flex-direction: column;
-    box-shadow: inset 0px 0px 5px 0px #6f6e6ee0;
-}
-.cirulo_interior_porcentaje_c_r span{
-    margin: 10px;
-}
 .contenedor_kardex_analisis{
     display: flex;
     justify-items: center;
     gap: 10px;
-    background: linear-gradient(45deg, var(--fondo-principal), var(--fondo-quinto));
+    background: linear-gradient(45deg, var(--fondo-primero), var(--fondo-quinto));
     width: 1100px;
-    border-radius: 14px;
     justify-content: space-evenly;
     padding: 20px 0;
-}
-.label_analisis{
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-}
-.contenedor_gastos_varios{
-    display: grid;
-    grid-template-columns: 1fr;
-    justify-items: center;
-    gap: 10px;
-    align-content: space-around;
-    background: var(--fondo-principal) 40%;
-    width: 1100px;
-    border-radius: 14px;
-    padding: 20px 0;
-}
-.etiqueta_canal_venta{
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    justify-items: center;
-    align-items: center;
 }
 .contenedor-pre-credito{
     position: fixed;

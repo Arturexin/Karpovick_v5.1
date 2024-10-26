@@ -79,7 +79,7 @@ function crearBodyTransferencias(codigoTransferencia, id_prod){
                     `<td class="id_modal invisible">${id_prod}</td>`+// Columna 0 > id producto
                     `<td style="border-left: 7px solid ${CS(suc_add[obtenerIndiceSucursal("#sun_opc")])};" class="suc_modal">${suc_add[obtenerIndiceSucursal("#sun_opc")]}</td>`+// Columna 1 > sucursal origen
                     `<td>${document.getElementById("categoria-form").children[document.getElementById("categoria-form").selectedIndex].textContent}</td>`+// Columna 2 > categoría
-                    `<td class="insertar input-tablas" style="border-radius: 5px">${codigoTransferencia}</td>`+// Columna 3 > código
+                    `<td class="insertar input-tablas">${codigoTransferencia}</td>`+// Columna 3 > código
                     `<td></td>`+// Columna 4 > descripción
                     `<td style="text-align: right"></td>`+// Columna 5 > existencias sucursal origen
                     `<td style="text-align: right"></td>`+// Columna 6 > saldo en origen***

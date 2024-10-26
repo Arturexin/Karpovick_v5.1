@@ -11,10 +11,10 @@ body{
 .nav_usuarios {
     margin: 20px;
     padding: 10px;
-    background-color: var(--fondo-secundario);
+    background-color: var(--fondo-segundo);
     display: flex;
     justify-content: space-between;
-    border: 3px solid var(--fondo-principal);
+    border: 3px solid var(--fondo-primero);
     border-radius: 10px;
 }
 h1{
@@ -28,7 +28,7 @@ h1{
 .tabla-proformaC {
     margin: 0px auto;
     background-color: var(--color-principal);
-    border: 3px solid var(--fondo-principal);
+    border: 3px solid var(--fondo-primero);
     border-radius: 14px;
     font-size: 15px;
 }
@@ -41,7 +41,7 @@ h1{
     background-color: #ce9b9b;
 }
 .tabla-proformaC th {
-	background:var(--fondo-secundario);
+	background:var(--fondo-segundo);
     border-radius: 10px;
 	color:var(--color-principal);
 	font-family:Arial;

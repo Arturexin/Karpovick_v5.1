@@ -110,7 +110,7 @@ async function crearBodyDevoluciones(){
             let fila = `<tr>`+
                 `<td class="id_modal invisible">${event.id}</td>`+//Columna 0 > id entradas
                 `<td style="border-left: 7px solid ${CS(event.sucursal_nombre)};">${event.sucursal_nombre}</td>`+//Columna 1 > sucursal
-                `<td class="codigoDevoluciones" style="background: rgb(105, 211, 35); border-radius: 5px">${event.codigo}</td>`+//Columna 2 >código
+                `<td class="codigoDevoluciones" style="background: rgb(105, 211, 35);>${event.codigo}</td>`+//Columna 2 >código
                 `<td style="text-align: right">${event.existencias}</td>`+//Columna 3 > existencias compradas
                 `<td><input class="cantidadADevolver input-tablas-dos-largo" onkeyup = "operarQDevolucion(this)"></td>`+//Columna 4 > cantidad a devolver
                 `<td>${event.comprobante}</td>`+//Columna 5 > comprobante de compra
@@ -334,12 +334,12 @@ async function graficoDevolucionesCompras(){
         let d_e = 0;
         let d_s = 0;
         devolucionesEntradas.forEach((event)=>{
-            if(event.mes === i){
+            if(event.mes === i + 1){
                 d_e = event.suma_devoluciones_entradas;
             };
         });
         devolucionesSalidas.forEach((event)=>{
-            if(event.mes === i){
+            if(event.mes === i + 1){
                 d_s = event.suma_devoluciones_salidas;
             };
         });

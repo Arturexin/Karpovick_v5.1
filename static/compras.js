@@ -430,7 +430,7 @@ function crearBodyRecompras (codigoMovimientos, id_prod){
                     `<td class="id_modal invisible">${id_prod}</td>`+// Columna 0 > id
                     `<td style="border-left: 7px solid ${CS(suc_add[obtenerIndiceSucursal("#sun_opc")])};" class="suc_modal">${suc_add[obtenerIndiceSucursal("#sun_opc")]}</td>`+// Columna 1 > sucursal
                     `<td>${document.getElementById("categoria-form").children[document.getElementById("categoria-form").selectedIndex].textContent}</td>`+// Columna 2 > categoría
-                    `<td class="codigo_modal" style="border-radius: 5px">${codigoMovimientos}</td>`+// Columna 3 > código
+                    `<td class="codigo_modal">${codigoMovimientos}</td>`+// Columna 3 > código
                     `<td></td>`+// Columna 4 > descripción
                     `<td class="invisible"></td>`+// Columna 5 > talla
                     `<td style="text-align: right"></td>`+// Columna 6 > existencias

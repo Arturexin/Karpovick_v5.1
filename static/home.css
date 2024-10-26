@@ -8,17 +8,17 @@
     display: grid;
     width: 1100px;
     max-width: 1100px;
-    background: linear-gradient(45deg, var(--fondo-principal), var(--fondo-quinto));
-    border-radius: 14px;
+    background: linear-gradient(45deg, var(--fondo-primero), var(--fondo-quinto));
+    
     justify-items: center;
 }
 .pestana_home{
-    background: linear-gradient(45deg, var(--fondo-principal), var(--fondo-quinto));
+    background: linear-gradient(45deg, var(--fondo-primero), var(--fondo-quinto));
     display: grid;
     grid-template-columns: 1fr 1fr;
     justify-items: center;
     width: 1100px;
-    border-radius: 14px;
+    
     align-items: center;
 }
 .leyenda_sucursales{
@@ -26,8 +26,6 @@
     justify-content: space-evenly;
     align-items: center;
     width: 100%;
-    border-top-right-radius: 14px;
-    border-top-left-radius: 14px;
     background: var(--fondo-marca-uno);
     padding: 10px 0;
     color: var(--color-secundario);
@@ -41,17 +39,7 @@
     width: 20px;
     height: 10px;
 }
-.graf_avan_men{
-    width: 0;
-    margin: 5px 10px;
-    height: 2px;
-    border: 2px solid rgba(167, 166, 166, 0.493);
-    border-radius: 3px;
-    /* background: white; */
-    text-align: end;
-    
-    /* color: rgb(88, 212, 94); */
-}
+
 .grafico_interno{
     padding: 20px 0px 30px 20px;
     text-align: center;
@@ -66,405 +54,7 @@
     justify-content: space-around;
     margin: 5px;
 }
-.valor_sucursal{
-    font-size: 12px;
-    color: var(--fuente_principal); 
-}
-.contenido_sucursal_grafico{
-    width: 160px;
-    display: flex;
-    justify-content: space-between;
-}
-.body_etiqueta_avan_men{
-    margin: 10px;
-    padding: 5px;
-    /* background: rgba(46, 43, 43, 0.411);
-    border-radius: 5px; */
-}
-.fondo_graf{
-    margin: 0px;
-}
 
-/* ///////////////////////////////////////////////// */
-.graf_venta_anual{
-    width: 100%;
-    margin: 0px 10px 10px 10px;
-    padding: 10px;
-    text-align: center;
-    border-radius: 7px;
-}
-.graf_venta_anual h3{
-    margin: 10px;
-}
-.etiqueta_mes_total{
-    display: inline-block;
-    transform: rotate(-40deg);
-    font-size: 14px;
-}
-.tabla_rot{
-    flex-direction: column;
-    align-items: flex-end;
-}
-.constenido_total_grafico{
-    width: 80px;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-}
-.graf_total_mes{
-    vertical-align: auto;
-}
-.graf_fila_total{
-    height: 210px;
-    display: flex;
-    align-items: flex-end;
-}
-.graf_fila_total td{
-    height: 200px;
-    width: 50px;
-    display: flex;
-    justify-content: space-between;
-    font-size: 14px;
-}
-
-.graf_fila_total_negativo{
-    height: 20px;
-    display: flex;
-    align-items: flex-start;
-}
-.graf_fila_total_negativo td{
-    height: 20px;
-    width: 50px;
-    display: flex;
-    justify-content: space-between;
-}
-
-.graf_fila_etiqueta{
-    display: flex;
-    align-items: flex-start;
-    padding: 10px 0;
-}
-.graf_fila_etiqueta td{
-    width: 50px;
-    display: flex;
-    justify-content: center;
-}
-
-.graf_total_mes_venta_total{
-    position: relative;
-    display: inline-block;
-    margin: 1px;
-}
-
-.graf_total_mes_costo_total{
-    position: relative;
-    display: inline-block;
-    margin: 1px;
-}
-
-.etiqueta_numeracion_grafico{
-    display: flex;
-}
-.valor_grafico_total_venta{
-    display: flex;
-    width: 20px;
-}
-.valor_grafico_total_costo{
-    display: flex;
-    width: 20px;
-}
-
-.span_total_venta{
-    visibility: hidden;
-    width: max-content;
-    background-color: #000;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px;
-    position: absolute;
-    z-index: 1;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-.graf_total_mes_venta_total:hover .span_total_venta{
-    visibility: visible;
-    opacity: 1;
-}
-.span_total_costo{
-    visibility: hidden;
-    width: max-content;
-    background-color: #000;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px;
-    position: absolute;
-    z-index: 1;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-.graf_total_mes_costo_total:hover .span_total_costo{
-    visibility: visible;
-    opacity: 1;
-}
-
-.graf_total_mes_venta_total_negativo{
-    position: relative;
-    display: inline-block;
-    margin: 1px;
-}
-.span_total_venta_negativo{
-    visibility: hidden;
-    width: max-content;
-    background-color: #000;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px;
-    position: absolute;
-    z-index: 1;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-.graf_total_mes_venta_total_negativo:hover .span_total_venta_negativo{
-    visibility: visible;
-    opacity: 1;
-}
-
-.indice_total_venta{
-    display: flex;
-    justify-content: space-evenly;
-    font-size: 14px;
-}
-.indice_total_venta div{
-    display: flex;
-    align-items: center;
-}
-.color_total_venta{
-    width: 20px;
-    height: 10px;
-    background: #E6CA7B;
-    margin: 5px;
-}
-.color_total_costo{
-    width: 20px;
-    height: 10px;
-    background: #E66E8D;
-    margin: 5px;
-}
-/* ////////////////////////////////////////////////////////////////// */
-
-.graf_total_mes_venta_total_ac{
-    position: relative;
-    display: inline-block;
-    margin: 1px;
-}
-.span_total_venta_ac{
-    visibility: hidden;
-    width: max-content;
-    background-color: #000;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px;
-    position: absolute;
-    z-index: 1;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-.graf_total_mes_venta_total_ac:hover .span_total_venta_ac{
-    visibility: visible;
-    opacity: 1;
-}
-.graf_total_mes_venta_total_su{
-    position: relative;
-    display: inline-block;
-    margin: 1px;
-}
-.span_total_venta_su{
-    visibility: hidden;
-    width: max-content;
-    background-color: #000;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px;
-    position: absolute;
-    z-index: 1;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-.graf_total_mes_venta_total_su:hover .span_total_venta_su{
-    visibility: visible;
-    opacity: 1;
-}
-.graf_total_mes_venta_total_sd{
-    position: relative;
-    display: inline-block;
-    margin: 1px;
-}
-.span_total_venta_sd{
-    visibility: hidden;
-    width: max-content;
-    background-color: #000;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px;
-    position: absolute;
-    z-index: 1;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-.graf_total_mes_venta_total_sd:hover .span_total_venta_sd{
-    visibility: visible;
-    opacity: 1;
-}
-.graf_total_mes_venta_total_st{
-    position: relative;
-    display: inline-block;
-    margin: 1px;
-}
-.span_total_venta_st{
-    visibility: hidden;
-    width: max-content;
-    background-color: #000;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px;
-    position: absolute;
-    z-index: 1;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-.graf_total_mes_venta_total_st:hover .span_total_venta_st{
-    visibility: visible;
-    opacity: 1;
-}
-
-.graf_total_mes_venta_sucursal_ac_negativo{
-    position: relative;
-    display: inline-block;
-    margin: 1px;
-}
-.span_total_sucursal_ac_negativo{
-    visibility: hidden;
-    width: max-content;
-    background-color: #000;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px;
-    position: absolute;
-    z-index: 1;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-.graf_total_mes_venta_sucursal_ac_negativo:hover .span_total_sucursal_ac_negativo{
-    visibility: visible;
-    opacity: 1;
-}
-.graf_total_mes_venta_sucursal_su_negativo{
-    position: relative;
-    display: inline-block;
-    margin: 1px;
-}
-.span_total_sucursal_su_negativo{
-    visibility: hidden;
-    width: max-content;
-    background-color: #000;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px;
-    position: absolute;
-    z-index: 1;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-.graf_total_mes_venta_sucursal_su_negativo:hover .span_total_sucursal_su_negativo{
-    visibility: visible;
-    opacity: 1;
-}
-.graf_total_mes_venta_sucursal_sd_negativo{
-    position: relative;
-    display: inline-block;
-    margin: 1px;
-}
-.span_total_sucursal_sd_negativo{
-    visibility: hidden;
-    width: max-content;
-    background-color: #000;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px;
-    position: absolute;
-    z-index: 1;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-.graf_total_mes_venta_sucursal_sd_negativo:hover .span_total_sucursal_sd_negativo{
-    visibility: visible;
-    opacity: 1;
-}
-.graf_total_mes_venta_sucursal_st_negativo{
-    position: relative;
-    display: inline-block;
-    margin: 1px;
-}
-.span_total_sucursal_st_negativo{
-    visibility: hidden;
-    width: max-content;
-    background-color: #000;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px;
-    position: absolute;
-    z-index: 1;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-.graf_total_mes_venta_sucursal_st_negativo:hover .span_total_sucursal_st_negativo{
-    visibility: visible;
-    opacity: 1;
-}
 /* /////////////////////////////////////////////////////// */
 .contenedor_circulo_sucursal{
     width: 300px;
@@ -479,160 +69,26 @@
     justify-content: center;
     align-items: stretch;
 }
-#circulo_stock_sucursal{
-    width: 250px;
-    height: 250px;
-    border-radius: 50%;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0px 0px 5px 0px #6f6e6ee0;
-    font-size: 20px;
-}
-.cirulo_interior{
-    width: 85%;
-    height: 85%;
-    border-radius: 50%;
-    background: linear-gradient(45deg, var(--fondo-principal), var(--fondo-quinto));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    
-    pointer-events: none;
-    flex-direction: column;
-    box-shadow: inset 0px 0px 5px 0px #6f6e6ee0;
-}
-.cirulo_interior span{
-    margin: 5px;
-}
+
 /* /////////////////////////////////////////////////////////////////// */
-.modelo_circulo{
-    width: 250px;
-    height: 250px;
-    border-radius: 50%;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0px 0px 5px 0px #6f6e6ee0;
-}
-.modelo_circulo_esperado{
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0px 0px 5px 0px #6f6e6ee0;
-    font-size: 10px;
-}
-.cirulo_interior_margen {
-    width: 90%;
-    height: 90%;
-    border-radius: 50%;
-    background: linear-gradient(45deg, var(--fondo-principal), var(--fondo-quinto));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-    flex-direction: column;
-    box-shadow: inset 0px 0px 5px 0px #6f6e6ee0;
-}
-
-
-
-.circulo_uno{
-    fill: none;
-    stroke: blue;
-    stroke-width: 10px;
-    stroke-dasharray: 40 100;
-    transform: rotate(-90deg);
-    transform-origin: 50%;
-}
-.circulo_dos{
-    fill: none;
-    position: absolute;
-    top: 0;
-    left: 0;
-    stroke: red;
-    stroke-width: 10px;
-    stroke-dasharray: 20 80;
-    transform: rotate(50deg);
-    transform-origin: 50%;
-}
 
 .titulo_graficos_dos{
     display: flex;
     justify-content: space-around;
 }
-.parte_multi{
-    display: grid;
-    align-content: space-between;
-    gap: 40px;
-}
+
 .modelo_circulo_sucursal{
     width: 100px;
     /* height: 130px; */
 }
-.parte_multi_suc{
-    display: grid;
-    align-content: space-between;
-    gap: 10px;
-}
-.titulo_graficos_suc{
-    display: flex;
-    width: 100%;
-    justify-content: space-around;
-}
+
 .tabla_mapa_calor{
     width: 1100px;
-    border-radius: 14px;
-    background: linear-gradient(45deg, var(--fondo-principal), var(--fondo-quinto));
+    
+    background: linear-gradient(45deg, var(--fondo-primero), var(--fondo-quinto));
     padding: 10px;
 }
 
 .tabla_mapa_calor tbody tr:hover {
-    background-color: var(--fondo-cuaternario);
-}
-
-.contenedor_pentagono {
-    position: relative;
-    width: 500px;
-    height: 280px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.pentagono{
-    width: 200px;
-    height: 200px;
-    background-color: #3498db81;
-    stroke: red;
-}
-.contenedor_pentagono_dos{
-    position: relative;
-    width: 200px;
-    height: 200px;
-    background-color: #3f492f;
-    clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
-    stroke: red;
-}
-.number {
-    position: absolute;
-    font-size: 16px;
-    color: #fff; /* Color del número */
-}
-.titulo_desempeno_home{
-    border: 2px solid var(--border-principal);
-    padding: 10px;
-    border-radius: 10px;
-    width: 600px;
-    margin: 30px;
-    text-align: center;
-    
+    background-color: var(--fondo-cuarto);
 }

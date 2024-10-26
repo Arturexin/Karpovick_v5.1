@@ -9,6 +9,7 @@ function init(){
     agregarMoneda(document.querySelectorAll(".moneda_cabecera"))
 };
 const URL_API_almacen_central = 'http://127.0.0.1:3000/api/'
+
 let fechaPrincipal = "";
 function generarFecha(){
     fechaPrincipal = new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate()+" "+new Date().getHours()+":"+new Date().getMinutes()+":"+new Date().getSeconds();
@@ -121,7 +122,7 @@ let cli_db = JSON.parse(localStorage.getItem("clientes_consulta"));
 let usu_db = JSON.parse(localStorage.getItem("datos_usuario"));
 let neg_db = JSON.parse(localStorage.getItem("datos_negocio"));
 
-
+usu_db !== null ? document.getElementById("usuario-cliente").textContent = usu_db.nombre_usuario: "";
 
 async function cargarDatos(ruta){
     let url = URL_API_almacen_central + ruta
@@ -251,63 +252,87 @@ function categoriaProductosCreacion(categoria){
     };
     return array;
 };
+
 ///////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////
+const colores_sidebar = [
+    "rgb(144, 238, 144)",
+    "rgb(222, 184, 135)",
+    "rgb(135, 206, 250)",
+    "rgb(186, 85, 211)",
+    "rgb(211, 211, 211)",
+]
 let btnHome, btnVentas, btnCompras, btnTransferencias, btnKardex, btnDetalleVentas, 
     btnModificacion, btnDevolucionCompras, btnAnalisis, btnPerdidas, btnProductos,
     btnEntradasP, btnSalidasP, btnClientes, btnConfiguracion;
 
 function sidebarMarcadito(){
     if(btnHome == 1){
-        document.getElementById("button-home").classList.add("marcadito")
+        document.getElementById("button-home").style.background = `linear-gradient(135deg, var(--fondo-primero) 20%, var(--side_cero) 80%)`
+        document.getElementById("sidebar").style.borderRight = ` 1px solid var(--side_cero)`
         document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
     }else if(btnVentas == 1){
-        document.getElementById("button-ventas").classList.add("marcadito")
+        document.getElementById("button-ventas").style.background = `linear-gradient(135deg, var(--fondo-primero) 20%, var(--side_cero) 80%)`
+        document.getElementById("sidebar").style.borderRight = ` 1px solid var(--side_cero)`
         document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
     }else if(btnCompras == 1){
-        document.getElementById("button-compras").classList.add("marcadito");
+        document.getElementById("button-compras").style.background = `linear-gradient(135deg, var(--fondo-primero) 20%, var(--side_uno) 80%)`;
+        document.getElementById("sidebar").style.borderRight = ` 1px solid var(--side_uno)`
         document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
     }else if(btnTransferencias == 1){
-        document.getElementById("button-transferencias").classList.add("marcadito")
+        document.getElementById("button-transferencias").style.background = `linear-gradient(135deg, var(--fondo-primero) 20%, var(--side_uno) 80%)`
+        document.getElementById("sidebar").style.borderRight = ` 1px solid var(--side_uno)`
         document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
         document.getElementById("buscador-productos-form").focus();
+    }else if(btnPerdidas == 1){
+        document.getElementById("button-perdidas").style.background = `linear-gradient(135deg, var(--fondo-primero) 20%, var(--side_uno) 80%)`
+        document.getElementById("sidebar").style.borderRight = ` 1px solid var(--side_uno)`
+        document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
+        document.getElementById("buscador-productos-form").focus();
+    }else if(btnModificacion == 1){
+        document.getElementById("button-modificacion").style.background = `linear-gradient(135deg, var(--fondo-primero) 20%, var(--side_uno) 80%)`
+        document.getElementById("sidebar").style.borderRight = ` 1px solid var(--side_uno)`
+        document.querySelector(".baja_opacidad").classList.add("alta_opacidad");
     }else if(btnKardex == 1){
-        document.getElementById("button-kardex").classList.add("marcadito")
+        document.getElementById("button-kardex").style.background = `linear-gradient(135deg, var(--fondo-primero) 20%, var(--side_dos) 80%)`
+        
+        document.getElementById("sidebar").style.borderRight = ` 1px solid var(--side_dos)`
         document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
         document.getElementById("buscador-productos-form").focus();
     }else if(btnDetalleVentas == 1){
-        document.getElementById("button-detalle-ventas").classList.add("marcadito")
+        document.getElementById("button-detalle-ventas").style.background = `linear-gradient(135deg, var(--fondo-primero) 20%, var(--side_dos) 80%)`
+        document.getElementById("sidebar").style.borderRight = ` 1px solid var(--side_dos)`
         document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
-    }else if(btnModificacion == 1){
-        document.getElementById("button-modificacion").classList.add("marcadito")
-        document.querySelector(".baja_opacidad").classList.add("alta_opacidad");
     }else if(btnDevolucionCompras == 1){
-        document.getElementById("button-devolucion-compras").classList.add("marcadito")
+        document.getElementById("button-devolucion-compras").style.background = `linear-gradient(135deg, var(--fondo-primero) 20%, var(--side_dos) 80%)`
+        document.getElementById("sidebar").style.borderRight = ` 1px solid var(--side_dos)`
         document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
         document.getElementById("buscador_operacion").focus();
     }else if(btnAnalisis == 1){
-        document.getElementById("button-devolucion-salidas").classList.add("marcadito")
+        document.getElementById("button-devolucion-salidas").style.background = `linear-gradient(135deg, var(--fondo-primero) 20%, var(--side_dos) 80%)`
+        document.getElementById("sidebar").style.borderRight = ` 1px solid var(--side_dos)`
         document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
-    }else if(btnPerdidas == 1){
-        document.getElementById("button-perdidas").classList.add("marcadito")
-        document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
-        document.getElementById("buscador-productos-form").focus();
     }else if(btnProductos == 1){
-        document.getElementById("button-productos").classList.add("marcadito")
+        document.getElementById("button-productos").style.background = `linear-gradient(135deg, var(--fondo-primero) 20%, var(--side_tres) 80%)`
+        document.getElementById("sidebar").style.borderRight = ` 1px solid var(--side_tres)`
         document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
     }else if(btnEntradasP == 1){
-        document.getElementById("button-entradas").classList.add("marcadito")
+        document.getElementById("button-entradas").style.background = `linear-gradient(135deg, var(--fondo-primero) 20%, var(--side_tres) 80%)`
+        document.getElementById("sidebar").style.borderRight = ` 1px solid var(--side_tres)`
         document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
     }else if(btnSalidasP == 1){
-        document.getElementById("button-salidas").classList.add("marcadito")
+        document.getElementById("button-salidas").style.background = `linear-gradient(135deg, var(--fondo-primero) 20%, var(--side_tres) 80%)`
+        document.getElementById("sidebar").style.borderRight = ` 1px solid var(--side_tres)`
         document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
     }else if(btnClientes == 1){
-        document.getElementById("button-clientes").classList.add("marcadito")
+        document.getElementById("button-clientes").style.background = `linear-gradient(135deg, var(--fondo-primero) 20%, var(--side_tres) 80%)`
+        document.getElementById("sidebar").style.borderRight = ` 1px solid var(--side_tres)`
         document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
         document.getElementById("nombre").focus();
     }else if(btnConfiguracion == 1){
-        document.getElementById("button-configuracion").classList.add("marcadito")
+        document.getElementById("button-configuracion").style.background = `linear-gradient(135deg, var(--fondo-primero) 20%, var(--side_cuatro) 80%)`
+        document.getElementById("sidebar").style.borderRight = ` 1px solid var(--side_cuatro)`
         document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
     };
 };
@@ -375,7 +400,7 @@ function expancionTexto(){
 ////////////////////////////////////////////////////////////////////////////////////////
 const colores_fondo_web = {
     fondo_principal : ["#121212", "#d8a7eb", "#FFD700", "#FBF5EE"],
-    fondo_secundario : ["#050505", "#B2A7EB", "#232323", "#44b6db"],
+    fondo_secundario : ["#2F2F2F", "#B2A7EB", "#232323", "#44b6db"],
     fondo_terciario : ["#31383f", "#efe7ee", "#F4EAF6", "#FFFFFF"],
     fondo_cuaternario : ["#5b6774", "#B78DC7", "#B39800", "#FFFFFF"],
 
@@ -383,16 +408,16 @@ const colores_fondo_web = {
 
     fuente_principal : ["#eee", "#1c101a", "#232323", "#000"],
     fuente_secundario : ["#eee", "#1c101a", "#eee", "#eee"],
-    marca_uno : ["#994d40", "#A7EBCC", "#232323", "#44b6db"],
-    border_principal : ["#994d40", "#EBD5A7", "#232323", "#50C3CC"],
+    marca_uno : ["#B3675A", "#A7EBCC", "#232323", "#44b6db"],
+    border_principal : ["#B3675A", "#EBD5A7", "#232323", "#50C3CC"],
     fondo_input : ["#31383f", "#efe7ee", "#FFE44D", "#FFFFFF"],
 
     boton_uno : ["#5ca1cc", "#A7E3EB", "#3e3e97", "#50C3CC"],
-    boton_dos : ["#994d40", "#EBC4A7", "#5d5c5c", "#dd836e"],
+    boton_dos : ["#B3675A", "#EBC4A7", "#5d5c5c", "#dd836e"],
 
-    boton_tres : ["#6edc8e", "#D7EBA7", "#232323", "#44db95"],
+    boton_tres : ["#6abb6b", "#D7EBA7", "#232323", "#44db95"],
     /* boton_uno : ["#4b9ec3", "#A7E3EB", "#3e3e97", "#50C3CC"],
-    boton_dos : ["#994d40", "#EBC4A7", "#5d5c5c", "#dd836e"],
+    boton_dos : ["#B3675A", "#EBC4A7", "#5d5c5c", "#dd836e"],
 
     boton_tres : ["#77E578", "#D7EBA7", "#232323", "#44db95"], */
 };
@@ -401,10 +426,10 @@ function cambioColorFondo() {
     document.querySelectorAll(".color_fondo").forEach((event, i) => {
         event.style.background = colores_fondo_web.fondo_principal[i];
         event.addEventListener("click", () => {
-            document.documentElement.style.setProperty('--fondo-principal', colores_fondo_web.fondo_principal[i]);
-            document.documentElement.style.setProperty('--fondo-secundario', colores_fondo_web.fondo_secundario[i]);
-            document.documentElement.style.setProperty('--fondo-terciario', colores_fondo_web.fondo_terciario[i]);
-            document.documentElement.style.setProperty('--fondo-cuaternario', colores_fondo_web.fondo_cuaternario[i]);
+            document.documentElement.style.setProperty('--fondo-primero', colores_fondo_web.fondo_principal[i]);
+            document.documentElement.style.setProperty('--fondo-segundo', colores_fondo_web.fondo_secundario[i]);
+            document.documentElement.style.setProperty('--fondo-tercero', colores_fondo_web.fondo_terciario[i]);
+            document.documentElement.style.setProperty('--fondo-cuarto', colores_fondo_web.fondo_cuaternario[i]);
             document.documentElement.style.setProperty('--fondo-quinto', colores_fondo_web.fondo_quinto[i]);
             document.documentElement.style.setProperty('--color-principal', colores_fondo_web.fuente_principal[i]);
             document.documentElement.style.setProperty('--color-secundario', colores_fondo_web.fuente_secundario[i]);
@@ -421,10 +446,10 @@ function cambioColorFondo() {
 function inicioColoresFondo(){
     for(let i = 0; i < 4; i++){
         if(localStorage.getItem("clave_control_color") === `${i}`){
-            document.documentElement.style.setProperty('--fondo-principal', colores_fondo_web.fondo_principal[i]);
-            document.documentElement.style.setProperty('--fondo-secundario', colores_fondo_web.fondo_secundario[i]);
-            document.documentElement.style.setProperty('--fondo-terciario', colores_fondo_web.fondo_terciario[i]);
-            document.documentElement.style.setProperty('--fondo-cuaternario', colores_fondo_web.fondo_cuaternario[i]);
+            document.documentElement.style.setProperty('--fondo-primero', colores_fondo_web.fondo_principal[i]);
+            document.documentElement.style.setProperty('--fondo-segundo', colores_fondo_web.fondo_secundario[i]);
+            document.documentElement.style.setProperty('--fondo-tercero', colores_fondo_web.fondo_terciario[i]);
+            document.documentElement.style.setProperty('--fondo-cuarto', colores_fondo_web.fondo_cuaternario[i]);
             document.documentElement.style.setProperty('--fondo-quinto', colores_fondo_web.fondo_quinto[i]);
             document.documentElement.style.setProperty('--color-principal', colores_fondo_web.fuente_principal[i]);
             document.documentElement.style.setProperty('--color-secundario', colores_fondo_web.fuente_secundario[i]);

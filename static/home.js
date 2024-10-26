@@ -189,12 +189,12 @@ async function graficoDonaEfectivo(){
     }, { suma_costos: 0, suma_ventas: 0, suma_ventas_esperado: 0 });
 
     graficoDonaDos(document.getElementById("grafico_circulo_ventas"), ['Ventas esperadas', 'Ventas reales'], [sumaTotal.suma_ventas_esperado, sumaTotal.suma_ventas], 
-    cls, 
-    cls_dos, true
+    colores_uno, 
+    colores_dos, true
     )
     graficoDona(document.getElementById("grafico_circulo_margen"), ['Margen esperado', 'Margen real'], [(1-(sumaTotal.suma_costos/sumaTotal.suma_ventas_esperado))*100, (1-(sumaTotal.suma_costos/sumaTotal.suma_ventas))*100], 
-    cls[0], 
-    cls_dos[1], true, '%'
+    colores_uno[0], 
+    colores_dos[1], true, '%'
     )
 
     gastos_grafico_detallado.forEach((event)=>{
@@ -204,7 +204,7 @@ async function graficoDonaEfectivo(){
         array_gastos[3] += event._otros;
     });
     
-    graficoDonaDos(document.getElementById("grafico_circulo_gastos"), array_nom_dos, array_gastos, cls, cls_dos)
+    graficoDonaDos(document.getElementById("grafico_circulo_gastos"), array_nom_dos, array_gastos, colores_uno, colores_dos)
 
 
 };

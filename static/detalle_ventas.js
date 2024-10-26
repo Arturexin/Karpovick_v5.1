@@ -431,7 +431,7 @@ function promCanalVenta(){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 async function buscarCredito(tipo_comprobante, nombre, id_det_ventas, devolucion_){
     credito_ = await cargarDatos(`credito_comprobante/${id_det_ventas}`)
-    console.log(credito_)
+    
     if(credito_.length > 0){
         tabla_creditos(nombre, devolucion_)
         document.getElementById("acciones_creditos").classList.add("modal-show-credito")

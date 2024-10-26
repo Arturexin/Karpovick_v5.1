@@ -11,6 +11,7 @@ function inicioKardex(){
     cambioSucursalKardex("fffff-sucursal")
     buscarProducto(document.getElementById('buscador-productos-form'))
     cargarDatosAnio()
+    graficoVacio()
 };
 let ventasMensuales = [];
 
@@ -151,17 +152,30 @@ function reinicarKardex(){
     document.getElementById("total-existencias-detalle-transferencias").textContent = "";
     document.getElementById("total-importe-detalle-transferencias").textContent = "";
     document.getElementById("id-form").value = "";
+    graficoVacio()
 };
+function graficoVacio(){
+    document.getElementById("contenedor_grafico_kardex").innerHTML = `<canvas id="grafico_kardex"></canvas>`
+    graficoLineasVerticalUnid(  document.getElementById("grafico_kardex"), 
+    [], 
+    [], 
+    [], 
+    [],
+    [],
+    mes_anio,
+    ['Entradas', 'Salidas', 'Transferencias', 'Despacho'])
+}
 function cambioSucursalKardex(id){
     document.getElementById(id).addEventListener("change", ()=>{
-        document.getElementById("buscador-productos-detalle-movimientos").value = ""
-        document.getElementById("categoria-detalle-movimientos").value = ""
-        document.getElementById("codigo-detalle-movimientos").value = ""
-        document.getElementById("descripcion-detalle-movimientos").value = ""
-        document.getElementById("costo-unitario-detalle-movimientos").value = ""
+        document.getElementById("buscador-productos-form").value = ""
+        document.getElementById("categoria-form").value = ""
+        document.getElementById("codigo-form").value = ""
+        document.getElementById("descripcion-form").value = ""
         document.getElementById("id-form").value = "";
-        document.getElementById("buscador-productos-detalle-movimientos").focus();
+        document.getElementById("buscador-productos-form").focus();
+
         reinicarKardex();
+        graficoVacio()
     });
 };
 function removerTablas(){
@@ -211,7 +225,6 @@ function graficoKardex(){
             }else if(new Date(event.fecha).getMonth() === i && event.id_suc_origen !== Number(document.getElementById("fffff-sucursal").value)){
                 suma_transferencias+=event.existencias;
             }
-            console.log(suma_transferencias)
         });
         array_entradas.push(suma_entradas)
         array_salidas.push(suma_salidas)

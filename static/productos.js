@@ -198,7 +198,7 @@ function tabla_body_productos(e, i, id_suc){
     let tabla_= document.querySelector("#tabla_proforma_producto > tbody");
     let nuevaFilaTabla_ = tabla_.insertRow(-1);
     let fila =  `<tr>` +
-                    `<td class="nom_suc" style="text-align: center; width: 180px">${suc_add[i]}</td>` + //nombre de sucursal
+                    `<td class="nom_suc" style="text-align: center; width: 180px; border-left: 7px solid ${CS(suc_add[i])};">${suc_add[i]}</td>` + //nombre de sucursal
                     `<td style="text-align: center; width: 90px">${e[sucursales_activas[i]]}</td>` + // existencias del producto
                     `<td>
                         <input class="input-tablas-dos-largo q_recompra" onKeyup = "op_recompras(this)">
@@ -305,7 +305,7 @@ function tabla_transferencias_body(e, i, id_suc){
     let tabla_= document.querySelector("#tabla_proforma_producto > tbody");
     let nuevaFilaTabla_ = tabla_.insertRow(-1);
     let fila = `<tr>` +
-                    `<td class="nom_suc" style="text-align: center; width: 180px">${suc_add[i]}</td>` + //nombre de sucursal
+                    `<td class="nom_suc" style="text-align: center; width: 180px; border-left: 7px solid ${CS(suc_add[i])};">${suc_add[i]}</td>` + //nombre de sucursal
                     `<td style="text-align: center; width: 90px">${e[sucursales_activas[i]]}</td>` + // existencias del producto
                     `<td>
                         <input class="input-tablas-dos-largo q_tran" onKeyup = "op_transferencias(this)">

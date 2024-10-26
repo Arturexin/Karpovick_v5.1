@@ -188,6 +188,7 @@ procesarGastos.addEventListener("click", async (e) => {
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 async function graficoBarras(anio){
+    document.getElementById("contenedor_gastos_mensuales_sucursal").innerHTML = `<canvas id="gastos_mensuales_sucursal" class="gradico_anual"></canvas>`
     gastos_grafico_sucursales = await cargarDatos(`gastos_suma_mes_sucursal?`+
                                                 `year_actual=${anio}`)
     let arrayAC = [];

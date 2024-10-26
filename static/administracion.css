@@ -15,9 +15,8 @@
     display: flex;
     width: 250px;
     height: 58px;
-    background: var(--fondo-principal);
+    background: var(--fondo-primero);
     align-items: center;
-    border-radius: 30px;
     justify-content: space-between;
 }
 .contenedor_form_sucursal{
@@ -28,7 +27,7 @@
     border-radius: 50%;
     color: var(--color-principal);
     background-color: var(--boton-uno);
-    border: 4px solid var(--fondo-terciario);
+    border: 4px solid var(--fondo-tercero);
     cursor: pointer;
     margin: 0;
 }

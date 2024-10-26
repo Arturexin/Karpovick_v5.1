@@ -1,3 +1,5 @@
+const elements = document.querySelectorAll(".stock_sucursal");
+
 function busquedaDetalle(indice, termino){
     // Obtén la referencia al elemento <ul>
     let miUl_cabecera = document.getElementById("lista_cabecera");
@@ -110,13 +112,13 @@ function marcarDatosPuesto(clase, dato, index, maximo){
     };
 };
 function busquedaStock(){
-    document.querySelectorAll(".stock_sucursal").forEach((event, i)=>{
+    elements.forEach((event, i)=>{
         event.addEventListener("click", ()=>{
             removerMarcaBotonDos()
             let sucursal_ = suc_db.find(x=> x.sucursal_nombre === suc_add[i])
             if(sucursal_){
                 cargarTop(sucursal_.id_sucursales, sucursales_activas[i])
-                event.classList.add("marcaBotonDos")
+                event.style.background = `${cls[i]}`
             }
         });
     });
@@ -127,13 +129,8 @@ function removerMarcaBotonDos(){
     miUl_cabecera.innerHTML = "";
     miUl_detalle.innerHTML = "";
 
-    if(document.querySelectorAll(".stock_sucursal").children !== undefined){
-        document.querySelectorAll(".stock_sucursal")[0].classList.remove("marcaBotonDos")
-        document.querySelectorAll(".stock_sucursal")[1].classList.remove("marcaBotonDos")
-        document.querySelectorAll(".stock_sucursal")[2].classList.remove("marcaBotonDos")
-        document.querySelectorAll(".stock_sucursal")[3].classList.remove("marcaBotonDos")
-        document.querySelectorAll(".stock_sucursal")[4].classList.remove("marcaBotonDos")
-
+    for (let i = 0; i < elements.length; i++) {
+        elements[i].style.background = cls_dos[i];
     }
 }
 
