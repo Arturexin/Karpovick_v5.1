@@ -36,7 +36,7 @@
 	font-family:'Open Sans', sans-serif;
 	font-size:14px;
 	font-weight:bold;
-	padding:2px 10px;
+	padding:2px 5px;
 	text-decoration:none;
 	/* text-shadow:0px 1px 0px #3e5c8a; */
 	user-select: none;
@@ -131,11 +131,9 @@
 }
 
 /* //////////////////////////////////////////////////////////////////////////////// */
-.myButtonAgregarDos {
+.btn_t {
 	width: 50%;
-	
-	background:var(--boton-uno);
-	background-color:var(--boton-uno);
+	background:rgb(92 161 204 / 40%);
 	cursor:pointer;
 	color: var(--color-secundario);
 	font-family:'Open Sans', sans-serif;
@@ -146,9 +144,12 @@
 	user-select: none;
 	border: none;
 }
-.myButtonAgregarDos:active {
+.btn_t:active {
 	position:relative;
 	top:1px;
+}
+.btn_t:hover {
+	box-shadow: 0px 0px 3px 0px rgb(92 161 204);
 }
 .marcaBoton {
 	
@@ -158,11 +159,8 @@
 	transition: background-color .4s, box-shadow .4s, font-size .4s;
 }
 .marcaBotonDos {
-	
-	background:var(--boton-tres);
-	background-color:var(--boton-tres);
-	color: var(--color-secundario);
-	transition: background-color .4s, box-shadow .4s, font-size .4s;
+	background:rgb(92 161 204);
+	transition: background-color .4s;
 }
 .botonBloqueoMenu {
 	display: flex;

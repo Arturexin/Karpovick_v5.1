@@ -5,7 +5,7 @@ function inicioDevolucionCompras(){
 
     cargarDatosAnio()
     graficoDevolucionesCompras();
-    btnDevolucionCompras = 1;
+    array_btn_pages[8] = 1;
 };
 let array_comprobante= [];
 let operacion_n = '';
@@ -16,7 +16,6 @@ const op_ = ["", "Venta", "Compra", "Recompra"]
 /////////////////////////////////////////////////////////////////////
 function cargarDatosAnio(){
     document.getElementById("cargar_datos_anio").addEventListener("click", async ()=>{
-        reinicioBarraGrafico(barras_dev_compras);
         anio_principal = anio_referencia.value;
 
         graficoDevolucionesCompras();
@@ -149,7 +148,7 @@ mandarATablaDevoluciones.addEventListener("click",manadarDevoluciones)
 async function manadarDevoluciones(e){
     e.preventDefault();
     if(Number(document.getElementById("buscador_operacion").value) > 0){
-        document.querySelector(".contenedor-devolucion-compras").classList.add("modal-show-devolucion-compras");
+        document.querySelector(".contenedor-pre-recompra").classList.add("modal-show");
 
         await crearBodyDevoluciones();
 
@@ -213,7 +212,7 @@ mandarATablaDevolucion.addEventListener("click", (e)=>{
     crearBodyDevolucionesFinal();
 
     if(document.querySelector("#tabla_modal > tbody").children.length == 0){
-        document.querySelector(".contenedor-devolucion-compras").classList.remove("modal-show-devolucion-compras");
+        document.querySelector(".contenedor-pre-recompra").classList.remove("modal-show");
     };
     indice_causa = 0;
     document.getElementById("causa_devolucion").value = 0
@@ -298,7 +297,7 @@ async function realizarDevolucionCompras(){
 const removerTablaDevolucionesUno = document.getElementById("remover-tabla-devoluciones-compras-uno");
 removerTablaDevolucionesUno.addEventListener("click", () =>{
     removerListaModal()
-    document.querySelector(".contenedor-devolucion-compras").classList.remove("modal-show-devolucion-compras");
+    document.querySelector(".contenedor-pre-recompra").classList.remove("modal-show");
     document.querySelector("#tabla_modal > tbody").remove();
     document.querySelector("#tabla_modal").createTBody();
     document.getElementById("buscador_operacion").focus();

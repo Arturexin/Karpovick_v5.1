@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", inicioVentas)
 function inicioVentas(){
-    btnVentas = 1;
+    array_btn_pages[1] = 1;
     cargarSucursalesEjecucion(document.getElementById("fffff-sucursal"))
     document.getElementById("buscador-productos-ventas").focus()
     cambioSucursal();
@@ -40,7 +40,7 @@ const btnEntradas = document.getElementById("entradas-caja");// Te direcciona al
 btnEntradas.addEventListener("click", (e) => {
     e.preventDefault();
     location.href = "/ventas";
-    document.getElementById("entradas-caja").classList.add("marcaBoton")
+    document.getElementById("entradas-caja").classList.add("marcaBotonDos")
 });
 const btnSalidas = document.getElementById("salidas-caja");// Te direcciona al apartado de salidas de efectivo (gastos)
 btnSalidas.addEventListener("click", (e) => {

@@ -4,7 +4,7 @@
 document.addEventListener("DOMContentLoaded", inicioEntradas)
 function inicioEntradas(){
     inicioTablasEntradas()
-    btnEntradasP = 1;
+    array_btn_pages[11] = 1;
 };
 const url_array_conteo = ["entradas_conteo", "transferencias_conteo", "perdidas_conteo"]
 const url_array_tabla = ["entradas_tabla", "transferencias_tabla", "perdidas_tabla"]
@@ -129,7 +129,7 @@ async function accionRemove(id) {
     contenedor_tab.children[0].remove();
     
     contenedorBotonesProducto(`procesarRemove(${entradas.idEntr})`, "Eliminar entrada")
-    document.getElementById("acciones_rapidas_entradas").classList.add("modal_show")
+    document.getElementById("acciones_rapidas_entradas").classList.add("modal-show")
 };
 
 async function procesarRemove(idEntr){
@@ -165,7 +165,7 @@ function accionDevoluciones(id) {
             }
         });
         contenedorBotonesProducto(`procesarDevolucion()`, "Procesar Devolución")
-        document.getElementById("acciones_rapidas_entradas").classList.add("modal_show")
+        document.getElementById("acciones_rapidas_entradas").classList.add("modal-show")
     }else{
         modal_proceso_abrir("No es una Compra o Recompra.", "")
         modal_proceso_salir_botones()
@@ -265,7 +265,7 @@ function contenedorBotonesProducto(funcion, titulo){
 function removerContenido(){
     let contenido = document.getElementById("form_accion_rapida")
     contenido.remove();
-    document.getElementById("acciones_rapidas_entradas").classList.remove("modal_show")
+    document.getElementById("acciones_rapidas_entradas").classList.remove("modal-show")
 };
 //////////////////BUSCA PRODUCTOS EN TABLA ALMACÉN CENTRAL////////////////////////////////////////////
 
@@ -328,7 +328,7 @@ async function realizarDevolucion(){
         modal_proceso_salir_botones()
         removerContenido()
     };
-    document.getElementById("acciones_rapidas_entradas").classList.remove("modal_show")
+    document.getElementById("acciones_rapidas_entradas").classList.remove("modal-show")
 };
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Volcado de datos/////////////////////////////////////////////////////////////////////////////////////////////////////////////////

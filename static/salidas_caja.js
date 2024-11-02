@@ -3,20 +3,18 @@ let anio_principal = ""
 function inicioGastosVarios(){
     anio_principal = new Date().getFullYear()
     inicioTablasGastos()
-    btnVentas = 1;
+    array_btn_pages[1] = 1;
     cargarSucursalesEjecucion(document.getElementById("fffff-sucursal"))
     cargarDatosAnio()
-    graficoBarras(anio_principal)
-    /* graficoDonas(anio_principal) */
+    graficoBarras([])
+    
 };
 const barras_sucursales = [".cg_1_c_s", ".cg_2_c_s", ".cg_3_c_s", ".cg_4_c_s", ".cg_5_c_s"]
 function cargarDatosAnio(){
     document.getElementById("cargar_datos_anio").addEventListener("click", async ()=>{
-        reinicioBarraGrafico(barras_sucursales);//Reinicia gráfico Ventas Mensuales sucursales
         anio_principal = anio_referencia.value;
 
-        graficoBarras(anio_principal)
-        /* graficoDonas(anio_principal) */
+        graficoBarras([])
         modal_proceso_abrir(`Datos del año ${anio_principal} cargados.`, "")
         modal_proceso_salir_botones()
     })
@@ -187,10 +185,9 @@ procesarGastos.addEventListener("click", async (e) => {
 });
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-async function graficoBarras(anio){
+async function graficoBarras(gastos_grafico_sucursales){
     document.getElementById("contenedor_gastos_mensuales_sucursal").innerHTML = `<canvas id="gastos_mensuales_sucursal" class="gradico_anual"></canvas>`
-    gastos_grafico_sucursales = await cargarDatos(`gastos_suma_mes_sucursal?`+
-                                                `year_actual=${anio}`)
+
     let arrayAC = [];
     let arraySU = [];
     let arraySD = [];
@@ -212,66 +209,21 @@ async function graficoBarras(anio){
     };
     graficoLineasVertical(document.getElementById("gastos_mensuales_sucursal"), arrayAC, arraySU, arraySD, arrayST, arraySC, mes_anio, suc_add);
 };
-function graficarDona(id,clase_valor_margen, clase_porcentaje_margen, numerador, denominador, valor_margen, porcentaje_margen, color_uno, color_dos) {
-    
-    let circulo = document.getElementById(id);
-    circulo.style.background = `conic-gradient(#fff0 0deg, #fff0 0deg)`;//reiniciamos colores de la dona
-    circulo.style.background = `conic-gradient(${color_uno} ${((numerador/denominador)) * 360}deg, ${color_dos} ${((numerador/denominador)) * 360}deg)`;//asiganamos valores a la dona
-    document.querySelector(clase_valor_margen).textContent = `${moneda()} ${(valor_margen).toFixed(2)}`
-    document.querySelector(clase_porcentaje_margen).textContent = porcentaje_margen + "%"
-}
-async function graficoDonas(anio){
-    gastos_grafico_detallado = await cargarDatos(`gastos_suma_mes?`+
-                                                `year_actual=${anio}`)
-    let _nomina = 0;
-    let _seguridad_social = 0;
-    let _proveedores = 0;
-    let _impuestos = 0;
-    let _servicios = 0;
-    let _alquiler = 0;
-    let _mantenimientos = 0;
-    let _publicidad = 0;
-    let _pago_prestamos = 0;
-    let _depositos = 0;
-    let _otros = 0;
 
-    gastos_grafico_detallado.forEach((event)=>{
-        _nomina += event._nomina;
-        _seguridad_social += event._seguridad_social;
-        _proveedores += event._proveedores;
-        _impuestos += event._impuestos;
-        _servicios += event._servicios;
-        _alquiler += event._alquiler;
-        _mantenimientos += event._mantenimientos;
-        _publicidad += event._publicidad;
-        _pago_prestamos += event._pago_prestamos;
-        _depositos += event._depositos;
-        _otros += event._otros;
-    })
-    total = _nomina + 
-            _seguridad_social + 
-            _proveedores + 
-            _impuestos + 
-            _servicios + 
-            _alquiler + 
-            _mantenimientos + 
-            _publicidad + 
-            _pago_prestamos + 
-            _depositos + 
-            _otros 
-    console.log(_depositos)
-    graficoDonaDos(document.getElementById("circulo_total_deposito"), ['Depósito', 'Total'], [_depositos, total], colores_uno, colores_dos, true)
-    graficoDonaDos(document.getElementById("circulo_total_personal"), ['Personal', 'Total'], [_nomina, total], colores_uno, colores_dos, true)
-    graficoDonaDos(document.getElementById("circulo_total_alquiler"), ['Alquiler', 'Total'], [_alquiler, total], colores_uno, colores_dos, true)
-    graficoDonaDos(document.getElementById("circulo_total_servicios"), ['Servicios', 'Total'], [_servicios, total], colores_uno, colores_dos, true)
-    graficoDonaDos(document.getElementById("circulo_total_insumos"), ['Insumos', 'Total'], [_proveedores, total], colores_uno, colores_dos, true)
-
-    graficoDonaDos(document.getElementById("circulo_total_seguridad_social"), ['Seg. Social', 'Total'], [_seguridad_social, total], colores_uno, colores_dos, true)
-    graficoDonaDos(document.getElementById("circulo_total_impuestos"), ['Impuestos', 'Total'], [_impuestos, total], colores_uno, colores_dos, true)
-    graficoDonaDos(document.getElementById("circulo_total_mantenimiento"), ['Mantenimiento', 'Total'], [_mantenimientos, total], colores_uno, colores_dos, true)
-    graficoDonaDos(document.getElementById("circulo_total_publicidad"), ['Publicidad', 'Total'], [_publicidad, total], colores_uno, colores_dos, true)
-    graficoDonaDos(document.getElementById("circulo_total_prestamos"), ['Préstamos', 'Total'], [_pago_prestamos, total], colores_uno, colores_dos, true)
-    graficoDonaDos(document.getElementById("circulo_total_otros"), ['Otros', 'Total'], [_otros, total], colores_uno, colores_dos, true)
-};
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
+document.querySelectorAll(".concep_").forEach((event)=>{
+    event.addEventListener("click", async ()=>{
+        if(event.value !== "total_pagos"){
+            gastos_grafico_sucursales = await cargarDatos(`gastos_suma_mes_concepto?`+
+                                                            `concepto=${event.value}&`+
+                                                            `year_actual=${anio_principal}`)
+            graficoBarras(gastos_grafico_sucursales)
+        }else{
+            gastos_grafico_sucursales = await cargarDatos(`gastos_suma_mes_sucursal?`+
+                                                            `year_actual=${anio_principal}`)
+            graficoBarras(gastos_grafico_sucursales)
+        }
+    
+    })
 
+})

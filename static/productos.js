@@ -6,7 +6,7 @@ let sucursales_comparacion = ""
 
 function inicioProductos(){
     inicioTablasProductos()
-    btnProductos = 1;
+    array_btn_pages[10] = 1;
     sucursales_comparacion = JSON.parse(localStorage.getItem("sucursal_consulta"))
 
     sucursales_comparacion.forEach((event, i)=>{
@@ -118,7 +118,7 @@ async function accionRemove(id) {
     contenedor_tab.children[0].remove();
     
     contenedorBotonesProducto(`procesarRemove(${prod_.idProd})`, "Eliminar producto")
-    document.getElementById("acciones_rapidas").classList.add("modal_show")
+    document.getElementById("acciones_rapidas").classList.add("modal-show")
 };
 
 async function procesarRemove(idProd){
@@ -220,7 +220,7 @@ function accion_recompras(id){
         coincidencia ? tabla_body_productos(prod_, i, coincidencia.id_sucursales) : ";"
     });
     contenedorBotonesProducto(`procesarRecompra()`, "Procesar recompra")
-    document.getElementById("acciones_rapidas").classList.add("modal_show")
+    document.getElementById("acciones_rapidas").classList.add("modal-show")
 };
 function op_recompras(e){
     let row_ = e.closest("tr");
@@ -232,7 +232,7 @@ function op_recompras(e){
 function removerContenido(){
     let contenido = document.getElementById("form_accion_rapida")
     contenido.remove();
-    document.getElementById("acciones_rapidas").classList.remove("modal_show")
+    document.getElementById("acciones_rapidas").classList.remove("modal-show")
 };
 
 
@@ -330,7 +330,7 @@ function accion_transferencias(id){
     contenedorBotonesProducto("procesarTransferencia()", "Procesar transferencia")
     document.querySelector(".suc_tran").checked = true;
     sucursalOrigen();
-    document.getElementById("acciones_rapidas").classList.add("modal_show");
+    document.getElementById("acciones_rapidas").classList.add("modal-show");
 };
 
 function op_transferencias(e){// Opera las cantidades a transferir con respecto a las existencias

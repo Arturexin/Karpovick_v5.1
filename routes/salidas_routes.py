@@ -462,7 +462,7 @@ def getCategoriasSucursalSalidas():
                 'suma_veces': int(fila[7])
                 }
             resultado.append(contenido)
-        return jsonify(resultado)
+        return jsonify({"status": "success", "datos": resultado})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -512,7 +512,7 @@ def getCodigoSucursalSalidas():
                 'suma_veces': int(fila[8])
                 }
             resultado.append(contenido)
-        return jsonify(resultado)
+        return jsonify({"status": "success", "datos": resultado})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

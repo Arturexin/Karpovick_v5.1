@@ -3,7 +3,7 @@ let anio_principal = ""
 function inicioModificacion(){
     anio_principal = new Date().getFullYear()
     cargarDatosAnio()
-    btnModificacion = 1;
+    array_btn_pages[5] = 1;
     /* mostrarFormRegistro() */
 
     document.getElementById("categoria_buscador_detalle").innerHTML = llenarCategoriaProductosEjecucion();
@@ -34,8 +34,8 @@ function mostrarFormRegistro(){
     document.getElementById("categoria-form").innerHTML = llenarCategoriaProductosEjecucion();
     document.getElementById("proveedor-form").innerHTML = baseProv();
 
-    document.getElementById("registra-modificacion").classList.add("marcaBoton")
-    document.getElementById("editar-modificacion").classList.remove("marcaBoton")
+    document.getElementById("registra-modificacion").classList.add("marcaBotonDos")
+    document.getElementById("editar-modificacion").classList.remove("marcaBotonDos")
     document.getElementById("codigo-form").focus();
     document.querySelector(".baja_opacidad_interior").classList.add("alta_opacidad_interior")
 
@@ -114,7 +114,7 @@ function agregarAtablaModal(){
         let array_cod_db = [];
         let array_cod_a_s = [];
         ///////////////////////////////////////////////////////////////////////////////
-        document.querySelector(".contenedor-pre-modificacion").classList.add("modal-show-modificacion");//Mostrmos el modal
+        document.querySelector(".contenedor-pre-recompra").classList.add("modal-show");//Mostrmos el modal
         let arrayCreacionCategoriaTallas = categoriaProductosCreacion(document.getElementById("categoria-form"));//Evaluamos la categoría
         ///////////////////////////////////////////////////////////////////////////////
         crearHeadRegistro();
@@ -219,7 +219,7 @@ function filaBodyProformaPincipal(){
 function mandarATablaPrincipalRegistro(){
     filaBodyProformaPincipal();
     
-    document.querySelector(".contenedor-pre-modificacion").classList.remove("modal-show-modificacion")
+    document.querySelector(".contenedor-pre-recompra").classList.remove("modal-show")
     document.querySelector("#tabla_modal > thead > tr:nth-child(2)").remove()
     
     document.getElementById("formulario-compras-uno").reset();
@@ -292,8 +292,8 @@ botonEditarProducto.addEventListener("click", () =>{
     document.getElementById("button_contenedor").innerHTML = formButton("Agregar a pre lista", "agregarATablaPreModificacion()", "reseteoFormulario()")
     document.getElementById("categoria-form").innerHTML = llenarCategoriaProductosEjecucion();
 
-    document.getElementById("registra-modificacion").classList.remove("marcaBoton")
-    document.getElementById("editar-modificacion").classList.add("marcaBoton")
+    document.getElementById("registra-modificacion").classList.remove("marcaBotonDos")
+    document.getElementById("editar-modificacion").classList.add("marcaBotonDos")
     document.getElementById("buscador-productos-form").focus();
     document.querySelector(".baja_opacidad_interior").classList.add("alta_opacidad_interior") 
  
@@ -404,7 +404,7 @@ async function agregarATablaPreModificacion(){
     };
     rellenarCategoria();
     rellenarProveedor();
-    contenedorBotonesModal("mandarATablaPrincipalModificacion()", "Enviar a la lista")
+    contenedorBotonesModal("mandarATablaPrincipalModificacion()", "Enviar a la lista");
     if(array_id_a_s.length > 0){
         let cabecera =  `<ul>Los códigos: `
             for(let event of array_id_a_s){
@@ -419,7 +419,7 @@ async function agregarATablaPreModificacion(){
             event.style.background = "var(--boton-tres)"
         }
     });
-    document.querySelector(".contenedor-pre-modificacion").classList.add("modal-show-modificacion");
+    document.querySelector(".contenedor-pre-recompra").classList.add("modal-show");
     await buscarPorCodidoModificacionOrigen();
     arrayCreacionCategoriaTallas = [];
 };
@@ -574,7 +574,7 @@ function filaBodyProformaPincipalDos(){
 function mandarATablaPrincipalModificacion(){
     filaBodyProformaPincipalDos();
 
-    document.querySelector(".contenedor-pre-modificacion").classList.remove("modal-show-modificacion")
+    document.querySelector(".contenedor-pre-recompra").classList.remove("modal-show")
     document.querySelector("#tabla_modal > thead > tr:nth-child(2)").remove()
 
     document.getElementById("formulario-compras-uno").reset();
@@ -632,7 +632,7 @@ async function funcionGeneralModificacion(){
 
 const removerTablaModificacionDos = document.getElementById("remover-tabla-modificacion-dos");
 removerTablaModificacionDos.addEventListener("click", () =>{
-    document.querySelector(".contenedor-pre-modificacion").classList.remove("modal-show-modificacion");
+    document.querySelector(".contenedor-pre-recompra").classList.remove("modal-show");
     document.querySelector("#tabla_principal > tbody").remove();
     document.querySelector("#tabla_principal").createTBody();
     if(clave_form == 0){
@@ -681,7 +681,7 @@ function removerModal(){
         removerListaModalId()
         document.getElementById("buscador-productos-form").focus();
     };
-    document.querySelector(".contenedor-pre-modificacion").classList.remove("modal-show-modificacion")
+    document.querySelector(".contenedor-pre-recompra").classList.remove("modal-show")
     document.querySelector("#tabla_modal > thead > tr:nth-child(2)").remove()
     document.querySelector("#tabla_modal > tbody").remove();
     document.querySelector("#tabla_modal").createTBody();

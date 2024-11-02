@@ -3,9 +3,9 @@
 {% block content %}
 <div class="ventas-form baja_opacidad">
     <div class="contenedor_botones_ventas botones-compras">
-        <button id="apertura-caja" class="myButtonAgregarDos btn_venta_uno">Apertura de Caja</button>
-        <button id="entradas-caja" class="myButtonAgregarDos marcaBoton btn_venta_uno">Entradas de Caja</button>
-        <button id="salidas-caja" class="myButtonAgregarDos btn_venta_uno">Salidas de Caja</button>
+        <button id="apertura-caja" class="btn_t btn_venta_uno">Apertura de Caja</button>
+        <button id="entradas-caja" class="btn_t marcaBotonDos btn_venta_uno">Entradas de Caja</button>
+        <button id="salidas-caja" class="btn_t btn_venta_uno">Salidas de Caja</button>
     </div>
     <div class="ventas_interior">
         <div class="contenedor_botones_ventas uno_cliente">
@@ -280,7 +280,7 @@
                         </div>
                     </div>
                     <div style="display: flex;">
-                        <select style="width: 240px;" id="categoria_buscador_detalle" class="input-general-importante">
+                        <select style="width: 240px;" id="categoria_buscador_detalle" class="select_input">
                         </select>
                         <div class="tooltip_ayuda">
                             <span class="material-symbols-outlined">help</span>
@@ -313,6 +313,7 @@
         {% endwith %}
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 <script src="../static/ventas.js"></script>
 <script src="../static/form.js"></script>
 {% endblock %}

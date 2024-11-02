@@ -16,9 +16,9 @@
                 </tr>
                 <tr>
                     <th scope="row" colspan="15">
-                        <button id="buscarFiltrosProductos">Buscar</button>
-                        <button id="restablecerProductos">Restablecer</button>
-                        <button id="extraccion_">CSV</button>
+                        <button id="buscarFiltrosProductos" class="myButtonEditar">Buscar</button>
+                        <button id="restablecerProductos" class="eliminarTablaFila">Restablecer</button>
+                        <button id="extraccion_" class="myButtonEditar">CSV</button>
                     </th>
                 </tr>
                 <tr>
@@ -45,12 +45,12 @@
             <tfoot>
                 <tr>
                     <th scope="row" colspan="16">
-                        <button id="_inicio_"><<<</button>
-                        <button id="retroceder"><<  </button>  
+                        <button id="_inicio_" class="eliminarTablaFila"><<<</button>
+                        <button id="retroceder" class="eliminarTablaFila"><<  </button>  
                         <select id="numeracionTabla" style="width: 50px; text-align: center;">
                         </select>
-                        <button id="avanzar">  >></button>
-                        <button id="_final_">>>></button>
+                        <button id="avanzar" class="eliminarTablaFila">  >></button>
+                        <button id="_final_" class="eliminarTablaFila">>>></button>
                     </th>
                 </tr>
             </tfoot>
@@ -93,7 +93,7 @@
         
     </div>
 
-    <div id="acciones_rapidas" class="contenedor_pre">
+    <div id="acciones_rapidas" class="contenedor-pre-recompra">
     </div>
     <details>
         <summary>Acciones</summary>
@@ -110,6 +110,15 @@
     </details>
     
 </div>
+
+<link rel="stylesheet" href="../static/inventario.css">
+
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" 
+        integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA==" 
+        crossorigin="anonymous" 
+        referrerpolicy="no-referrer">
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 

@@ -8,7 +8,7 @@ function inicioPerdidas(){
     document.getElementById("categoria-form").innerHTML = llenarCategoriaProductosEjecucion();
     buscarProducto(document.getElementById('buscador-productos-form'))
     cargarDatosAnio()
-    btnPerdidas = 1;
+    array_btn_pages[4] = 1;
 
     document.getElementById("categoria_buscador_detalle").innerHTML = llenarCategoriaProductosEjecucion();
 };
@@ -19,7 +19,6 @@ const in_existencias = ["in_ac", "in_su", "in_sd", "in_st", "in_sc"];
 const barras_perdidas = [".cg_1_c", ".cg_2_c", ".cg_3_c", ".cg_4_c", ".cg_5_c"]
 function cargarDatosAnio(){
     document.getElementById("cargar_datos_anio").addEventListener("click", async ()=>{
-        reinicioBarraGrafico(barras_perdidas);
         anio_principal = anio_referencia.value;
 
         modal_proceso_abrir(`Datos del año ${anio_principal} cargados.`, "")

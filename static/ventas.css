@@ -1,7 +1,4 @@
-.ventas-form{
-    display: grid;
-    gap: 20px;
-}
+
 .ventas_interior{
     display: grid;
     grid-template-areas: "a  d"
@@ -97,16 +94,7 @@
     background-color: rgb(137, 240, 69);
     color: #141E30;
 }
-.input-select-ventas {
-    width: 260px;
-    border: 2px solid var(--border-principal);
-    padding: 3px;
-    background-color: var(--fondo-primero);
-    color: var(--color-principal);
-    font-size: 20px;
-    text-align: center;
-    cursor: pointer;
-}
+
 .label-metodo-pago {
     display: flex;
     margin: 3px 0px;

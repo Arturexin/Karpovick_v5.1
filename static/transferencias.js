@@ -8,7 +8,7 @@ function inicioTransferencias(){
     document.getElementById("categoria-form").innerHTML = llenarCategoriaProductosEjecucion();
     buscarProducto(document.getElementById('buscador-productos-form'))
     cargarDatosAnio()
-    btnTransferencias = 1;
+    array_btn_pages[3] = 1;
 
     busquedaStock()
     document.getElementById("categoria_buscador_detalle").innerHTML = llenarCategoriaProductosEjecucion();
@@ -54,7 +54,7 @@ function crearHeadTransferencias(){
     let fila = `
                 <tr class="tbody_preproforma">
                     <th style="width: 120px;">Sucursal de origen
-                        <select id="sun_opc" onChange="accionSelectUno()"></select>
+                        <select id="sun_opc" onChange="accionSelectUno()" class="select_input"></select>
                     </th>
                     <th style="width: 120px;">Categoría</th>
                     <th style="width: 120px;">Código</th>
@@ -63,7 +63,7 @@ function crearHeadTransferencias(){
                     <th style="width: 70px;">Saldo en origen</th>
                     <th style="width: 70px;">Unidades a transferir</th>
                     <th style="width: 70px;">Sucursal de destino
-                        <select id="sun_opc_dos" onChange="accionSelectDos()"></select>
+                        <select id="sun_opc_dos" onChange="accionSelectDos()" class="select_input"></select>
                     </th>
                     <th style="width: 70px;">Existencias en destino</th>
                     <th style="width: 70px;">Saldo en destino</th>
@@ -219,7 +219,7 @@ async function agregarAtablaModal(){
                 event.style.background = "var(--boton-tres)"
             }
         });
-        document.querySelector(".contenedor-pre-transferencia").classList.add("modal-show-transferencia")
+        document.querySelector(".contenedor-pre-recompra").classList.add("modal-show")
         await buscarCodigo();
 
         arrayCreacionCategoriaTallas = [];
@@ -328,7 +328,7 @@ function agregarAtablaTransferenciasPrincipal(){
     filaBodyTransferenciasProformaPincipal()
 
     if(document.querySelector("#tabla_modal > tbody").children.length == 0){
-        document.querySelector(".contenedor-pre-transferencia").classList.remove("modal-show-transferencia")
+        document.querySelector(".contenedor-pre-recompra").classList.remove("modal-show")
         document.querySelector("#tabla_modal > thead > tr:nth-child(2)").remove()
     }
 
@@ -415,7 +415,7 @@ async function realizarTransferencia(){
 ////BOTONES PARA ELIMINAR CONTENIDO DE TABLAS////////////////////////////////////////////////////////////////////////
 function removerModal(){
     removerListaModal()
-    document.querySelector(".contenedor-pre-transferencia").classList.remove("modal-show-transferencia")
+    document.querySelector(".contenedor-pre-recompra").classList.remove("modal-show")
     document.querySelector("#tabla_modal > thead > tr:nth-child(2)").remove()
     document.querySelector("#tabla_modal > tbody").remove();
     document.querySelector("#tabla_modal").createTBody();

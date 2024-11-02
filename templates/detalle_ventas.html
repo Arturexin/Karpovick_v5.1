@@ -19,7 +19,6 @@
             </div>  
             <div class="grafico_compras">
                 <section id="contenedor_detalle_ventas">
-                    <!-- <canvas id="ventas_mensuales" class="gradico_detalle_ventas"></canvas> -->
                 </section>
             </div>
         </div>
@@ -28,7 +27,6 @@
                 <h4 style="font-size: 20px;">Operaciones acumuladas por sucursal</h4>
             </div>
             <div id="contenedor_detalle_sucursales">
-                <!-- <canvas id="detalle_sucursales" class="gradico_anual"></canvas> -->
             </div>
             <div style="display: flex; gap: 11px; align-content: center;">
                 
@@ -40,7 +38,7 @@
             </div>
         </div>
     </div>
-    <div id="acciones_creditos" class="contenedor-pre-credito">
+    <div id="acciones_creditos" class="contenedor-pre-recompra">
     </div>
     <div class="contenedor_tabla_salidas">
         <table id="tabla-detalle-ventas"  class="tabla-proforma">
@@ -51,9 +49,9 @@
                 <tr>
                     <th scope="row" colspan="15">
                         <div>
-                            <button id="buscarFiltrosVentas">Buscar</button>
-                            <button id="restablecerVentas">Restablecer</button>
-                            <button id="reportesCreditos">Créditos activos</button>
+                            <button id="buscarFiltrosVentas" class="myButtonEditar">Buscar</button>
+                            <button id="restablecerVentas" class="eliminarTablaFila">Restablecer</button>
+                            <button id="reportesCreditos" class="myButtonEditar">Créditos activos</button>
                         </div>
                         <div>Fecha Inicio
                             <input id="filtro-tabla-detalleVentas-fecha-inicio" type="date" class="input-filtro" placeholder="Fecha Inicio">
@@ -102,12 +100,12 @@
             <tfoot>
                 <tr>
                     <th scope="row" colspan="16">
-                        <button id="_inicio_"><<<</button>
-                        <button id="retrocederVentas"><<  </button>
+                        <button id="_inicio_" class="eliminarTablaFila"><<<</button>
+                        <button id="retrocederVentas" class="eliminarTablaFila"><<  </button>
                         <select id="numeracionTablaVentas" style="width: 50px; text-align: center;">
                         </select>  
-                        <button id="avanzarVentas">  >></button>
-                        <button id="_final_">>>></button>
+                        <button id="avanzarVentas" class="eliminarTablaFila">  >></button>
+                        <button id="_final_" class="eliminarTablaFila">>>></button>
                     </th>
                 </tr>
             </tfoot>
@@ -123,6 +121,8 @@
         </div>
     </details>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 

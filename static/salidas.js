@@ -4,7 +4,7 @@
 document.addEventListener("DOMContentLoaded", inicioSalidas)
 function inicioSalidas(){
     inicioTablasSalidas()
-    btnSalidasP = 1;
+    array_btn_pages[12] = 1;
 };
 
 const url_array_conteo = ["salidas_conteo", "transferencias_conteo_s"]
@@ -128,7 +128,7 @@ async function accionRemove(id) {
     contenedor_tab.children[0].remove();
     
     contenedorBotonesProducto(`procesarRemove(${salidas.idSal})`, "Eliminar salida")
-    document.getElementById("acciones_rapidas_salidas").classList.add("modal_show")
+    document.getElementById("acciones_rapidas_salidas").classList.add("modal-show")
 };
 
 async function procesarRemove(idSal){
@@ -169,7 +169,7 @@ function accionDevoluciones(id) {
             }
         });
         contenedorBotonesProducto(`procesarDevolucion()`, "Procesar Devolución")
-        document.getElementById("acciones_rapidas_salidas").classList.add("modal_show")
+        document.getElementById("acciones_rapidas_salidas").classList.add("modal-show")
     }else{
         modal_proceso_abrir("No es una venta.", "")
         modal_proceso_salir_botones()
@@ -263,7 +263,7 @@ function contenedorBotonesProducto(funcion, titulo){
 function removerContenido(){
     let contenido = document.getElementById("form_accion_rapida")
     contenido.remove();
-    document.getElementById("acciones_rapidas_salidas").classList.remove("modal_show")
+    document.getElementById("acciones_rapidas_salidas").classList.remove("modal-show")
 };
 function op_dev(e){
     let row_ = e.closest("tr");
@@ -340,7 +340,7 @@ async function realizarDevolucion(){
         modal_proceso_salir_botones()
         removerContenido()
     };
-    document.getElementById("acciones_rapidas_salidas").classList.remove("modal_show")
+    document.getElementById("acciones_rapidas_salidas").classList.remove("modal-show")
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////

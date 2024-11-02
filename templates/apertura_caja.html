@@ -3,9 +3,9 @@
 {% block content %}
 <div class="ventas-form baja_opacidad">
     <div class="contenedor_botones_ventas botones-compras">
-        <button id="apertura-caja" class="myButtonAgregarDos marcaBoton">Apertura de Caja</button>
-        <button id="entradas-caja" class="myButtonAgregarDos">Entradas de Caja</button>
-        <button id="salidas-caja" class="myButtonAgregarDos">Salidas de Caja</button>
+        <button id="apertura-caja" class="btn_t marcaBotonDos">Apertura de Caja</button>
+        <button id="entradas-caja" class="btn_t">Entradas de Caja</button>
+        <button id="salidas-caja" class="btn_t">Salidas de Caja</button>
     </div>
     <div class="contenedor_apertura_caja">
         <div class="contenedor_apertura_caja_interno">
@@ -93,8 +93,8 @@
                 <tr>
                     <th scope="row" colspan="15">
                         <div>
-                            <button id="buscarFiltrosCaja">Buscar</button>
-                            <button id="restablecerCaja">Restablecer</button>
+                            <button id="buscarFiltrosCaja" class="myButtonEditar">Buscar</button>
+                            <button id="restablecerCaja" class="eliminarTablaFila">Restablecer</button>
                         </div>
                         <div>Fecha Inicio
                             <input id="filtro-tabla-caja-fecha-inicio" type="date" class="input-filtro">
@@ -127,12 +127,12 @@
             <tfoot>
                 <tr>
                     <th scope="row" colspan="16">
-                        <button id="_inicio_"><<<</button>
-                        <button id="retrocederCaja"><<  </button>  
+                        <button id="_inicio_" class="eliminarTablaFila"><<<</button>
+                        <button id="retrocederCaja" class="eliminarTablaFila"><<  </button>  
                         <select id="numeracionTablaCaja" style="width: 50px; text-align: center;">
                         </select>
-                        <button id="avanzarCaja">  >></button>
-                        <button id="_final_">>>></button>
+                        <button id="avanzarCaja" class="eliminarTablaFila">  >></button>
+                        <button id="_final_" class="eliminarTablaFila">>>></button>
                     </th>
                 </tr>
             </tfoot>

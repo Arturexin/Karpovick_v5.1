@@ -4,31 +4,20 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link rel="stylesheet" href="../static/index.css">
     <link rel="stylesheet" href="../static/button.css">
     <link rel="stylesheet" href="../static/ventas.css">
-    <link rel="stylesheet" href="../static/inventario.css">
+    <!-- <link rel="stylesheet" href="../static/inventario.css"> -->
     <link rel="stylesheet" href="../static/administracion.css">
     <link rel="stylesheet" href="../static/movimientos.css">
-    <link rel="stylesheet" href="../static/mantenimiento.css">
     <link rel="stylesheet" href="../static/general.css">
-    <link rel="stylesheet" href="../static/filtros.css">
-    <link rel="stylesheet" href="../static/home.css">
-    
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" 
-            integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA==" 
-            crossorigin="anonymous" 
-            referrerpolicy="no-referrer">
-    </script>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fasthand&family=Montserrat:wght@500&family=Nunito&family=Roboto&family=Ubuntu&display=swap" rel="stylesheet">
+    <!-- <link rel="stylesheet" href="../static/home.css"> -->
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
     <link rel="icon" href="../static/images/Karpovick_logo_dos.png" type="image/x-icon">
+    
     <title>Karpovick</title>
     
 </head>
@@ -54,7 +43,6 @@
                     <p>Ventas</p>
                 </a>
             </li>
-            <!-- <hr style="border: 1px solid var(--fondo-marca-uno);"> -->
             <li>
                 <a id="button-compras" class="sub-lista" href="{{ url_for('compras')}}">
                     <div class="tooltip_index">
@@ -74,7 +62,7 @@
                 </a>
             </li>
             <li>
-                <a id="button-perdidas" class="sub-lista" href="{{ url_for('perdidas')}}">
+                <a id="button-perdidas" class="sub-lista" href="{{ url_for('despacho')}}">
                     <div class="tooltip_index">
                         <span class="material-symbols-outlined" style="color: var(--side_uno);">money_off</span>
                         <span class="tooltiptext_index">Despacho</span>
@@ -109,8 +97,6 @@
                     <p>Detalle de ventas</p>
                 </a>
             </li>
-            <!-- <hr style="border: 1px solid var(--fondo-marca-uno);"> -->
-            
             <li>
                 <a id="button-devolucion-compras" class="sub-lista" href="{{ url_for('devolucion_compras')}}">
                     <div class="tooltip_index">
@@ -129,8 +115,6 @@
                     <p>Análisis</p>
                 </a>
             </li>
-            
-            <!-- <hr style="border: 1px solid var(--fondo-marca-uno);"> -->
             <li>
                 <a id="button-productos" class="sub-lista" href="{{ url_for('productos')}}">
                     <div class="tooltip_index">
@@ -167,7 +151,6 @@
                     <p>Clientes</p>
                 </a>
             </li>
-            <!-- <hr style="border: 1px solid var(--fondo-marca-uno);"> -->
             <li>
                 <a id="button-configuracion" class="sub-lista" href="{{ url_for('configuracion')}}">
                     <div class="tooltip_index">
@@ -231,6 +214,7 @@
     </div>
     
     <script src="../static/index.js"></script>
-    <script src="../static/componentes_creados.js"></script>
+    <script src="../static/sidebar.js"></script>
+    <script src="../static/modal_mensaje.js"></script>
 </body>
 </html>

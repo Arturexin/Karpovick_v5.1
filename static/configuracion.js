@@ -4,7 +4,7 @@ function inicioConfiguracion(){
     searchDatosUsuario();
     searchSucursales();
     searchUsuarios()
-    btnConfiguracion = 1;
+    array_btn_pages[14] = 1;
     inicioTablaCategorias()
 };
 ////////////////////////////////////////////////////////////////////

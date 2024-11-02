@@ -22,7 +22,7 @@
                 <div style="display: grid;grid-template-columns: 1fr 1fr;align-items: center;">
 
                     <input type="text" id="buscador_descripcion" placeholder="Buscar por palabras clave..." class="input_busqueda_dos">
-                    <select id="categoria_buscador_detalle" class="">
+                    <select id="categoria_buscador_detalle" class="select_input">
                     </select>
                 </div>
                 <div style="display: grid;grid-template-columns: 1fr 1fr 1fr;align-items: center;">
@@ -52,10 +52,7 @@
             </tbody>
             <tfoot>
                 <th scope="row" colspan="18" id="contenedor_botones_modal"></th>
-                <!-- <th scope="row" colspan="15">
-                    <button id="procesar-pre-despacho" class="myButtonAgregar">Enviar a tabla despacho</button>
-                    <button id="remover-tabla-despacho-uno" class="eliminarTablaFila">Cancelar</button>
-                </th> -->
+
             </tfoot>
         </table>
     </div>
@@ -110,7 +107,7 @@
         </table>
     </div>
 </div>
-<script src="../static/perdidas.js"></script>
+<script src="../static/despacho.js"></script>
 <script src="../static/form.js"></script>
 <script src="../static/buscador.js"></script>
 {% endblock %}

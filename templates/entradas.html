@@ -3,7 +3,7 @@
 {% block content %}
 <div class="entradas-form baja_opacidad">
     
-    <div id="acciones_rapidas_entradas" class="contenedor_pre">
+    <div id="acciones_rapidas_entradas" class="contenedor-pre-recompra">
     </div>
     <div class="contenedor_tabla_salidas">
         <table id="tabla-entradas" class="tabla-proforma">
@@ -21,9 +21,9 @@
                 <tr>
                     <th scope="row" colspan="15">
                         <div>
-                            <button id="buscarFiltrosEntradas">Buscar</button>
-                            <button id="restablecerEntradas">Restablecer</button>
-                            <button id="extraccion_">CSV</button>
+                            <button id="buscarFiltrosEntradas" class="myButtonEditar">Buscar</button>
+                            <button id="restablecerEntradas" class="eliminarTablaFila">Restablecer</button>
+                            <button id="extraccion_" class="myButtonEditar">CSV</button>
                         </div>
                         <div>Fecha Inicio
                             <input id="filtro-tabla-entradas-fecha-inicio" type="date" class="input-filtro" placeholder="Fecha Inicio">
@@ -69,12 +69,12 @@
             <tfoot>
                 <tr>
                     <th scope="row" colspan="16">
-                        <button id="_inicio_"><<<</button>
-                        <button id="retrocederEntradas"><<</button>
+                        <button id="_inicio_" class="eliminarTablaFila"><<<</button>
+                        <button id="retrocederEntradas" class="eliminarTablaFila"><<</button>
                         <select id="numeracionTablaEntradas" style="width: 50px; text-align: center;">
                         </select>  
-                        <button id="avanzarEntradas">>></button>
-                        <button id="_final_">>>></button>
+                        <button id="avanzarEntradas" class="eliminarTablaFila">>></button>
+                        <button id="_final_" class="eliminarTablaFila">>>></button>
                     </th>
                 </tr>
             </tfoot>

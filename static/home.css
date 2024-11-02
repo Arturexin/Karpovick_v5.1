@@ -1,9 +1,4 @@
-.Home{
-    display: grid;
-    grid-template-columns: 1fr;
-    justify-items: center;
-    gap: 20px;
-}
+
 .pestana_cabecera_home{
     display: grid;
     width: 1100px;
@@ -26,7 +21,7 @@
     justify-content: space-evenly;
     align-items: center;
     width: 100%;
-    background: var(--fondo-marca-uno);
+    background: var(--fondo-primero);
     padding: 10px 0;
     color: var(--color-secundario);
 }
@@ -40,13 +35,9 @@
     height: 10px;
 }
 
-.grafico_interno{
-    padding: 20px 0px 30px 20px;
-    text-align: center;
-}
+
 .grafico_interno_dos{
     display: grid;
-    /* justify-items: center; */
     width: 100%;
 }
 .etiqueta_sucursal{
@@ -56,14 +47,6 @@
 }
 
 /* /////////////////////////////////////////////////////// */
-.contenedor_circulo_sucursal{
-    width: 300px;
-    height: 300px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 10px;
-}
 .contenedor_circulo_sucursal_multi{
     display: flex;
     justify-content: center;
@@ -77,18 +60,4 @@
     justify-content: space-around;
 }
 
-.modelo_circulo_sucursal{
-    width: 100px;
-    /* height: 130px; */
-}
 
-.tabla_mapa_calor{
-    width: 1100px;
-    
-    background: linear-gradient(45deg, var(--fondo-primero), var(--fondo-quinto));
-    padding: 10px;
-}
-
-.tabla_mapa_calor tbody tr:hover {
-    background-color: var(--fondo-cuarto);
-}

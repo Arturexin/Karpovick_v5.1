@@ -6,14 +6,13 @@ function inicioClientes(){
     inicioTablasClientes()
     cargarDatosAnio()
     graficoClientes();
-    btnClientes = 1;
+    array_btn_pages[13] = 1;
 };
 const barras_compras = [".cg_1_c", ".cg_2_c", ".cg_3_c", ".cg_4_c", ".cg_5_c"]
 /////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
 function cargarDatosAnio(){
     document.getElementById("cargar_datos_anio").addEventListener("click", async ()=>{
-        reinicioBarraGrafico(barras_compras);
         anio_principal = anio_referencia.value;
 
         graficoClientes();

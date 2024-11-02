@@ -81,7 +81,6 @@
         <div style="padding: 20px 0;">
             <div class="titulo_graficos"><p>Total Clientes y Proveedores</p></div>  
             <div id="contenedor_clientes_proveedores">
-                <!-- <canvas id="clientes_preveedores" class="gradico_anual"></canvas> -->
             </div>
         </div>
     </div>
@@ -100,9 +99,9 @@
                 <tr>
                     <th scope="row" colspan="15">
                         <div>
-                            <button id="buscarFiltrosClientes">Buscar</button>
-                            <button id="restablecerClientes">Restablecer</button>
-                            <button id="reporteClientes">Reporte de ventas</button>
+                            <button id="buscarFiltrosClientes" class="myButtonEditar">Buscar</button>
+                            <button id="restablecerClientes" class="eliminarTablaFila">Restablecer</button>
+                            <button id="reporteClientes" class="myButtonEditar">Reporte de ventas</button>
                         </div>
                         <div>Fecha Inicio
                             <input id="filtro-tabla-clientes-fecha-inicio" type="date" class="input-filtro" placeholder="Fecha Inicio">
@@ -127,12 +126,12 @@
             <tfoot>
                 <tr>
                     <th scope="row" colspan="16">
-                        <button id="_inicio_"><<<</button>
-                        <button id="retrocederClientes"><<  </button>
+                        <button id="_inicio_" class="eliminarTablaFila"><<<</button>
+                        <button id="retrocederClientes" class="eliminarTablaFila"><<  </button>
                         <select id="numeracionTablaClientes" style="width: 50px; text-align: center;">
                         </select>
-                        <button id="avanzarClientes">  >></button>
-                        <button id="_final_">>>></button>
+                        <button id="avanzarClientes" class="eliminarTablaFila">  >></button>
+                        <button id="_final_" class="eliminarTablaFila">>>></button>
                     </th>
                 </tr>
             </tfoot>

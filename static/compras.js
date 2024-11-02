@@ -3,7 +3,7 @@ let anio_principal = ""
 async function inicioCompras(){
     anio_principal = new Date().getFullYear()
     cargarDatosAnio()
-    btnCompras = 1;
+    array_btn_pages[2] = 1;
 
     agregarMoneda(document.querySelectorAll(".moneda_compras"));
     busquedaStock()
@@ -34,8 +34,8 @@ function mostrarFormNuevoProducto(){
     document.getElementById("categoria-form").innerHTML = llenarCategoriaProductosEjecucion();
     document.getElementById("proveedor-form").innerHTML = baseProv();
 
-    document.getElementById("nuevo-producto").classList.add("marcaBoton")
-    document.getElementById("recompra-producto-plus").classList.remove("marcaBoton")
+    document.getElementById("nuevo-producto").classList.add("marcaBotonDos")
+    document.getElementById("recompra-producto-plus").classList.remove("marcaBotonDos")
     document.getElementById("codigo-form").focus();
     document.querySelector(".baja_opacidad_interior").classList.add("alta_opacidad_interior")
     document.getElementById("procesar-compras-plus").classList.add("invisible")
@@ -59,7 +59,7 @@ function crearHeadCompra(){
     let fila = `
                 <tr class="tbody_preproforma">
                     <th style="width: 120px;">Sucursal
-                        <select id="sun_opc" onChange="accionSelect()"></select>
+                        <select id="sun_opc" onChange="accionSelect()" class="select_input"></select>
                     </th>
                     <th style="width: 120px;">Categoría</th>
                     <th style="width: 120px;">Código</th>
@@ -370,8 +370,8 @@ function mostrarFormrecompraProductoPlus(){
     document.getElementById("button_contenedor").innerHTML = formButton("Agregar a pre lista", "agregarATablaPreRecompras()", "reseteoFormulario()")
     document.getElementById("categoria-form").innerHTML = llenarCategoriaProductosEjecucion();
 
-    document.getElementById("nuevo-producto").classList.remove("marcaBoton")
-    document.getElementById("recompra-producto-plus").classList.add("marcaBoton")
+    document.getElementById("nuevo-producto").classList.remove("marcaBotonDos")
+    document.getElementById("recompra-producto-plus").classList.add("marcaBotonDos")
     document.getElementById("buscador-productos-form").focus();
     document.querySelector(".baja_opacidad_interior").classList.add("alta_opacidad_interior")
     document.getElementById("procesar-compras-plus").classList.remove("invisible")
@@ -408,7 +408,7 @@ function crearHeadRecompra(){
     let fila = `
                 <tr class="tbody_preproforma">
                     <th style="width: 120px;">Sucursal
-                        <select id="sun_opc" onChange="accionSelectDos()"></select>
+                        <select id="sun_opc" onChange="accionSelectDos()" class="select_input"></select>
                     </th>
                     <th style="width: 120px;">Categoría</th>
                     <th style="width: 120px;">Código</th>
@@ -511,6 +511,9 @@ async function agregarATablaPreRecompras(){
 
         arrayCreacionCategoriaTallas = [];
         document.querySelector("#tabla_modal > tbody > tr > td:nth-child(8) > input").focus();
+    }else if(document.getElementById("id-form").value < 1){
+        modal_proceso_abrir("Seleccione un código a recomprar.", "")
+        modal_proceso_salir_botones()
     };
 };
 function op_cantidad_dos(e){

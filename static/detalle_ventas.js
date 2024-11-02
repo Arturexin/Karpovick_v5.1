@@ -6,7 +6,7 @@ function inicioDetalleVentas(){
     cargarDatosAnio()
     inicioTablasDetalleVentas()
     cargarDatosEmpresa()
-    btnDetalleVentas = 1;
+    array_btn_pages[7] = 1;
 };
 let metodo_pago_detalle = ["Efectivo", "Tarjeta", "Crédito", "Devoluciones"];
 const barras_detalle = [".cg_1_c", ".cg_2_c", ".cg_3_c", ".cg_4_c", ".cg_5_c"]
@@ -26,7 +26,6 @@ async function cargarDatosEmpresa(){
 }
 function cargarDatosAnio(){
     document.getElementById("cargar_datos_anio").addEventListener("click", async ()=>{
-        reinicioBarraGrafico(barras_detalle);
         anio_principal = anio_referencia.value;
 
         det_ve_gr = await cargarDatos(`ventas_grafico?`+
@@ -434,7 +433,7 @@ async function buscarCredito(tipo_comprobante, nombre, id_det_ventas, devolucion
     
     if(credito_.length > 0){
         tabla_creditos(nombre, devolucion_)
-        document.getElementById("acciones_creditos").classList.add("modal-show-credito")
+        document.getElementById("acciones_creditos").classList.add("modal-show")
         removerAccionRapida()
         let _input_efectivo = document.querySelector("#accion_efectivo")
         let _input_tarjeta = document.querySelector("#accion_tarjeta")
@@ -453,7 +452,7 @@ async function buscarCredito(tipo_comprobante, nombre, id_det_ventas, devolucion
             Number(_input_pendiente.textContent) >= 0){
                 try{
                     modal_proceso_abrir(`Procesando el pago de ${tipo_comprobante}!!!.`, "")
-                    await procesarPagoCredito(credito_, tipo_comprobante, id_det_ventas)
+                    await procesarPagoCredito(credito_, tipo_comprobante, id_det_ventas, devolucion_)
                 }catch (error){
                     modal_proceso_abrir("Ocurrió un error. " + error, "")
                     console.error("Ocurrió un error. ", error)
@@ -599,10 +598,10 @@ function removerAccionRapida(){
     remover.addEventListener("click", (e)=>{
         e.preventDefault();
         document.getElementById("form_accion_rapida").remove()
-        document.getElementById("acciones_creditos").classList.remove("modal-show-credito")
+        document.getElementById("acciones_creditos").classList.remove("modal-show")
     });
 };
-async function procesarPagoCredito(array_cre, tipo_comprobante, id_det_ventas){
+async function procesarPagoCredito(array_cre, tipo_comprobante, id_det_ventas, devolucion_){
     if(array_cre.length > 0 && array_cre[array_cre.length - 1].saldo_total > 0){
         let efectivo = Number(document.getElementById("accion_efectivo").value)
         let tarjeta = Number(document.getElementById("accion_tarjeta").value)
@@ -621,7 +620,7 @@ async function procesarPagoCredito(array_cre, tipo_comprobante, id_det_ventas){
             this.saldo_interes = parseFloat((array_cre[array_cre.length - 1].saldo_interes - ((efectivo + tarjeta) - (efectivo + tarjeta)/tasa)).toFixed(2));
             this.saldo_total = parseFloat(((array_cre[array_cre.length - 1].saldo_monto - (efectivo + tarjeta)/tasa) + 
                                 (array_cre[array_cre.length - 1].saldo_interes - ((efectivo + tarjeta) - (efectivo + tarjeta)/tasa))-
-                                perdida).toFixed(2));
+                                perdida - devolucion_).toFixed(2));
             this.saldo_perdida = parseFloat((perdida).toFixed(2));
             this.fecha_cre = generarFecha();
             this.situacion = this.saldo_perdida > 0 ? "pérdida" : this.saldo_total > 0 ? "pendiente" : "liquidado";
@@ -640,7 +639,7 @@ async function procesarPagoCredito(array_cre, tipo_comprobante, id_det_ventas){
             modal_proceso_abrir(`${responde_credito.message}`, "")
             modal_proceso_salir_botones()
             document.getElementById("form_accion_rapida").remove()
-            document.getElementById("acciones_creditos").classList.remove("modal-show-credito")
+            document.getElementById("acciones_creditos").classList.remove("modal-show")
         }
     }else if(array_cre.length <= 0){
         modal_proceso_abrir(`El comprobante ${tipo_comprobante} no presenta crédito alguno para cancelar.`, "")
@@ -666,7 +665,7 @@ async function revertirUltimoPago(array_cre){
             modal_proceso_abrir(`${response.message}.`)
             modal_proceso_salir_botones()
             document.getElementById("form_accion_rapida").remove()
-            document.getElementById("acciones_creditos").classList.remove("modal-show-credito")
+            document.getElementById("acciones_creditos").classList.remove("modal-show")
         };
     };
 }

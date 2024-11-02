@@ -4,7 +4,7 @@ function inicioHome(){
     anio_principal = new Date().getFullYear()
     cargarFuncionesGraficos()
     cargarDatosAnio()
-    btnHome = 1;
+    array_btn_pages[0] = 1;
 };
 let ventasMensuales = [];
 let ventasMensualesSucursales = [];
@@ -47,7 +47,7 @@ async function cargarDatosAnio(){
 function leyendaSucursal(){
     let leyenda = document.querySelectorAll(".color_leyenda_sucursales");
     leyenda.forEach((event, i)=>{
-        event.style.background = `${colorFondoBarra[i]}`
+        event.style.background = `${cls[i]}`
     })
     let etiquetas_uno = document.querySelectorAll(".etiqueta_sucursal");
     etiquetas_uno.forEach((event, i)=>{

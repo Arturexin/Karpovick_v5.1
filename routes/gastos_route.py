@@ -9,6 +9,7 @@ gastos_conteo = Blueprint('gastos_conteo', __name__)
 gastos_tabla = Blueprint('gastos_tabla', __name__)
 gastos_pago_mercancias = Blueprint('gastos_pago_mercancias', __name__)
 gastos_suma_mes = Blueprint('gastos_suma_mes', __name__)
+gastos_concepto_mes = Blueprint('gastos_concepto_mes', __name__)
 gastos_suma_mes_suc = Blueprint('gastos_suma_mes_suc', __name__)
 gastos_post = Blueprint('gastos_post', __name__)
 gastos_delete = Blueprint('gastos_delete', __name__)
@@ -194,6 +195,50 @@ def getSumaGastosPorMes():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@gastos_concepto_mes.route('/api/gastos_suma_mes_concepto') # Salidas de caja, HOME
+@cross_origin()
+@login_required   
+def getConceptoMes():
+    try:
+        usuarioLlave = session.get('usernameDos')
+        year_actual = request.args.get('year_actual')
+        concepto = request.args.get('concepto')
+
+        with mysql.connection.cursor() as cur:
+            query = (
+                "SELECT MONTH(fecha_gastos) AS mes, "
+                "SUM(CASE WHEN sucursal_nombre = 'Almacén Central' AND concepto LIKE %s THEN (monto + caja_bancos) ELSE 0 END) AS ac, "
+                "SUM(CASE WHEN sucursal_nombre = 'Sucursal Uno' AND concepto LIKE %s THEN (monto + caja_bancos) ELSE 0 END) AS su, "
+                "SUM(CASE WHEN sucursal_nombre = 'Sucursal Dos' AND concepto LIKE %s THEN (monto + caja_bancos) ELSE 0 END) AS sd, "
+                "SUM(CASE WHEN sucursal_nombre = 'Sucursal Tres' AND concepto LIKE %s THEN (monto + caja_bancos) ELSE 0 END) AS st, "
+                "SUM(CASE WHEN sucursal_nombre = 'Sucursal Cuatro' AND concepto LIKE %s THEN (monto + caja_bancos) ELSE 0 END) AS sc "
+                "FROM gastos_varios "
+                "JOIN sucursales ON gastos_varios.sucursal_gastos = sucursales.id_sucursales "
+                "WHERE identificador_gastos = %s "
+                "AND gastos_varios.estado > 0 "
+                "AND YEAR(fecha_gastos) = %s "
+                "GROUP BY mes"
+            )
+            data_params = (concepto, concepto, concepto, concepto, concepto, usuarioLlave, year_actual)
+            cur.execute(query, data_params)
+            data = cur.fetchall()
+
+        resultado = []
+        for fila in data:
+            contenido = { 
+                'mes': fila[0],
+                'ac': fila[1],
+                'su': fila[2],
+                'sd': fila[3],
+                'st': fila[4],
+                'sc': fila[5],
+            }
+            resultado.append(contenido)
+
+        return jsonify(resultado)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @gastos_suma_mes_suc.route('/api/gastos_suma_mes_sucursal')#Salidas de caja
 @cross_origin()
 @login_required
@@ -207,7 +252,8 @@ def getSumaGastosPorMesSucursal():
                      "SUM(CASE WHEN sucursal_nombre = 'Almacén Central' THEN (monto + caja_bancos) ELSE 0 END) AS ac, "
                      "SUM(CASE WHEN sucursal_nombre = 'Sucursal Uno' THEN (monto + caja_bancos) ELSE 0 END) AS su, "
                      "SUM(CASE WHEN sucursal_nombre = 'Sucursal Dos' THEN (monto + caja_bancos) ELSE 0 END) AS sd, "
-                     "SUM(CASE WHEN sucursal_nombre = 'Sucursal Tres' THEN (monto + caja_bancos) ELSE 0 END) AS st "
+                     "SUM(CASE WHEN sucursal_nombre = 'Sucursal Tres' THEN (monto + caja_bancos) ELSE 0 END) AS st, "
+                     "SUM(CASE WHEN sucursal_nombre = 'Sucursal Cuatro' THEN (monto + caja_bancos) ELSE 0 END) AS sc "
                      "FROM gastos_varios "
                      "JOIN sucursales ON `gastos_varios`.`sucursal_gastos` = `sucursales`.`id_sucursales` "
                      "WHERE `identificador_gastos` = %s "
@@ -225,7 +271,8 @@ def getSumaGastosPorMesSucursal():
                 'ac': fila[1],
                 'su': fila[2],
                 'sd': fila[3],
-                'st': fila[4]
+                'st': fila[4],
+                'sc': fila[5],
                 }
             resultado.append(contenido)
         return jsonify(resultado)

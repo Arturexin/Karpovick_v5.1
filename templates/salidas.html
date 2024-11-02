@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="salidas-form baja_opacidad">
-    <div id="acciones_rapidas_salidas" class="contenedor_pre">
+    <div id="acciones_rapidas_salidas" class="contenedor-pre-recompra">
     </div>
     <div class="contenedor_tabla_salidas">
         <table id="tabla-salidas" class="tabla-proforma"">
@@ -18,9 +18,9 @@
                 <tr>
                     <th scope="row" colspan="15">
                         <div>
-                            <button id="buscarFiltrosSalidas">Buscar</button>
-                            <button id="restablecerSalidas">Restablecer</button>
-                            <button id="extraccion_">CSV</button>
+                            <button id="buscarFiltrosSalidas" class="myButtonEditar">Buscar</button>
+                            <button id="restablecerSalidas" class="eliminarTablaFila">Restablecer</button>
+                            <button id="extraccion_" class="myButtonEditar">CSV</button>
                         </div>
                         <div>Fecha Inicio
                             <input id="filtro-tabla-salidas-fecha-inicio" type="date" class="input-filtro" placeholder="Fecha Inicio">
@@ -28,8 +28,8 @@
                             <input id="filtro-tabla-salidas-fecha-fin" type="date" class="input-filtro" placeholder="Fecha Fin">
                         </div>
                         <div>
-                            <button id="reporte_ventas">Reporte de Ventas</button>
-                            <button id="reporte_usuarios">Reporte de Usuarios</button>                            
+                            <button id="reporte_ventas" class="myButtonEditar">Reporte de Ventas</button>
+                            <button id="reporte_usuarios" class="myButtonEditar">Reporte de Usuarios</button>                            
                         </div>
                     </th>
                 </tr>
@@ -66,12 +66,12 @@
             <tfoot>
                 <tr>
                     <th scope="row" colspan="16">
-                        <button id="_inicio_"><<<</button>
-                        <button id="retrocederSalidas"><<  </button>
+                        <button id="_inicio_" class="eliminarTablaFila"><<<</button>
+                        <button id="retrocederSalidas" class="eliminarTablaFila"><<  </button>
                         <select id="numeracionTablaSalidas" style="width: 50px; text-align: center;">
                         </select>  
-                        <button id="avanzarSalidas">  >></button>
-                        <button id="_final_">>>></button>
+                        <button id="avanzarSalidas" class="eliminarTablaFila">  >></button>
+                        <button id="_final_" class="eliminarTablaFila">>>></button>
                     </th>
                 </tr>
             </tfoot>

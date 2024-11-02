@@ -4,7 +4,7 @@
 }
 
 .body_web{
-    background: linear-gradient(135deg, var(--fondo-tercero), var(--fondo-cuarto));
+    background: linear-gradient(90deg, var(--fondo-tercero), var(--fondo-cuarto));
     font-family: 'Open Sans', sans-serif;  /* ///// */
 
     font-size: 15px;
@@ -82,7 +82,7 @@ main{
     
 }
 .cambioColor{
-    background-color: var(--fondo-marca-uno);
+    background-color: var(--fondo-segundo);
     color: var(--color-secundario);
 }
 .principal {
@@ -164,7 +164,7 @@ select:focus{ outline: none;}
     align-content: center;
     position: fixed;
     width: 100%;
-    
+    justify-items: center;
 }
 
 .usuario_cliente{
@@ -191,14 +191,11 @@ select:focus{ outline: none;}
     background: var(--fondo-tercero);
     align-items: center;
     justify-content: space-evenly;
+    min-width: 100px;
 }
 .color_fondo{
-    /* margin: 3px; */
     width: 15px;
     height: 15px;
-    background: white;
-    border: none;
-    border-radius: 50%;
     cursor: pointer;
 }
 .color_fondo:active {
@@ -210,4 +207,81 @@ select:focus{ outline: none;}
     align-items: center;
     justify-content: center;
     height: 50px;
+}
+/* ####################################################### */
+.Home{
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 20px;
+}
+.ventas-form{
+    display: grid;
+    gap: 20px;
+}
+.compras-form{
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 20px;
+}
+.transferencias-form{
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 20px;
+}
+.modificacion-form{
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 20px;
+}
+.detalleVentas-form{
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 20px;
+}
+.devolucionCompras-form{
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 20px;
+}
+.devolucionSalidas-form{
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 20px;
+}
+.perdidas-form{
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 20px;
+}
+.clientes-form {
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 20px;
+}
+.salidas-form{
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 20px;
+}
+.entradas-form{
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 20px;
+}
+.productos-form{
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 20px;
 }

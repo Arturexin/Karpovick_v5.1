@@ -12,7 +12,7 @@ import routes.productos_routes as productos_
 import routes.entradas_routes as entradas_
 import routes.salidas_routes as salidas_
 import routes.transferencias_routes as transferencias_
-import routes.perdidas_routes as perdidas_
+import routes.despacho_routes as despacho_
 import routes.creditos_routes as credito_
 import routes.categorias_route as categorias_
 import routes.numeracion_routes as numeracion_
@@ -119,10 +119,10 @@ app.register_blueprint(transferencias_.productos_transferencias_p)
 ##########################################################################################################################################################################
 # Datos de la tabla PERDIDAS
 ##########################################################################################################################################################################
-app.register_blueprint(perdidas_.perdidas_conteo)
-app.register_blueprint(perdidas_.perdidas_tabla)
-app.register_blueprint(perdidas_.perdidas_kardex_id)
-app.register_blueprint(perdidas_.perdidas_perdida_post)
+app.register_blueprint(despacho_.perdidas_conteo)
+app.register_blueprint(despacho_.perdidas_tabla)
+app.register_blueprint(despacho_.perdidas_kardex_id)
+app.register_blueprint(despacho_.perdidas_perdida_post)
 ##########################################################################################################################################################################
 # Datos de la tabla CREDITOS
 ##########################################################################################################################################################################
@@ -179,6 +179,7 @@ app.register_blueprint(gastos_.gastos_conteo)
 app.register_blueprint(gastos_.gastos_tabla)
 app.register_blueprint(gastos_.gastos_pago_mercancias)
 app.register_blueprint(gastos_.gastos_suma_mes)
+app.register_blueprint(gastos_.gastos_concepto_mes)
 app.register_blueprint(gastos_.gastos_suma_mes_suc)
 app.register_blueprint(gastos_.gastos_post)
 app.register_blueprint(gastos_.gastos_delete)
@@ -340,14 +341,14 @@ def analisis():
     if puesto not in (201, 202):
         return render_template('index.html')
     return render_template('analisis.html')
-@app.route('/perdidas')
+@app.route('/despacho')
 @cross_origin()
 @login_required
-def perdidas():
+def despacho():
     puesto = session.get('puesto')
     if puesto not in (201, 202):
         return render_template('index.html')
-    return render_template('perdidas.html')
+    return render_template('despacho.html')
 @app.route('/productos')
 @cross_origin()
 @login_required

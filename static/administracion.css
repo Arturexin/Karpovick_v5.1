@@ -1,9 +1,4 @@
-.clientes-form {
-    display: grid;
-    grid-template-columns: 1fr;
-    justify-items: center;
-    gap: 20px;
-}
+
 .boton-cli {
     text-align: center;
     width: 400px;

@@ -7,6 +7,8 @@ function init(){
     cargarIndices();
     cambiarAnio();
     agregarMoneda(document.querySelectorAll(".moneda_cabecera"))
+
+    menuVertical()
 };
 const URL_API_almacen_central = 'http://127.0.0.1:3000/api/'
 
@@ -16,15 +18,16 @@ function generarFecha(){
     return fechaPrincipal;
 };
 let clave_form = 0;
-let colorFondoBarra = ["#E6CA7B","#91E69C","#6380E6","#E66E8D","#4D4D4D"];
 let sucursales_activas = ['existencias_ac', 'existencias_su', 'existencias_sd', 'existencias_st', 'existencias_sc'];
 let suc_add = ["Almacén Central", "Sucursal Uno", "Sucursal Dos", "Sucursal Tres", "Sucursal Cuatro"];
-let mapa_calor = ["#91ff85","#C6F556","#F5CF6F","#DE8B59","#FF666D"];
-let obtenerAnio = new Date().getFullYear() % 100
-const arregloMeses = [`01-${obtenerAnio}`, `02-${obtenerAnio}` ,`03-${obtenerAnio}` ,`04-${obtenerAnio}` ,`05-${obtenerAnio}` ,`06-${obtenerAnio}`, 
-                    `07-${obtenerAnio}`, `08-${obtenerAnio}`, `09-${obtenerAnio}`, `10-${obtenerAnio}`, `11-${obtenerAnio}` ,`12-${obtenerAnio}`];
-const mes_anio = [`Ene-${obtenerAnio}`, `Feb-${obtenerAnio}` ,`Mar-${obtenerAnio}` ,`Abr-${obtenerAnio}` ,`May-${obtenerAnio}` ,`Jun-${obtenerAnio}`, 
-                    `Jul-${obtenerAnio}`, `Ago-${obtenerAnio}`, `Set-${obtenerAnio}`, `Oct-${obtenerAnio}`, `Nov-${obtenerAnio}` ,`Dic-${obtenerAnio}`];
+let mapa_calor = [
+    'rgba(145, 255, 133, 0.6)', // #91ff85
+    'rgba(198, 245, 86, 0.6)',  // #C6F556
+    'rgba(245, 207, 111, 0.6)', // #F5CF6F
+    'rgba(222, 139, 89, 0.6)',  // #DE8B59
+    'rgba(255, 102, 109, 0.6)'  // #FF666D
+];
+
 const meses_letras = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Set","Oct","Nov","Dic",]
 const monedas = { 
                     "Balboa": "B/.",
@@ -57,6 +60,11 @@ function agregarMoneda(elemento){
 
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
+let mes_anio = arrayFechaMes(new Date().getFullYear() % 100)
+function arrayFechaMes(obtenerAnio){
+    return [`Ene-${obtenerAnio}`, `Feb-${obtenerAnio}` ,`Mar-${obtenerAnio}` ,`Abr-${obtenerAnio}` ,`May-${obtenerAnio}` ,`Jun-${obtenerAnio}`, 
+            `Jul-${obtenerAnio}`, `Ago-${obtenerAnio}`, `Set-${obtenerAnio}`, `Oct-${obtenerAnio}`, `Nov-${obtenerAnio}` ,`Dic-${obtenerAnio}`];
+}
 function cambiarAnio(){
     let anio_referencia = document.getElementById("anio_referencia")
     anio_referencia.value = new Date().getFullYear()
@@ -66,12 +74,14 @@ function cambiarAnio(){
         if(anio_referencia.value < new Date().getFullYear()){
             suma += 1;
             anio_referencia.value = new Date().getFullYear() + suma
+            mes_anio = arrayFechaMes((anio_referencia.value).slice(-2))
         }
     })
     document.getElementById("resta_anio").addEventListener("click", ()=>{
         if(anio_referencia.value > 0){
             suma -= 1;
             anio_referencia.value = new Date().getFullYear() + suma
+            mes_anio = arrayFechaMes((anio_referencia.value).slice(-2))
         }
     })
 }
@@ -222,7 +232,6 @@ function cargarSucursalesEjecucion(elemento_id){// SE LLAMA AL CARGAR LA PAGINA 
     elemento_id.innerHTML = html_sucursal
 };
 function llenarCategoriaProductosEjecucion(){
-    
     let html_cat = `<option value="0" selected>-- Seleccione una categoría --</option>`;
     for(categoria of cat_db) {
         let fila = `<option value="${categoria.id}">${categoria.categoria_nombre}</option>`
@@ -252,93 +261,7 @@ function categoriaProductosCreacion(categoria){
     };
     return array;
 };
-
-///////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////
-const colores_sidebar = [
-    "rgb(144, 238, 144)",
-    "rgb(222, 184, 135)",
-    "rgb(135, 206, 250)",
-    "rgb(186, 85, 211)",
-    "rgb(211, 211, 211)",
-]
-let btnHome, btnVentas, btnCompras, btnTransferencias, btnKardex, btnDetalleVentas, 
-    btnModificacion, btnDevolucionCompras, btnAnalisis, btnPerdidas, btnProductos,
-    btnEntradasP, btnSalidasP, btnClientes, btnConfiguracion;
-
-function sidebarMarcadito(){
-    if(btnHome == 1){
-        document.getElementById("button-home").style.background = `linear-gradient(135deg, var(--fondo-primero) 20%, var(--side_cero) 80%)`
-        document.getElementById("sidebar").style.borderRight = ` 1px solid var(--side_cero)`
-        document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
-    }else if(btnVentas == 1){
-        document.getElementById("button-ventas").style.background = `linear-gradient(135deg, var(--fondo-primero) 20%, var(--side_cero) 80%)`
-        document.getElementById("sidebar").style.borderRight = ` 1px solid var(--side_cero)`
-        document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
-    }else if(btnCompras == 1){
-        document.getElementById("button-compras").style.background = `linear-gradient(135deg, var(--fondo-primero) 20%, var(--side_uno) 80%)`;
-        document.getElementById("sidebar").style.borderRight = ` 1px solid var(--side_uno)`
-        document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
-    }else if(btnTransferencias == 1){
-        document.getElementById("button-transferencias").style.background = `linear-gradient(135deg, var(--fondo-primero) 20%, var(--side_uno) 80%)`
-        document.getElementById("sidebar").style.borderRight = ` 1px solid var(--side_uno)`
-        document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
-        document.getElementById("buscador-productos-form").focus();
-    }else if(btnPerdidas == 1){
-        document.getElementById("button-perdidas").style.background = `linear-gradient(135deg, var(--fondo-primero) 20%, var(--side_uno) 80%)`
-        document.getElementById("sidebar").style.borderRight = ` 1px solid var(--side_uno)`
-        document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
-        document.getElementById("buscador-productos-form").focus();
-    }else if(btnModificacion == 1){
-        document.getElementById("button-modificacion").style.background = `linear-gradient(135deg, var(--fondo-primero) 20%, var(--side_uno) 80%)`
-        document.getElementById("sidebar").style.borderRight = ` 1px solid var(--side_uno)`
-        document.querySelector(".baja_opacidad").classList.add("alta_opacidad");
-    }else if(btnKardex == 1){
-        document.getElementById("button-kardex").style.background = `linear-gradient(135deg, var(--fondo-primero) 20%, var(--side_dos) 80%)`
-        
-        document.getElementById("sidebar").style.borderRight = ` 1px solid var(--side_dos)`
-        document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
-        document.getElementById("buscador-productos-form").focus();
-    }else if(btnDetalleVentas == 1){
-        document.getElementById("button-detalle-ventas").style.background = `linear-gradient(135deg, var(--fondo-primero) 20%, var(--side_dos) 80%)`
-        document.getElementById("sidebar").style.borderRight = ` 1px solid var(--side_dos)`
-        document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
-    }else if(btnDevolucionCompras == 1){
-        document.getElementById("button-devolucion-compras").style.background = `linear-gradient(135deg, var(--fondo-primero) 20%, var(--side_dos) 80%)`
-        document.getElementById("sidebar").style.borderRight = ` 1px solid var(--side_dos)`
-        document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
-        document.getElementById("buscador_operacion").focus();
-    }else if(btnAnalisis == 1){
-        document.getElementById("button-devolucion-salidas").style.background = `linear-gradient(135deg, var(--fondo-primero) 20%, var(--side_dos) 80%)`
-        document.getElementById("sidebar").style.borderRight = ` 1px solid var(--side_dos)`
-        document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
-    }else if(btnProductos == 1){
-        document.getElementById("button-productos").style.background = `linear-gradient(135deg, var(--fondo-primero) 20%, var(--side_tres) 80%)`
-        document.getElementById("sidebar").style.borderRight = ` 1px solid var(--side_tres)`
-        document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
-    }else if(btnEntradasP == 1){
-        document.getElementById("button-entradas").style.background = `linear-gradient(135deg, var(--fondo-primero) 20%, var(--side_tres) 80%)`
-        document.getElementById("sidebar").style.borderRight = ` 1px solid var(--side_tres)`
-        document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
-    }else if(btnSalidasP == 1){
-        document.getElementById("button-salidas").style.background = `linear-gradient(135deg, var(--fondo-primero) 20%, var(--side_tres) 80%)`
-        document.getElementById("sidebar").style.borderRight = ` 1px solid var(--side_tres)`
-        document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
-    }else if(btnClientes == 1){
-        document.getElementById("button-clientes").style.background = `linear-gradient(135deg, var(--fondo-primero) 20%, var(--side_tres) 80%)`
-        document.getElementById("sidebar").style.borderRight = ` 1px solid var(--side_tres)`
-        document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
-        document.getElementById("nombre").focus();
-    }else if(btnConfiguracion == 1){
-        document.getElementById("button-configuracion").style.background = `linear-gradient(135deg, var(--fondo-primero) 20%, var(--side_cuatro) 80%)`
-        document.getElementById("sidebar").style.borderRight = ` 1px solid var(--side_cuatro)`
-        document.querySelector(".baja_opacidad").classList.add("alta_opacidad")
-    };
-};
-
-///////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
 const cerrarSesion = document.getElementById("cerrar-sesion");
 cerrarSesion.addEventListener("click", async () => {
     localStorage.clear();
@@ -354,175 +277,6 @@ cerrarSesion.addEventListener("click", async () => {
         location.reload();
     };
 });
-/////////////////////////////////////////////////////////////////////////////////////////////
-function menuVertical(){
-    document.getElementById("boton_despliegue").addEventListener("click", ()=>{
-        document.querySelector(".menu-vertical").classList.toggle("menu_vertical_dos")
-        document.querySelector(".body_web").classList.toggle("body_web_dos")
-        document.getElementById("boton_despliegue").classList.toggle("cambioColor")
-        if(document.querySelector("#sidebar").clientWidth === 220){
-            reduccionTexto()
-        }else if(window.innerWidth > 1280){
-            expancionTexto()
-        }
-    });
-};
-menuVertical()
-window.addEventListener('resize', function() {
-    if (window.innerWidth > 1280 && document.querySelector("#sidebar").clientWidth > 50) {
-        expancionTexto()
-    }else{
-        reduccionTexto()
-    }
-});
-
-function inicioMenu(){
-    if(document.querySelector("#sidebar").clientWidth == 50){
-        reduccionTexto()
-    }else{
-        expancionTexto()
-    }
-}
-inicioMenu()
-
-function reduccionTexto(){
-    document.querySelectorAll(".sub-lista").forEach((event)=>{
-        event.children[1].classList.add("invisible")
-    })
-}    
-function expancionTexto(){
-    document.querySelectorAll(".sub-lista").forEach((event)=>{
-        event.children[1].classList.remove("invisible")
-    })
-}    
-
-//////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////
-const colores_fondo_web = {
-    fondo_principal : ["#121212", "#d8a7eb", "#FFD700", "#FBF5EE"],
-    fondo_secundario : ["#2F2F2F", "#B2A7EB", "#232323", "#44b6db"],
-    fondo_terciario : ["#31383f", "#efe7ee", "#F4EAF6", "#FFFFFF"],
-    fondo_cuaternario : ["#5b6774", "#B78DC7", "#B39800", "#FFFFFF"],
-
-    fondo_quinto : ["#383838", "#b388eb", "#FF8C00", "#D3C4B5"],
-
-    fuente_principal : ["#eee", "#1c101a", "#232323", "#000"],
-    fuente_secundario : ["#eee", "#1c101a", "#eee", "#eee"],
-    marca_uno : ["#B3675A", "#A7EBCC", "#232323", "#44b6db"],
-    border_principal : ["#B3675A", "#EBD5A7", "#232323", "#50C3CC"],
-    fondo_input : ["#31383f", "#efe7ee", "#FFE44D", "#FFFFFF"],
-
-    boton_uno : ["#5ca1cc", "#A7E3EB", "#3e3e97", "#50C3CC"],
-    boton_dos : ["#B3675A", "#EBC4A7", "#5d5c5c", "#dd836e"],
-
-    boton_tres : ["#6abb6b", "#D7EBA7", "#232323", "#44db95"],
-    /* boton_uno : ["#4b9ec3", "#A7E3EB", "#3e3e97", "#50C3CC"],
-    boton_dos : ["#B3675A", "#EBC4A7", "#5d5c5c", "#dd836e"],
-
-    boton_tres : ["#77E578", "#D7EBA7", "#232323", "#44db95"], */
-};
-
-function cambioColorFondo() {
-    document.querySelectorAll(".color_fondo").forEach((event, i) => {
-        event.style.background = colores_fondo_web.fondo_principal[i];
-        event.addEventListener("click", () => {
-            document.documentElement.style.setProperty('--fondo-primero', colores_fondo_web.fondo_principal[i]);
-            document.documentElement.style.setProperty('--fondo-segundo', colores_fondo_web.fondo_secundario[i]);
-            document.documentElement.style.setProperty('--fondo-tercero', colores_fondo_web.fondo_terciario[i]);
-            document.documentElement.style.setProperty('--fondo-cuarto', colores_fondo_web.fondo_cuaternario[i]);
-            document.documentElement.style.setProperty('--fondo-quinto', colores_fondo_web.fondo_quinto[i]);
-            document.documentElement.style.setProperty('--color-principal', colores_fondo_web.fuente_principal[i]);
-            document.documentElement.style.setProperty('--color-secundario', colores_fondo_web.fuente_secundario[i]);
-            document.documentElement.style.setProperty('--fondo-marca-uno', colores_fondo_web.marca_uno[i]);
-            document.documentElement.style.setProperty('--border-principal', colores_fondo_web.border_principal[i]);
-            document.documentElement.style.setProperty('--fondo-input', colores_fondo_web.fondo_input[i]);
-            document.documentElement.style.setProperty('--boton-uno', colores_fondo_web.boton_uno[i]);
-            document.documentElement.style.setProperty('--boton-dos', colores_fondo_web.boton_dos[i]);
-            document.documentElement.style.setProperty('--boton-tres', colores_fondo_web.boton_tres[i]);
-            localStorage.setItem("clave_control_color", i)
-        });
-    });
-};
-function inicioColoresFondo(){
-    for(let i = 0; i < 4; i++){
-        if(localStorage.getItem("clave_control_color") === `${i}`){
-            document.documentElement.style.setProperty('--fondo-primero', colores_fondo_web.fondo_principal[i]);
-            document.documentElement.style.setProperty('--fondo-segundo', colores_fondo_web.fondo_secundario[i]);
-            document.documentElement.style.setProperty('--fondo-tercero', colores_fondo_web.fondo_terciario[i]);
-            document.documentElement.style.setProperty('--fondo-cuarto', colores_fondo_web.fondo_cuaternario[i]);
-            document.documentElement.style.setProperty('--fondo-quinto', colores_fondo_web.fondo_quinto[i]);
-            document.documentElement.style.setProperty('--color-principal', colores_fondo_web.fuente_principal[i]);
-            document.documentElement.style.setProperty('--color-secundario', colores_fondo_web.fuente_secundario[i]);
-            document.documentElement.style.setProperty('--fondo-marca-uno', colores_fondo_web.marca_uno[i]);
-            document.documentElement.style.setProperty('--border-principal', colores_fondo_web.border_principal[i]);
-            document.documentElement.style.setProperty('--fondo-input', colores_fondo_web.fondo_input[i]);
-            document.documentElement.style.setProperty('--boton-uno', colores_fondo_web.boton_uno[i]);
-            document.documentElement.style.setProperty('--boton-dos', colores_fondo_web.boton_dos[i]);
-            document.documentElement.style.setProperty('--boton-tres', colores_fondo_web.boton_tres[i]);
-        }
-    }
-};
-//////////////////////////////////////////////////////////////////////////////////////////////
-//////MODALES ////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////
-function modal_proceso_abrir(mensaje, estado, mensaje_dos){
-    aperturarMensajesModal()
-    document.getElementById('myModal').style.display = 'block';
-    document.getElementById('mensaje_proceso').textContent = mensaje
-    document.getElementById('estado_proceso').textContent = estado
-    document.getElementById('mensaje_dos').innerHTML = mensaje_dos
-}
-function modal_proceso_abrir_botones(){
-    document.querySelector('.botones_respuesta').style.display = 'block';
-    document.getElementById("no_salir").focus()
-}
-function modal_proceso_abrir_botones_salir(){
-    document.querySelector('.botones_respuesta_dos').style.display = 'block';
-    document.getElementById("si_salir").focus()
-}
-function modal_proceso_cerrar(){
-    document.getElementById('myModal').style.display = 'none';
-    cerrarMensajesModal()
-}
-function modal_proceso_cerrar_botones(){
-    document.querySelector('.botones_respuesta').style.display = 'none';
-    cerrarMensajesModal()
-}
-function modal_proceso_salir_botones(){
-    modal_proceso_abrir_botones_salir()
-    document.getElementById("si_salir").addEventListener("click", () =>{
-        document.querySelector('.botones_respuesta_dos').style.display = 'none';
-        modal_proceso_cerrar()
-    })
-}
-function modal_proceso_salir_botones_focus(id){
-    modal_proceso_abrir_botones_salir()
-    document.getElementById("si_salir").addEventListener("click", () =>{
-        document.querySelector('.botones_respuesta_dos').style.display = 'none';
-        modal_proceso_cerrar()
-        document.getElementById(id).select()
-    })
-}
-//Modales
-function aperturarMensajesModal(){
-    let modal_mensaje = `<div class="modal-content">
-                            <p id="mensaje_proceso"></p>
-                            <p id="estado_proceso"></p>
-                            <p id="mensaje_dos"></p>
-                            <div class="botones_respuesta">
-                                <button id="si_comprobante" class="myButtonAgregar">Sí</button>
-                                <button id="no_salir" class="myButtonEliminar">No</button>
-                            </div>
-                            <div class="botones_respuesta_dos">
-                                <button id="si_salir" class="myButtonAgregar">Aceptar</button>
-                            </div>
-                        </div>`;
-    document.getElementById("myModal").innerHTML = modal_mensaje;
-}
-function cerrarMensajesModal(){
-    let modal_mensaje = ``;
-    document.getElementById("myModal").innerHTML = modal_mensaje;
-}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -543,7 +297,8 @@ function imprimirListaTabla() {
     ventanaImpresion.document.write('<button onclick="window.print()">Imprimir</button>');
     ventanaImpresion.document.close();
     document.querySelector("#check_comprobante").checked = false
-}
+};
+
 ////////////////////// Función para dividir productos en grupos según el primer carácter del código
 function dividirProductosDinamicamente(productos) {
     let grupos = {};
@@ -616,3 +371,7 @@ let cls_dos = [ "rgb(230, 202, 123, 0.1)",
     let index = suc_add.findIndex(el => el === nombre_sucursal)
     return cls[index]
  }
+
+ function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}

@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", inicioKardex)
 let anio_principal = ""
 function inicioKardex(){
     anio_principal = new Date().getFullYear()
-    btnKardex = 1;
+    array_btn_pages[6] = 1;
     document.getElementById("form_contenedor").innerHTML = formUpdate('Kardex')
     document.querySelector(".baja_opacidad_interior").classList.add("alta_opacidad_interior")
     document.getElementById("button_contenedor").innerHTML = formButton("Consultar", "procesarKardex()", "reseteoFormulario()")

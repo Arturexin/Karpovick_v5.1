@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", inicioAperturaCaja)
 function inicioAperturaCaja(){
     inicioTablasCaja()
-    btnVentas = 1;
+    array_btn_pages[1] = 1;
     
 };
 let fecha_hoy = new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate();
