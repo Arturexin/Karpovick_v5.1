@@ -102,16 +102,19 @@ function vaciadoInputBusqueda(){
     document.getElementById("filtro-tabla-productos-descripcion").value = ""
     document.getElementById("filtro-tabla-productos-proveedor").value = ""
 };
-function manejoDeFechas(){
-    return ""
-};
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////BOTON ACCIONES/////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //ELIMINAR PRODUCTO
 
 async function accionRemove(id) {
+    modal_proceso_abrir("Buscando resultados...", "", "")
+
     let prod_ = base_datos.array.find(y => y.idProd == id)// obtenemos los datos de la fila
+    
+    await delay(500)
+    modal_proceso_cerrar()
+
     tabla_proforma_productos(prod_, "Eliminar producto");
 
     let contenedor_tab = document.querySelector("#contenedor_tabla_producto");
@@ -211,8 +214,14 @@ function tabla_body_productos(e, i, id_suc){
     document.querySelector("#tabla_proforma_producto > tbody > tr:nth-child(1) > td:nth-child(3) > input").focus();
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function accion_recompras(id){
+async function accion_recompras(id){
+    modal_proceso_abrir("Buscando resultados...", "", "")
+    
     let prod_ = base_datos.array.find(y => y.idProd == id)// obtenemos los datos de la fila
+    
+    await delay(500)
+    modal_proceso_cerrar()
+
     tabla_proforma_productos(prod_, "Recompra");
     tabla_head_productos("Sucursal", "Existencias", "Recompra", "Saldo", "");
     suc_add.forEach((e, i)=>{
@@ -319,8 +328,14 @@ function tabla_transferencias_body(e, i, id_suc){
     document.querySelector("#tabla_proforma_producto > tbody > tr:nth-child(1) > td:nth-child(3) > input").focus();
 };
 
-function accion_transferencias(id){
+async function accion_transferencias(id){
+    modal_proceso_abrir("Buscando resultados...", "", "")
+
     let prod_ = base_datos.array.find(y => y.idProd == id)// obtenemos los datos de la fila
+
+    await delay(500)
+    modal_proceso_cerrar()
+
     tabla_proforma_productos(prod_, "Transferencia");
     tabla_head_productos("Sucursal", "Existencias", "Transferencia", "Saldo", "Orígen");
     suc_add.forEach((e, i)=>{
@@ -445,10 +460,12 @@ async function realizarTransferencia(){
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
-function editAlmacenCentral(id) {
+async function editAlmacenCentral(id) {
+    modal_proceso_abrir("Generando etiqueta.", "", "")
     let almacenCentral = base_datos.array.find(y => y.idProd == id);
     let codigo_Array = Array.from(document.querySelectorAll(".codigo-codigo-barras"));
     let busqueda_repetido = codigo_Array.find(x => x.textContent === almacenCentral.codigo)
+    await delay(500)
     if(busqueda_repetido === undefined){
         let tablaCodigoBarras = document.querySelector("#tabla-codigo-barras > tbody");
         let nueva_fila =    `<tr>
@@ -471,6 +488,7 @@ function editAlmacenCentral(id) {
                             </tr>`
                             
         tablaCodigoBarras.innerHTML += nueva_fila;
+        modal_proceso_cerrar()
         generarCodigoBarras()
         generarCodigoQr()
     }else{
@@ -588,22 +606,11 @@ function imprimirTicket(num, posicion, height, width){
     let nuevaVentana = window.open('');
     nuevaVentana.document.write(html);
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////Extraccion de datos en formato csv///////////////////////////////////////
-let datos_extraccion = [];
 
-let extraccion_ = document.getElementById("extraccion_")
-extraccion_.addEventListener("click", async ()=>{
-    datos_extraccion = await cargarDatos(   `productos_extraccion?`);
-    
-    const csvContent = arrayToCSV(datos_extraccion);
-    console.log(csvContent)
-    downloadCSV(csvContent, 'dataProductos.csv');
-});
 ////////////////////////////////////////////////////////////////////////////////////
 async function graficoStock(){
     stockSucursales = await cargarDatos(`almacen_central_stock_sucursal`);
-
+    await delay(500)
     let sucursales_monto = [ stockSucursales[0].almacen_central, 
                         stockSucursales[0].sucursal_uno, 
                         stockSucursales[0].sucursal_dos, 

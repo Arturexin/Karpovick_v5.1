@@ -240,10 +240,9 @@ def getClientes(id_cli):
 @cross_origin()
 def createClientes():
     if 'id_cli' in request.json:
-        updateCliente()
+        return updateCliente()
     else:
-        createCliente()
-    return 'ok'
+        return createCliente()
 
 def createCliente():
     dato_uno = 1

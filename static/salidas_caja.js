@@ -41,8 +41,7 @@ btnSalidas.addEventListener("click", (e) => {
 let filas_total_bd = {value: 0};
 let indice_tabla = {value : 1};
 let num_filas_tabla = {value: 0};
-let inicio = 0;
-let fin = 0;
+
 let base_datos = {array: []}
 async function inicioTablasGastos(){
     await conteoFilas(subRutaA(0), filas_total_bd, indice_tabla, 
@@ -105,21 +104,9 @@ function vaciadoInputBusqueda(){
     document.getElementById("filtro-tabla-gastosVarios-concepto").value = ""
     document.getElementById("filtro-tabla-gastosVarios-comprobante").value = ""
     document.getElementById("filtro-tabla-gastosVarios-usuario").value = ""
-    document.getElementById("filtro-tabla-gastosVarios-fecha-inicio").value = ""
-    document.getElementById("filtro-tabla-gastosVarios-fecha-fin").value = ""
+    document.getElementById("_fecha_inicio_").value = ""
+    document.getElementById("_fecha_fin_").value = ""
     document.getElementById("filtro-tabla-gastosVarios-sucursal").value = ""
-};
-function manejoDeFechas(){
-    inicio = document.getElementById("filtro-tabla-gastosVarios-fecha-inicio").value;
-    fin = document.getElementById("filtro-tabla-gastosVarios-fecha-fin").value;
-    if(inicio == "" && fin == ""){
-        inicio = '2000-01-01';
-        fin = new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate()
-    }else if(inicio == "" && fin != ""){
-        inicio = '2000-01-01';
-    }else if(inicio != "" && fin == ""){
-        fin = new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate();
-    };
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -213,15 +200,20 @@ async function graficoBarras(gastos_grafico_sucursales){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 document.querySelectorAll(".concep_").forEach((event)=>{
     event.addEventListener("click", async ()=>{
+        modal_proceso_abrir("Buscando resultados...", "", "")
         if(event.value !== "total_pagos"){
             gastos_grafico_sucursales = await cargarDatos(`gastos_suma_mes_concepto?`+
                                                             `concepto=${event.value}&`+
                                                             `year_actual=${anio_principal}`)
+                                                            await delay(500)
             graficoBarras(gastos_grafico_sucursales)
+            modal_proceso_cerrar()
         }else{
             gastos_grafico_sucursales = await cargarDatos(`gastos_suma_mes_sucursal?`+
                                                             `year_actual=${anio_principal}`)
+                                                            await delay(500)
             graficoBarras(gastos_grafico_sucursales)
+            modal_proceso_cerrar()
         }
     
     })

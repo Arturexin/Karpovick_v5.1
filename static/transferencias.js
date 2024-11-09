@@ -180,6 +180,7 @@ function clicKEliminarFila(e){
 
 async function agregarAtablaModal(){
     if(document.getElementById("id-form").value > 0){
+        modal_proceso_abrir("Buscando resultados...", "", "")
         let array_id_a_s = [];
         crearHeadTransferencias()
         cargarSucursalesEjecucion(document.getElementById("sun_opc"))
@@ -223,6 +224,8 @@ async function agregarAtablaModal(){
         await buscarCodigo();
 
         arrayCreacionCategoriaTallas = [];
+        modal_proceso_abrir("Resultados encontrados", "", "")
+        modal_proceso_cerrar()
         document.querySelector("#tabla_modal > tbody > tr:nth-child(1) > td:nth-child(8) > input").focus()
     }else if(document.getElementById("id-form").value < 1){
         modal_proceso_abrir("Seleccione un código a transferir.", "")
@@ -249,7 +252,7 @@ async function buscarCodigo(){//Busca el producto por ID
 
     let response = await cargarDatos(   `almacen_central_codigo_transferencias?`+
                                         `ids=${ids.join(",")}`);
-
+    await delay(500)
     for(id_t of id_trans){
         let row_ = id_t.closest("tr");
         let fila_res = response.find(x=> x.idProd === Number(row_.children[0].textContent))

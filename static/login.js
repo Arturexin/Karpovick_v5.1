@@ -65,9 +65,15 @@ async function initSession(){
                 password: document.getElementById("password").value
             })
         });    
-        if(response.ok){
+        if(response.redirected){
+            modal_proceso_abrir("Iniciando sesión.")
+            await delay(1000)
             location.href = response.url
-        };
+        }else{
+            modal_proceso_abrir("Usuario o contraseña no encontrados.")
+            await delay(1000)
+            location.href = response.url
+        }
         document.querySelector("#formulario-loggin").reset();
         document.getElementById("username").style.background =""
         document.getElementById("password").style.background ="" 
@@ -121,4 +127,18 @@ async function initRegister(){
     }else if(expresiones.email.test(document.getElementById("password-create").value) == false){
         document.getElementById("password-create").style.background ="#b36659"
     };
+}
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+function aperturarMensajesModal(){
+    let modal_mensaje = `<div class="modal-content">
+                            <p id="mensaje_proceso"></p>
+                        </div>`;
+    document.getElementById("myModal").innerHTML = modal_mensaje;
+}
+function modal_proceso_abrir(mensaje){
+    aperturarMensajesModal()
+    document.getElementById('myModal').style.display = 'block';
+    document.getElementById('mensaje_proceso').textContent = mensaje
 }

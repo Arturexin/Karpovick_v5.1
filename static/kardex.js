@@ -45,6 +45,7 @@ function reseteoFormulario(){
 
 async function procesarKardex(){
     if(document.querySelector("#codigo-form").value !== ""){
+        modal_proceso_abrir("Buscando resultados...", "", "")
         anio_principal = anio_referencia.value;
         removerTablas()
         kardex_entradas = await cargarDatos(`entradas_codigo_kardex/${document.getElementById("id-form").value}?`+
@@ -59,6 +60,7 @@ async function procesarKardex(){
         kardex_transferencias = await cargarDatos(`transfrencias_codigo_kardex/${document.getElementById("id-form").value}?`+
                                             `transferencias_sucursal=${document.getElementById("fffff-sucursal").value}&`+
                                             `year_actual=${anio_principal}`)
+        await delay(500)
         graficoKardex()
         
         llenadoTablaDetalle(kardex_entradas, "tabla-detalle-movimientos-entradas", "costo_unitario");
@@ -67,6 +69,9 @@ async function procesarKardex(){
         llenadoTablaDetalle(kardex_transferencias, "tabla-detalle-movimientos-transferencias", "costo_unitario");
         
         llenarKardex(kardex_entradas[0].costo_unitario);
+        
+        modal_proceso_abrir("Resultados encontrados", "", "")
+        modal_proceso_salir_botones()
     };
 }
 function llenadoTablaDetalle(array, id_tabla, nombre_propiedad_objeto_valor){
@@ -74,12 +79,17 @@ function llenadoTablaDetalle(array, id_tabla, nombre_propiedad_objeto_valor){
     let suma_monto = 0;
     let html = '';
     function comprobante(event, dato){
-        return  `<tr>`+
-                    `<td>${event.comprobante}</td>`+
-                    `<td style="text-align:center;">${dato}</td>`+
-                    `<td style="text-align:center;">${(Number(dato * event[nombre_propiedad_objeto_valor])).toFixed(2)}</td>`+
-                    `<td>${new Date(event.fecha).getDay()}-${new Date(event.fecha).getMonth()+1}-${new Date(event.fecha).getFullYear()}</td>`+
-                `</tr>`;
+        const valorCalculado = (Number(dato * event[nombre_propiedad_objeto_valor])).toFixed(2); 
+        const fecha = new Date(event.fecha); 
+        const dia = String(fecha.getDate()).padStart(2, '0'); // Asegura que el día tenga dos dígitos 
+        const mes = String(fecha.getMonth() + 1).padStart(2, '0'); // Asegura que el mes tenga dos dígitos 
+        const anio = fecha.getFullYear();
+        return `<tr>   
+                    <td>${event.comprobante}</td> 
+                    <td style="text-align:center;">${dato}</td> 
+                    <td style="text-align:center;">${valorCalculado}</td> 
+                    <td>${dia}-${mes}-${anio}</td> 
+                </tr>`;
     }
     array.forEach((event) => {
         let dato = 0;

@@ -11,7 +11,7 @@ from db_connection import mysql
 salidas_conteo = Blueprint('salidas_conteo', __name__)
 salidas_tabla = Blueprint('salidas_tabla', __name__)
 salidas_tabla_reporte = Blueprint('salidas_tabla_reporte', __name__)
-salidas_reporte_usuarios = Blueprint('salidas_reporte_usuarios', __name__)
+salidas_reporte_cliente = Blueprint('salidas_reporte_cliente', __name__)
 salidas_suma_ventas_mes = Blueprint('salidas_suma_ventas_mes', __name__)
 salidas_suma_total_sucursal_mes = Blueprint('salidas_suma_total_sucursal_mes', __name__)
 salidas_suma_ventas_dia_sucursal = Blueprint('salidas_suma_ventas_dia_sucursal', __name__)
@@ -136,14 +136,15 @@ def getAllSalidasReporte():
         fecha_fin_salidas = datetime.strptime(fecha_fin_salidas_str, '%Y-%m-%d')
         
         with mysql.connection.cursor() as cur:
-            query = ("SELECT sucursal_nombre, codigo, existencias_salidas, precio_venta_salidas, comprobante, fecha, existencias_devueltas, descripcion "
+            query = ("SELECT sucursal_nombre, codigo, existencias_salidas, precio_venta_salidas, comprobante, salidas.fecha AS fecha, existencias_devueltas, descripcion, nombres "
                         "FROM salidas "
                         "JOIN almacen_central ON `salidas`.`idProd` = `almacen_central`.`idProd` "
                         "JOIN sucursales ON `salidas`.`sucursal` = `sucursales`.`id_sucursales` "
+                        "JOIN usuarios ON `salidas`.`usuario` = `usuarios`.`id` "
                         "WHERE identificadorSal = %s "
                         "AND comprobante LIKE %s "
                         "AND salidas.estado > 0 "
-                        "AND fecha >= %s AND fecha < %s "
+                        "AND salidas.fecha >= %s AND salidas.fecha < %s "
                         "ORDER BY sucursal ASC ")
             data_params = (usuarioLlave, f"{comprobante_salidas}%", fecha_inicio_salidas, fecha_fin_salidas + timedelta(days=1))
             cur.execute(query, data_params)
@@ -159,14 +160,15 @@ def getAllSalidasReporte():
                 'comprobante': fila[4],
                 'fecha': fila[5].strftime('%d-%m-%Y'),
                 'existencias_devueltas': fila[6],
-                'descripcion': fila[7]
+                'descripcion': fila[7],
+                'nombres': fila[8]
                 }
             resultado.append(contenido)
         return jsonify(resultado)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
-@salidas_reporte_usuarios.route('/api/salidas_reporte_usuarios')#Salidas, Ventas
+@salidas_reporte_cliente.route('/api/salidas_reporte_cliente')#Clientes, Ventas
 @cross_origin()
 @login_required
 def getAllReporteUsuarios():
@@ -174,6 +176,7 @@ def getAllReporteUsuarios():
         usuarioLlave = session.get('usernameDos')
 
         comprobante_salidas = request.args.get('comprobante_salidas')
+        cliente_salidas = request.args.get('cliente_salidas')
         fecha_inicio_salidas_str = request.args.get('fecha_inicio_salidas')
         fecha_fin_salidas_str = request.args.get('fecha_fin_salidas')
         
@@ -181,16 +184,18 @@ def getAllReporteUsuarios():
         fecha_fin_salidas = datetime.strptime(fecha_fin_salidas_str, '%Y-%m-%d')
         
         with mysql.connection.cursor() as cur:
-            query = ("SELECT nombres, codigo, existencias_salidas, precio_venta_salidas, comprobante, salidas.fecha AS fecha, existencias_devueltas, descripcion "
+            query = ("SELECT nombres, codigo, existencias_salidas, precio_venta_salidas, comprobante, salidas.fecha AS fecha, existencias_devueltas, descripcion, cliente, sucursal_nombre "
                         "FROM salidas "
                         "JOIN almacen_central ON `salidas`.`idProd` = `almacen_central`.`idProd` "
+                        "JOIN sucursales ON `salidas`.`sucursal` = `sucursales`.`id_sucursales` "
                         "JOIN usuarios ON `salidas`.`usuario` = `usuarios`.`id` "
                         "WHERE identificadorSal = %s "
                         "AND comprobante LIKE %s "
+                        "AND cliente = %s "
                         "AND salidas.estado > 0 "
                         "AND salidas.fecha >= %s AND salidas.fecha < %s "
                         "ORDER BY usuario, salidas.fecha ASC ")
-            data_params = (usuarioLlave, f"{comprobante_salidas}%", fecha_inicio_salidas, fecha_fin_salidas + timedelta(days=1))
+            data_params = (usuarioLlave, f"{comprobante_salidas}%", f"{cliente_salidas}%", fecha_inicio_salidas, fecha_fin_salidas + timedelta(days=1))
             cur.execute(query, data_params)
             data = cur.fetchall()
 
@@ -204,7 +209,9 @@ def getAllReporteUsuarios():
                 'comprobante': fila[4],
                 'fecha': fila[5].strftime('%d-%m-%Y'),
                 'existencias_devueltas': fila[6],
-                'descripcion': fila[7]
+                'descripcion': fila[7],
+                'cliente': fila[8],
+                'sucursal_nombre': fila[9],
                 }
             resultado.append(contenido)
         return jsonify(resultado)

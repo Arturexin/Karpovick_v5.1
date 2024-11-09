@@ -53,6 +53,7 @@ btnSalidas.addEventListener("click", (e) => {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 async function consumoCliente(){// Busca datos de consumos acumulados de clientes registrados.
     let cli_consumo = await cargarDatos(`ventas_cliente_conteo/${Number(document.getElementById("txtIdv").value)}`);
+    await delay(500); 
     if(cli_consumo.length > 0){
         if(cli_consumo[0].conteo_cliente > 0){
             document.getElementById("concurrencia_cliente").textContent = `Cliente recurrente con ${cli_consumo[0].conteo_cliente} `+
@@ -61,14 +62,16 @@ async function consumoCliente(){// Busca datos de consumos acumulados de cliente
         };
     };
 };
-function buscarClienteVentas(cliente){// Función que busca clientes registrados
+async function buscarClienteVentas(cliente){// Función que busca clientes registrados
     document.getElementById('txtIdv').value = cliente.id_cli
+    await consumoCliente()
+    
     document.getElementById('clientesv').value = cliente.nombre_cli
     document.getElementById('dniv').value = cliente.dni_cli
     document.getElementById('emailv').value = cliente.email_cli
     document.getElementById('telefonov').value = cliente.telefono_cli
     document.getElementById('direccionv').value = cliente.direccion_cli
-    consumoCliente()
+
     modal_proceso_abrir("Cliente encontrado.", "")
     modal_proceso_salir_botones_focus("buscar-cliente-ventas")
 };
@@ -87,6 +90,7 @@ function funcionBusquedaCliente(opcion){
 };
 document.getElementById("boton-buscar-ventas-clientes").addEventListener("click", (e)=>{// Evento del botón "Buscar cliente"
     e.preventDefault()
+    modal_proceso_abrir("Buscando resultados...", "", "")
     funcionBusquedaCliente(document.getElementById("opcion-buscar-cliente").value);
 });
 //////////REGISTRO DE CLIENTES//////////////////////////////////////////////////////////////////
@@ -194,6 +198,7 @@ async function busquedaProductoPorId(){//Busca productos por id condicionado por
     let ids = [id_ven];
     let response = await cargarDatos(   `almacen_central_codigo_transferencias?`+
                                         `ids=${ids.join(",")}`);
+    await delay(500); 
     let fila_res = array_saldos.find(x => response[0].idProd === x.idProd)
     if(fila_res === undefined){
         if(response[0][sucursales_activas[idx_suc]] > 0){
@@ -259,17 +264,20 @@ function agregarAListaProductos(cantidAdAVender, precioAdAVender){// Busca coinc
 async function ventaRapida(){
     if(buscador_codigo.value !== "" && 
         id_ventas.value !== ""){
+        modal_proceso_abrir("Buscando resultados...", "", "")
         await busquedaProductoPorId()
         agregarAListaProductos(1)//agrega nueva fila
 
         resetFormularioVentas()
         resetMetodoPago()
         totalesTabla();
+        modal_proceso_cerrar()
     };
 };
 
 async function ventaDetallada_uno() {
     if(buscador_codigo.value !== ""){
+        modal_proceso_abrir("Buscando resultados...", "", "")
         await busquedaProductoPorId()
         if(array_saldos.length > 0){
             array_saldos.forEach((event)=>{
@@ -288,6 +296,7 @@ async function ventaDetallada_uno() {
         saldo_existencias_almacen_ventas.style.background = ""
         total_ventas.style.background = ""
         saldo_existencias_almacen_ventas.value > 0 ? cantidAdAVender.select() : "";
+        modal_proceso_cerrar()
     };
 };
 
@@ -511,7 +520,6 @@ async function funcionGeneralVentas(){
     let response = await funcionFetchDos(url_venta, objeto_venta);
     if(response.status === "success"){
         await realizarCredito(suc__, response.message[1]);
-
         if(document.querySelector("#check_comprobante").checked){
             NuevaVentanaComprobanteDePago(response.message[0], response.message[1])//comprobante
         };
@@ -807,11 +815,15 @@ function cambioSucursal(){
 ////////////////////Reporte de Ventas///////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 document.getElementById("reporte_ventas_hoy").addEventListener("click", async ()=>{
+    modal_proceso_abrir("Buscando resultados...", "", "")
+    let suma_unidades = 0;
+    let suma_monto = 0;
     let reporte_ventas = await cargarDatos(`salidas_tabla_reporte?`+
                                         `comprobante_salidas=Venta&`+
                                         `fecha_inicio_salidas=${new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate()}&`+
                                         `fecha_fin_salidas=${new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate()}`)
-
+    await delay(500); 
+    modal_proceso_cerrar()
     let reporteHTML = `
                     <style>
                         body{
@@ -820,11 +832,16 @@ document.getElementById("reporte_ventas_hoy").addEventListener("click", async ()
                             align-content: space-between;
                             justify-content: center;
                             gap: 20px;
+                            background: rgba(173, 216, 230, 0.8);
+                            color: #161616;
                         }
                         td, th{
-                            border: 1px solid black;
+                            border: 1px solid #161616;
                         }
-                        .titulo_resporte{
+                        th{
+                            background: rgba(100, 149, 237, 0.8);
+                        }
+                        .titulo_reporte{
                             display: grid;
                             justify-items: center;
                         }
@@ -864,13 +881,17 @@ document.getElementById("reporte_ventas_hoy").addEventListener("click", async ()
                             <td style="text-align: end;">${(sal.existencias_salidas * sal.precio_venta_salidas).toFixed(2)}</td>
                         </tr>`
             reporteHTML = reporteHTML + fila;
+            suma_unidades += sal.existencias_salidas;
+            suma_monto += (sal.existencias_salidas * sal.precio_venta_salidas);
         };
     };                  
     reporteHTML += `
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <th></th>
+                                    <th scope="row" colspan="5">Total</th>
+                                    <th>${suma_unidades}</th>
+                                    <th>${suma_monto.toFixed(2)}</th>
                                 </tr>
                             </tfoot>
                         </table>
@@ -1015,7 +1036,7 @@ async function actualizarSaldos(){//Esto se usa cuando el producto ya está en l
     let response = await cargarDatos(   `almacen_central_datos?`+
                                         `sucursal_get=${sucursales_activas[idx_suc]}&`+
                                         `ids=${ids.join(",")}`);
-
+    await delay(500)
     for(id_v of id_rev){
         let row_ = id_v.closest("tr");
 
@@ -1051,7 +1072,8 @@ async function actualizarSaldos(){//Esto se usa cuando el producto ya está en l
 document.getElementById("actualizar_saldos").addEventListener("click", recalcularSaldos)
 async function recalcularSaldos(e){
     e.preventDefault();
-    if(document.getElementById("tabla-ventas").children[1].children.length > 0){
+    if(document.getElementById("tabla-ventas").children[1].children.length > 0 &&
+    document.getElementById("tabla-ventas").children[2].children.length > 0){
         await actualizarSaldos();
         modal_proceso_salir_botones_focus("buscador-productos-ventas");
     }

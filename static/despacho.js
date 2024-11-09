@@ -111,6 +111,7 @@ function accionSelectDos(){// cambios al efectuar un cambio en select de sucursa
 };
 async function agregarAtablaModal(){
     if(document.getElementById("id-form").value > 0 && document.getElementById("motivo_salida").value !== "0"){
+        modal_proceso_abrir("Buscando resultados...", "", "")
         let array_id_a_s = [];
         crearHeadDespacho()
         cargarSucursalesEjecucion(document.getElementById("sun_opc"))
@@ -153,6 +154,8 @@ async function agregarAtablaModal(){
         await buscarPorCodido();
 
         arrayCreacionCategoriaTallas = [];
+        modal_proceso_abrir("Resultados encontrados", "", "")
+        modal_proceso_cerrar()
         document.querySelector("#tabla_modal > tbody > tr:nth-child(1) > td:nth-child(7) > input").focus();
     }else if(document.getElementById("motivo_salida").value === "0"){
         document.getElementById("motivo_salida").style.background = "var(--boton-dos)"
@@ -172,7 +175,7 @@ async function buscarPorCodido(){
     let ids = Array.from(id_rec).map(element => element.textContent);
     let response = await cargarDatos(   `almacen_central_codigo_transferencias?`+
                                         `ids=${ids.join(",")}`);
-
+    await delay(500)
     for(id_c of id_rec){
         let row_ = id_c.closest("tr");
         let fila_res = response.find(x=> x.idProd === Number(row_.children[0].textContent))

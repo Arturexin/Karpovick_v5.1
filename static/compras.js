@@ -350,7 +350,6 @@ async function funcionGeneralCompras(){
         localStorage.setItem("inventarios_consulta", JSON.stringify(await cargarDatos('almacen_central_ccd')))
         inv_db = JSON.parse(localStorage.getItem("inventarios_consulta"))
         inv_db_grupo = dividirProductosDinamicamente(inv_db);
-        console.log(inv_db_grupo)
         modal_proceso_abrir(`Operación "${response.message}" completada exitosamente.`)
         modal_proceso_salir_botones()
     };
@@ -468,6 +467,7 @@ function accionSelectDos(){// cambios al efectuar un cambio en select de sucursa
 };
 async function agregarATablaPreRecompras(){
     if(document.getElementById("id-form").value > 0){
+        modal_proceso_abrir("Buscando resultados...", "", "")
         let array_id_a_s = [];//array de códigos repetidos
         crearHeadRecompra()
         cargarSucursalesEjecucion(document.getElementById("sun_opc"))
@@ -510,6 +510,8 @@ async function agregarATablaPreRecompras(){
         await buscarCodigo();
 
         arrayCreacionCategoriaTallas = [];
+        modal_proceso_abrir("Resultados encontrados", "", "")
+        modal_proceso_cerrar()
         document.querySelector("#tabla_modal > tbody > tr > td:nth-child(8) > input").focus();
     }else if(document.getElementById("id-form").value < 1){
         modal_proceso_abrir("Seleccione un código a recomprar.", "")
@@ -530,7 +532,7 @@ async function buscarCodigo(){
     let ids = Array.from(id_rec).map(element => element.textContent);
     let response = await cargarDatos(   `almacen_central_codigo_transferencias?`+
                                         `ids=${ids.join(",")}`);
-
+    await delay(500)
     for(id_c of id_rec){
         let row_ = id_c.closest("tr");
         let fila_res = response.find(x=> x.idProd === Number(row_.children[0].textContent))

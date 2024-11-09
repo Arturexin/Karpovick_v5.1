@@ -73,7 +73,7 @@ function cuerpoFilaTabla(e){
                         <span class="tooltiptext">Editar categoría</span>
                     </div>
                     <div class="tooltip">
-                        <span onclick="removeCategorias(${e.id})" style="font-size:18px;" class="material-symbols-outlined eliminarTablaFila">delete</span>
+                        <span onclick="removeCategorias(${e.id}, '${e.categoria_nombre}')" style="font-size:18px;" class="material-symbols-outlined eliminarTablaFila">delete</span>
                         <span class="tooltiptext">Eliminar categoría</span>
                     </div>
                 </td>
@@ -84,15 +84,15 @@ function vaciadoInputBusqueda(){
     document.getElementById("filtro_tabla_actividad").value = ""
     document.getElementById("filtro_tabla_unidad").value = ""
 };
-function manejoDeFechas(){
-    return ""
-};
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 let categoria_tabla = [];
-function editCategorias(id) {
+async function editCategorias(id) {
+    modal_proceso_abrir("Buscando resultados...", "", "")
     categoria_tabla = base_datos.array.find(x => x.id == id)
+    await delay(500)
+    
     document.getElementById('id-configuracion').value = categoria_tabla.id
     document.getElementById('categoria-configuracion').value = categoria_tabla.categoria_nombre
     document.getElementById('unidad-configuracion').value = categoria_tabla.unidad_medida
@@ -110,6 +110,7 @@ function editCategorias(id) {
     document.getElementById('once-configuracion').value = categoria_tabla.once
     document.getElementById('doce-configuracion').value = categoria_tabla.doce
     agregarItem();
+    modal_proceso_cerrar()
 }
 let reiniciarConfig = document.getElementById("reiniciar_config");
 reiniciarConfig.addEventListener("click", (e)=>{
@@ -117,21 +118,30 @@ reiniciarConfig.addEventListener("click", (e)=>{
     formularioConfiguracionCategorias.reset()
     agregarItem()
 })
-async function removeCategorias(id) {
-    manejoDeFechas();
-    let url = URL_API_almacen_central + 'categorias_remove'
-    let data = {
-        'id': id,
-    };
-    let response = await funcionFetchDos(url, data);
-    if(response.status === "success"){
-        await conteoFilas(subRutaA(), filas_total_bd, indice_tabla, 
-                        document.getElementById("numeracionTablaCategorias"), 10)
-        await searchDatos(subRutaB(num_filas_tabla.value), base_datos,"#tabla-categorias")
-        localStorage.setItem("categoria_consulta", JSON.stringify(await cargarDatos('categorias')))
-        modal_proceso_abrir(`${response.message}`)
-        modal_proceso_salir_botones()
-    };
+async function removeCategorias(id, nombre) {
+    modal_proceso_abrir(`Eliminar una categoría podría generar problemas en la base de datos, antes de continuar
+                        edite la categoría de los productos que se verán afectados. ¿Desea eliminar la categoría "${nombre}"?.`, ``)
+    modal_proceso_abrir_botones()
+    document.getElementById("si_comprobante").addEventListener("click", async ()=>{
+        manejoDeFechas();
+        let url = URL_API_almacen_central + 'categorias_remove'
+        let data = {
+            'id': id,
+        };
+        let response = await funcionFetchDos(url, data);
+        if(response.status === "success"){
+            await conteoFilas(subRutaA(), filas_total_bd, indice_tabla, 
+                            document.getElementById("numeracionTablaCategorias"), 10)
+            await searchDatos(subRutaB(num_filas_tabla.value), base_datos,"#tabla-categorias")
+            localStorage.setItem("categoria_consulta", JSON.stringify(await cargarDatos('categorias')))
+            modal_proceso_abrir(`${response.message}`)
+            modal_proceso_salir_botones()
+        };
+    });
+    document.getElementById("no_salir").addEventListener("click", ()=>{
+        modal_proceso_cerrar()
+    });
+    
 };
 const registrarCategoria = document.getElementById("registrar-categoria");
 registrarCategoria.addEventListener("click", saveCategoria);
@@ -257,7 +267,7 @@ function incrementarCantidad(p){
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 async function searchNumeracion(){
     numeracion = await cargarDatos('numeracion_comprobante')
-
+    await delay(500)
     let html = ''
     for(numero of numeracion) {
         let fila = `<tr>
@@ -281,8 +291,10 @@ async function searchNumeracion(){
     };
     document.querySelector('#tabla-numeracion > tbody').outerHTML = html
 };
-function editNumeracion(id) {
+async function editNumeracion(id) {
+    modal_proceso_abrir("Buscando resultados...", "", "")
     let numero = numeracion.find(x => x.id == id)
+    await delay(500)
     document.getElementById('id-numeracion').value = numero.id
     document.getElementById('compras-numeracion').value = numero.compras
     document.getElementById('recompras-numeracion').value = numero.recompras
@@ -291,6 +303,7 @@ function editNumeracion(id) {
     document.getElementById('nota-venta-numeracion').value = numero.nota_venta
     document.getElementById('boleta-venta-numeracion').value = numero.boleta_venta
     document.getElementById('factura-numeracion').value = numero.factura
+    modal_proceso_cerrar()
 }
 const registrarNumeracion = document.getElementById("registrar-numeracion");
 registrarNumeracion.addEventListener("click", saveNumeracion);
@@ -318,7 +331,7 @@ async function saveNumeracion(e) {
 }
 async function searchDatosUsuario(){
     datos = await cargarDatos('numeracion_comprobante_datos')
-
+    await delay(500)
     let html = ''
     for(dato of datos) {
         let fila = `<tr>
@@ -339,14 +352,17 @@ async function searchDatosUsuario(){
     };
     document.querySelector('#tabla-numeracion-datos > tbody').outerHTML = html
 };
-function editNumeracionDatos(id) {
+async function editNumeracionDatos(id) {
+    modal_proceso_abrir("Buscando resultados...", "", "")
     let dato = datos.find(x => x.id == id)
+    await delay(500)
     document.getElementById('id-datos').value = dato.id
     document.getElementById('razon-datos').value = dato.nombre_empresa
     document.getElementById('ruc-datos').value = dato.ruc
     document.getElementById('direccion-datos').value = dato.direccion
     document.getElementById('moneda-datos').value = dato.moneda
     document.getElementById('web-datos').value = dato.web
+    modal_proceso_cerrar()
 };
 const registrarDatos = document.getElementById("registrar-datos");
 registrarDatos.addEventListener("click", saveNumeracionDatos);
@@ -400,6 +416,7 @@ registro.addEventListener('submit',async (event)=>{
         let response = ""
         let url = URL_API_almacen_central + 'registroInterno'
         if(id != ''){
+            modal_proceso_abrir("Editando usuario!!!.", "")
             data.id = id
             response = await funcionFetchDos(url, data);
         }else{
@@ -446,6 +463,7 @@ registro.addEventListener('submit',async (event)=>{
 });
 async function searchUsuarios(){
     usuarios = await cargarDatos('usuarios_tabla_local')
+    await delay(500)
     let html = ''
     for(usuario of usuarios) {
         let fila = `<tr>
@@ -475,7 +493,7 @@ async function searchUsuarios(){
                                 <span class="tooltiptext">Editar usuario</span>
                             </div>
                             <div class="tooltip">
-                                <span onclick="desactivarUsuario(${usuario.id})" style="font-size:18px;" class="material-symbols-outlined eliminarTablaFila desactivar_usuario">delete</span>
+                                <span onclick="desactivarUsuario(${usuario.id}, '${usuario.nombres} ${usuario.apellidos}')" style="font-size:18px;" class="material-symbols-outlined eliminarTablaFila desactivar_usuario">delete</span>
                                 <span class="tooltiptext">Eliminar usuario</span>
                             </div>
                             
@@ -487,8 +505,10 @@ async function searchUsuarios(){
     document.querySelector('#tabla-usuarios-local > tbody').outerHTML = html
     botonesUsuarios()
 };
-function editUsuarios(id) {
+async function editUsuarios(id) {
+    modal_proceso_abrir("Buscando resultados...", "", "")
     let usuario = usuarios.find(x => x.id == id)
+    await delay(500)
     document.getElementById('id_usuarios').value = usuario.id
     document.getElementById('nombres-create-usuario').value = usuario.nombres
     document.getElementById('apellidos-create-usuario').value = usuario.apellidos
@@ -496,6 +516,7 @@ function editUsuarios(id) {
     document.getElementById('email-create-usuario').value = usuario.e_mail
     document.getElementById('telefono-create-usuario').value = usuario.telefono
     document.getElementById('cargo-create-usuario').value = usuario.cargo
+    modal_proceso_cerrar()
 }
 async function reproducirUsuario(id){
     let usuario = usuarios.find(x => x.id == id)
@@ -543,28 +564,36 @@ async function pausarUsuario(id){
         modal_proceso_salir_botones()
     };
 };
-async function desactivarUsuario(id){
-    let usuario = usuarios.find(x => x.id == id)
-    if(usuario.cargo !== 201){
-        modal_proceso_abrir(`Desactivando usuario`, "")
-        data = {
-            'id': usuario.id,
-            'vinculacion': usu_db.id_usuario,
-            'clave': 2,
-            'num_sucursales': 0,
-            'num_usuarios': 0
-        };
-        let url = URL_API_almacen_central + 'usuarios_acciones'
-        let response = await funcionFetch(url, data)
-        if(response.ok){
-            await searchUsuarios()
-            modal_proceso_abrir(`La desactivación de este usuario se aprobará en las siguientes horas.`, "")
+async function desactivarUsuario(id, nombre){
+    modal_proceso_abrir(`¿Desea eliminar el usuario "${nombre}"?.`, ``)
+    modal_proceso_abrir_botones()
+    document.getElementById("si_comprobante").addEventListener("click", async ()=>{
+        let usuario = usuarios.find(x => x.id == id)
+        if(usuario.cargo !== 201){
+            modal_proceso_abrir(`Desactivando usuario`, "")
+            data = {
+                'id': usuario.id,
+                'vinculacion': usu_db.id_usuario,
+                'clave': 2,
+                'num_sucursales': 0,
+                'num_usuarios': 0
+            };
+            let url = URL_API_almacen_central + 'usuarios_acciones'
+            let response = await funcionFetch(url, data)
+            if(response.ok){
+                await searchUsuarios()
+                modal_proceso_abrir(`La desactivación de este usuario se aprobará en las siguientes horas.`, "")
+                modal_proceso_salir_botones()
+            };
+        }else{
+            modal_proceso_abrir(`No se puede desactivar al administrador.`, "")
             modal_proceso_salir_botones()
         };
-    }else{
-        modal_proceso_abrir(`No se puede desactivar al administrador.`, "")
-        modal_proceso_salir_botones()
-    };
+    });
+    document.getElementById("no_salir").addEventListener("click", ()=>{
+        modal_proceso_cerrar()
+    });
+    
 };
 function botonesUsuarios(){
     let boton_reproducir = document.querySelectorAll(".reproducir_usuario")
@@ -627,6 +656,7 @@ document.getElementById("agregar_sucursal").addEventListener("click", async (e)=
 });
 async function searchSucursales(){
     sucursales = await cargarDatos('sucursales')
+    await delay(500)
     let html = ''
     for(sucursal of sucursales) {
         let fila = `<tr>

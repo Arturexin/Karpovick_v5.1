@@ -277,7 +277,6 @@ async function funcionGeneralRegistro(){
         localStorage.setItem("inventarios_consulta", JSON.stringify(await cargarDatos('almacen_central_ccd')))
         inv_db = JSON.parse(localStorage.getItem("inventarios_consulta"))
         inv_db_grupo = dividirProductosDinamicamente(inv_db);
-        console.log(inv_db_grupo)
         modal_proceso_abrir(`${response.message}`, "")
         modal_proceso_salir_botones()
     };
@@ -378,8 +377,7 @@ function crearBodyModificacion(codigoModificacion, id_prod){
 /////AQUI MANDAMOS A TABLA PREMODIFICACION PARA EDITAR VALORES/////////////////////////////////////////////////////////////
 
 async function agregarATablaPreModificacion(){
-
-    let db_ = JSON.parse(localStorage.getItem("inventarios_consulta"))
+    modal_proceso_abrir("Buscando resultados...", "", "")
     let array_id_a_s = 0;
     crearHeadModificacion()
     let arrayCreacionCategoriaTallas = categoriaProductosCreacion(document.getElementById("categoria-form"));
@@ -422,6 +420,8 @@ async function agregarATablaPreModificacion(){
     document.querySelector(".contenedor-pre-recompra").classList.add("modal-show");
     await buscarPorCodidoModificacionOrigen();
     arrayCreacionCategoriaTallas = [];
+    modal_proceso_abrir("Resultados encontrados", "", "")
+    modal_proceso_cerrar()
 };
 function op_costo_dos(e){
     let row_ = e.closest("tr");
@@ -490,7 +490,7 @@ async function buscarPorCodidoModificacionOrigen(){
     let ids = Array.from(id_rem).map(element => element.textContent);
     let response = await cargarDatos(   `almacen_central_codigo_transferencias?`+
                                         `ids=${ids.join(",")}`);
- 
+    await delay(500)
     for(id_m of id_rem){
         let row_ = id_m.closest("tr");
         let fila_res = response.find(x=> x.idProd === Number(row_.children[0].textContent))

@@ -14,8 +14,7 @@ let sucursal_id_entradas = 0;
 let filas_total_bd = {value: 0};
 let indice_tabla = {value : 1};
 let num_filas_tabla = {value: 0};
-let inicio = 0;
-let fin = 0;
+
 let base_datos = {array: []}
 async function inicioTablasEntradas(){
     await conteoFilas(subRutaA(0), filas_total_bd, indice_tabla, 
@@ -99,29 +98,21 @@ function vaciadoInputBusqueda(){
     document.getElementById("filtro-tabla-entradas-categoria").value = ""
     document.getElementById("filtro-tabla-entradas-codigo").value = ""
     document.getElementById("filtro-tabla-entradas-operacion").value = ""
-    document.getElementById("filtro-tabla-entradas-fecha-inicio").value = ""
-    document.getElementById("filtro-tabla-entradas-fecha-fin").value = ""
+    document.getElementById("_fecha_inicio_").value = ""
+    document.getElementById("_fecha_fin_").value = ""
 };
-function manejoDeFechas(){
-    inicio = document.getElementById("filtro-tabla-entradas-fecha-inicio").value;
-    fin = document.getElementById("filtro-tabla-entradas-fecha-fin").value;
-    if(inicio == "" && fin == ""){
-        inicio = '2000-01-01';
-        fin = new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate()
-    }else if(inicio == "" && fin != ""){
-        inicio = '2000-01-01';
-    }else if(inicio != "" && fin == ""){
-        fin = new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate();
-    };
-};
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 async function accionRemove(id) {
+    modal_proceso_abrir("Buscando resultados...", "", "")
+
     let entradas = base_datos.array.find(y => y.idEntr == id)// obtenemos los datos de la fila
     let db = JSON.parse(localStorage.getItem("inventarios_consulta"))
     let producto = db.find(x=> x.codigo === entradas.codigo)
+
+    await delay(500)
+    modal_proceso_cerrar()
 
     tabla_proforma_productos(producto, "Eliminar entrada", entradas.categoria_nombre, entradas.comprobante);
 
@@ -151,11 +142,16 @@ async function procesarRemove(idEntr){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function accionDevoluciones(id) {
+async function accionDevoluciones(id) {
+    modal_proceso_abrir("Buscando resultados...", "", "")
+
     let entradas = base_datos.array.find(x => x.idEntr == id)
     let db = JSON.parse(localStorage.getItem("inventarios_consulta"))
     let sucursales_comparacion = JSON.parse(localStorage.getItem("sucursal_consulta"))
+
     if(entradas.comprobante.startsWith("Compra") || entradas.comprobante.startsWith("Recompra")){
+        await delay(500)
+        modal_proceso_cerrar()
         let producto = db.find(x=> x.codigo === entradas.codigo)
         tabla_proforma_productos(producto, "Devoluciones", entradas.categoria_nombre, entradas.comprobante)
         sucursales_comparacion.forEach((e, i) =>{
@@ -608,23 +604,7 @@ document.getElementById("exportar_formato").addEventListener("click", (e)=>{
     e.preventDefault();
     descargarCSV(array_cabecera, "misProductos")
 });
-///////Extraccion de datos en formato csv///////////////////////////////////////
-let datos_extraccion = [];
-let extraccion_ = document.getElementById("extraccion_")
-extraccion_.addEventListener("click", async ()=>{
-    let f_inicio = document.getElementById("filtro-tabla-entradas-fecha-inicio").value;
-    let f_fin = document.getElementById("filtro-tabla-entradas-fecha-fin").value;
-    f_inicio === "" ? f_inicio = new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate() : "";
-    f_fin === "" ? f_fin = new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate() : "";
 
-    datos_extraccion = await cargarDatos(   `entradas_extraccion?`+
-                                            `fecha_inicio_entradas=${f_inicio}&`+
-                                            `fecha_fin_entradas=${f_fin}`
-                                        );
-    const csvContent = arrayToCSV(datos_extraccion);
-    console.log(csvContent)
-    downloadCSV(csvContent, 'dataEntradas.csv');
-})
 function formatoMoneda(valor_numerico){
     let value = valor_numerico.toString();
     value = value.replace(/[^0-9.]/g, '');// Eliminar todo lo que no sea un número o un punto decimal

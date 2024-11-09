@@ -3,10 +3,11 @@ let anio_principal = ""
 
 function inicioDetalleVentas(){
     anio_principal = new Date().getFullYear()
-    cargarDatosAnio()
     inicioTablasDetalleVentas()
-    cargarDatosEmpresa()
+    cargarDatosAnio()
+    graficosInicio()
     array_btn_pages[7] = 1;
+    
 };
 let metodo_pago_detalle = ["Efectivo", "Tarjeta", "Crédito", "Devoluciones"];
 const barras_detalle = [".cg_1_c", ".cg_2_c", ".cg_3_c", ".cg_4_c", ".cg_5_c"]
@@ -15,10 +16,12 @@ const barras_detalle = [".cg_1_c", ".cg_2_c", ".cg_3_c", ".cg_4_c", ".cg_5_c"]
 let credito_ = []
 let reporte_ = []
 let reporte_dos_ = []
-async function cargarDatosEmpresa(){
-    det_ve_gr = await cargarDatos(  `ventas_grafico?`+
-                                    `year_actual=${anio_principal}`)
+async function graficosInicio(){
+    anio_principal = anio_referencia.value;
 
+    det_ve_gr = await cargarDatos(`ventas_grafico?`+
+                                `year_actual=${anio_principal}`)
+    await delay(500)
     graficoModoVenta()
     graficoVentas()
 
@@ -26,15 +29,8 @@ async function cargarDatosEmpresa(){
 }
 function cargarDatosAnio(){
     document.getElementById("cargar_datos_anio").addEventListener("click", async ()=>{
-        anio_principal = anio_referencia.value;
-
-        det_ve_gr = await cargarDatos(`ventas_grafico?`+
-                                    `year_actual=${anio_principal}`)
-
-        graficoModoVenta()
-        graficoVentas()
-
-        promCanalVenta()
+        modal_proceso_abrir("Buscando resultados...", "", "")
+        await graficosInicio()
 
         modal_proceso_abrir(`Datos del año ${anio_principal} cargados.`, "")
         modal_proceso_salir_botones()
@@ -45,8 +41,7 @@ function cargarDatosAnio(){
 let filas_total_bd = {value: 0};
 let indice_tabla = {value : 1};
 let num_filas_tabla = {value: 0};
-let inicio = 0;
-let fin = 0;
+
 let base_datos = {array: []}
 let detVentasComprobante = [];
 let det_ve_gr = [];
@@ -94,10 +89,10 @@ function subRutaB(num, index){
             `fecha_fin_det_venta=${fecha_fin[index]}`
 };
 function cuerpoFilaTabla(e){
-    let color_fondo = e.situacion === "pendiente" ? "rgb(153, 77, 64, 0.4)": e.situacion === "pérdida" ? "rgb(113, 89, 142, 0.4)": "";
+    let color_sucursal = e.situacion === "pendiente" ? "rgb(153, 77, 64, 0.4)": e.situacion === "pérdida" ? "rgb(113, 89, 142, 0.4)": "";
     let dev_ = e.modo_perdida - e.modo_efectivo - e.modo_tarjeta
 
-    return  `<tr class="ventas-fila" style="background: ${color_fondo}">
+    return  `<tr class="ventas-fila" style="background: ${color_sucursal}">
                 <td class="invisible">${e.id_det_ventas}</td>
                 <td style="border-left: 7px solid ${CS(e.sucursal_nombre)};">${e.sucursal_nombre}</td>
                 <td>${e.comprobante}</td>
@@ -134,25 +129,14 @@ function vaciadoInputBusqueda(){
     document.getElementById("filtro-tabla-detalleVentas-comprobante").value = ""
     document.getElementById("filtro-tabla-detalleVentas-tipoComprobante").value = ""
     document.getElementById("filtro-tabla-detalleVentas-dni").value = ""
-    document.getElementById("filtro-tabla-detalleVentas-fecha-inicio").value = ""
-    document.getElementById("filtro-tabla-detalleVentas-fecha-fin").value = ""
-};
-function manejoDeFechas(){
-    inicio = document.getElementById("filtro-tabla-detalleVentas-fecha-inicio").value;
-    fin = document.getElementById("filtro-tabla-detalleVentas-fecha-fin").value;
-    if(inicio == "" && fin == ""){
-        inicio = '2000-01-01';
-        fin = new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate()
-    }else if(inicio == "" && fin != ""){
-        inicio = '2000-01-01';
-    }else if(inicio != "" && fin == ""){
-        fin = new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate();
-    };
+    document.getElementById("_fecha_inicio_").value = ""
+    document.getElementById("_fecha_fin_").value = ""
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 async function buscarTicketVenta(id_ventas) {
+    modal_proceso_abrir("Buscando resultados...", "", "")
     let datos_cliente = JSON.parse(localStorage.getItem("clientes_consulta"))
     let numeracion_comprobante_venta = "";
     let importe_venta = 0;
@@ -166,7 +150,10 @@ async function buscarTicketVenta(id_ventas) {
         numeracion_comprobante_venta = "Factura"
     };
     detVentasComprobante = await cargarDatos(`salidas_comprobante/${filaDetalleVenta.comprobante}`)
+    await delay(500)
     let _cliente = datos_cliente.find(x => x.id_cli === detVentasComprobante[0].cliente);
+    modal_proceso_abrir("Resultados encontrados", "", "")
+    modal_proceso_salir_botones()
     if(_cliente.nombre_cli === "Sin datos"){
         nombre_cliente = "";
     }else{
@@ -429,9 +416,11 @@ function promCanalVenta(){
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 async function buscarCredito(tipo_comprobante, nombre, id_det_ventas, devolucion_){
+    modal_proceso_abrir("Buscando resultados...", "", "")
     credito_ = await cargarDatos(`credito_comprobante/${id_det_ventas}`)
-    
+    await delay(500)
     if(credito_.length > 0){
+        modal_proceso_cerrar()
         tabla_creditos(nombre, devolucion_)
         document.getElementById("acciones_creditos").classList.add("modal-show")
         removerAccionRapida()
@@ -443,7 +432,7 @@ async function buscarCredito(tipo_comprobante, nombre, id_det_ventas, devolucion
         declararPerdida(credito_, _input_efectivo, _input_tarjeta, _input_pendiente, _input_perdida, devolucion_)
         document.getElementById("accion_procesar_pago").addEventListener("click", async (e)=>{
             e.preventDefault()
-    
+
             _input_efectivo.style.background = "";
             _input_tarjeta.style.background = "";
     
@@ -471,9 +460,11 @@ async function buscarCredito(tipo_comprobante, nombre, id_det_ventas, devolucion
                 modal_proceso_salir_botones()
             }
         })
-        document.getElementById("revertir_credito").addEventListener("click", ()=>{
-            revertirUltimoPago(credito_)
+        document.getElementById("revertir_credito").addEventListener("click", async ()=>{
+            modal_proceso_abrir(`Revirtiendo el pago de ${tipo_comprobante}!!!.`, "")
+            await revertirUltimoPago(credito_)
         })
+        
     }else{
         modal_proceso_abrir("No presenta crédito.", "")
         modal_proceso_salir_botones()
@@ -630,7 +621,6 @@ async function procesarPagoCredito(array_cre, tipo_comprobante, id_det_ventas, d
         let urlCredito = URL_API_almacen_central + 'operar_creditos'
         let responde_credito = await funcionFetchDos(urlCredito, credito)
         if(responde_credito.status === "success"){
-            console.log("Respuesta creditos "+responde_credito.message)
             manejoDeFechas()
             await conteoFilas(subRutaA(1), filas_total_bd, indice_tabla, 
                             document.getElementById("numeracionTablaVentas"), 20)
@@ -672,18 +662,43 @@ async function revertirUltimoPago(array_cre){
 ////////////////////////////////////////////////////////////////////////////////////////////////
 document.getElementById("reportesCreditos").addEventListener("click", async (e)=>{
     e.preventDefault()
+    modal_proceso_abrir("Buscando resultados...", "", "")
     reporte_dos_ = await cargarDatos(`credito_reporte_dos`)
-
+    await delay(500)
+    modal_proceso_abrir("Resultados encontrados.", "", "")
+    modal_proceso_salir_botones()
     reporte_creditos()
 })
 function reporte_creditos(){
+    manejoDeFechas()
     let suma_monto = 0;
     let suma_saldo = 0;
-    let html = `<div style="display: grid; justify-items: center;">
-                    <h2 style="text-align: center;">Reporte de cuentas por cobrar</h2>
-                    <br>
-                    <h3 style="text-align: center;">${new Date()}</h3>
-                    <br>
+    let html = `<style>
+                    body{
+                        display: grid;
+                        align-items: center;
+                        align-content: space-between;
+                        justify-content: center;
+                        gap: 20px;
+                        background: rgba(173, 216, 230, 0.8);
+                        color: #161616;
+                        justify-items: center;
+                    }
+                    td, th{
+                        border: 1px solid #161616;
+                    }
+                    th{
+                        background: rgba(100, 149, 237, 0.8);
+                    }
+                    .titulo_reporte{
+                        display: grid;
+                        justify-items: center;
+                    }
+                </style>
+                <div class="titulo_reporte">
+                    <h2>Reporte de cuentas por cobrar</h2>
+                    <h3>Fecha de reporte: ${inicio} a ${fin}</h3>
+                </div>
                     <table>
                         <thead>
                             <th style="width: 120px; text-align: center;">Sucursal</th>
@@ -724,8 +739,9 @@ function reporte_creditos(){
                             </tr>
                         </tfooter>
                     </table>
+                    <h4 style="text-align: center;">${new Date()}</h4>
                     <button onclick="window.print()">Imprimir</button>
-                </div>`
+                `
     let nuevaVentana = window.open('');
     nuevaVentana.document.write(html);
 }

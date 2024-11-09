@@ -20,6 +20,7 @@ async function cargarFuncionesGraficos(){
     ventasDiaSucursales = await cargarDatos(`salidas_suma_ventas_por_dia_por_sucursal`)
     gastos_grafico_detallado = await cargarDatos(   `gastos_suma_mes?`+
                                                     `year_actual=${anio_principal}`)
+    await delay(500);                                                
     totalVentasPorMes()
     graficoDonaEfectivo()
     totalVentasPorMesSucursal()
@@ -34,9 +35,9 @@ async function cargarFuncionesGraficos(){
 async function cargarDatosAnio(){
     document.getElementById("cargar_datos_anio").addEventListener("click", async ()=>{
         anio_principal = anio_referencia.value;
-    
-        cargarFuncionesGraficos()
-    
+        modal_proceso_abrir("Buscando resultados...", "", "")
+        await cargarFuncionesGraficos()
+        
         modal_proceso_abrir(`Datos del año ${anio_principal} cargados.`, "")
         modal_proceso_salir_botones()
     })

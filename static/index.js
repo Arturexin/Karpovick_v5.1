@@ -97,27 +97,37 @@ document.getElementById("actualizar_bases").addEventListener("click", async (eve
 });
 async function cargarIndices(){
     try{
+        modal_proceso_abrir("Cargando datos...", "", "")
         if(!localStorage.getItem("inventarios_consulta") || JSON.parse(localStorage.getItem("inventarios_consulta")).length === 0){
             localStorage.setItem("inventarios_consulta", JSON.stringify(await cargarDatos('almacen_central_ccd')))
+            await delay(100)
         };
         if(!localStorage.getItem("sucursal_consulta") || JSON.parse(localStorage.getItem("sucursal_consulta")).length === 0){
             localStorage.setItem("sucursal_consulta", JSON.stringify(await cargarDatos('sucursales_index')))
+            await delay(100)
         };
         if(!localStorage.getItem("categoria_consulta") || JSON.parse(localStorage.getItem("categoria_consulta")).length === 0){
             localStorage.setItem("categoria_consulta", JSON.stringify(await cargarDatos('categorias')))
+            await delay(100)
         };
         if(!localStorage.getItem("proveedores_consulta") || JSON.parse(localStorage.getItem("proveedores_consulta")).length === 0){
             localStorage.setItem("proveedores_consulta", JSON.stringify(await cargarDatos('proveedores')))
+            await delay(100)
         };
         if(!localStorage.getItem("clientes_consulta") || JSON.parse(localStorage.getItem("clientes_consulta")).length === 0){
             localStorage.setItem("clientes_consulta", JSON.stringify(await cargarDatos('clientes_ventas')))
+            await delay(100)
         };
         if(!localStorage.getItem("datos_negocio") || JSON.parse(localStorage.getItem("datos_negocio")).length === 0){
             localStorage.setItem("datos_negocio", JSON.stringify(await cargarDatos('numeracion_comprobante_datos')))
+            await delay(100)
         };
         if(!localStorage.getItem("datos_usuario") || JSON.parse(localStorage.getItem("datos_usuario")).length === 0){
             localStorage.setItem("datos_usuario", JSON.stringify(await cargarDatos('datos_usuario')))
+            await delay(100)
         };
+        
+        modal_proceso_cerrar();
     }catch (error){
         alert('Error al cargar índices:', error.message);
         console.error('Error al cargar índices:', error.message);
@@ -146,6 +156,7 @@ async function cargarDatos(ruta){
         if (!respuesta.ok) {
             throw new Error("Error en la respuesta de la API: " + respuesta.statusText);
         };
+        
         return await respuesta.json();
     } catch (error) {
         console.error("Error durante la solicitud:", error);
@@ -164,6 +175,7 @@ async function funcionFetch(url, fila){
         if (!response.ok) {
             throw new Error("Error en la respuesta de la API: " + response.statusText);
         };
+        await delay(500);
         return response;
     } catch (error) {
         console.error("Error durante la solicitud:", error);
@@ -179,11 +191,10 @@ async function funcionFetchDos(url, fila){
                 'Content-Type': 'application/json'
             }
         });
-
         if (!response.ok) {
             throw new Error("Error en la respuesta de la API: " + response.statusText);
         }
-
+        await delay(500);
         // Convertir la respuesta a JSON
         let data = await response.json();
         return data;  // Retorna el JSON con la respuesta de la API
@@ -265,7 +276,8 @@ function categoriaProductosCreacion(categoria){
 const cerrarSesion = document.getElementById("cerrar-sesion");
 cerrarSesion.addEventListener("click", async () => {
     localStorage.clear();
-    
+    modal_proceso_abrir("Cerrando sesión...", "", "")
+    await delay(1000)
     let response  = await fetch('/logout', {
         "method": 'GET',
         "headers": {
@@ -367,11 +379,11 @@ let cls_dos = [ "rgb(230, 202, 123, 0.1)",
         "rgb(99, 128, 230, 0.1)",
         "rgb(230, 110, 141, 0.1)",
         "rgb(77, 77, 77, 0.1)"]
- function CS(nombre_sucursal){
+function CS(nombre_sucursal){
     let index = suc_add.findIndex(el => el === nombre_sucursal)
     return cls[index]
- }
+}
 
- function delay(ms) {
+function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }

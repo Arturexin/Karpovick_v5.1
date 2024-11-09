@@ -4,7 +4,9 @@ function inicioDevolucionCompras(){
     anio_principal = new Date().getFullYear()
 
     cargarDatosAnio()
-    graficoDevolucionesCompras();
+
+    document.getElementById("contenedor_grafico_devoluciones").innerHTML = `<canvas id="grafico_devoluciones"></canvas>`
+    graficoBarrasVerticalUnid(document.getElementById("grafico_devoluciones"), [], [], ['Dev-Entradas', 'Dev-Salidas']);
     array_btn_pages[8] = 1;
 };
 let array_comprobante= [];
@@ -16,12 +18,10 @@ const op_ = ["", "Venta", "Compra", "Recompra"]
 /////////////////////////////////////////////////////////////////////
 function cargarDatosAnio(){
     document.getElementById("cargar_datos_anio").addEventListener("click", async ()=>{
+        modal_proceso_abrir("Buscando resultados...", "", "")
         anio_principal = anio_referencia.value;
 
         graficoDevolucionesCompras();
-
-        modal_proceso_abrir(`Datos del año ${anio_principal} cargados.`, "")
-        modal_proceso_salir_botones()
     })
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -75,6 +75,7 @@ async function crearBodyDevoluciones(){
     let operacion = `${document.getElementById("t_op").textContent}-${document.getElementById("buscador_operacion").value}`
     if(Number(document.getElementById("tipo_devolucion").value) > 1 && (operacion_n === "" || operacion_n === operacion)){
         response = await cargarDatos(`entradas_comprobante/${operacion}`)
+        await delay(500)
         if(response.length > 0){
             response.forEach((e)=>{
                 ingresar(e)
@@ -83,6 +84,7 @@ async function crearBodyDevoluciones(){
         };
     }else if(Number(document.getElementById("tipo_devolucion").value) > 0 && (operacion_n === "" || operacion_n === operacion)){
         response = await cargarDatos(`salidas_comprobante/${operacion}`)
+        await delay(500)
         if(response.length > 0){
             response.forEach((e)=>{
                 ingresar(e)
@@ -96,6 +98,7 @@ async function crearBodyDevoluciones(){
         modal_proceso_abrir("Solo puede procesar una operación por vez", "")
         modal_proceso_salir_botones()
     };
+    
     let array_id_a_s = [];
     let tabla= document.querySelector("#tabla_modal > tbody");
     let ids = Array.from(document.querySelectorAll(".id_proforma")).map(element => element.textContent);
@@ -109,7 +112,7 @@ async function crearBodyDevoluciones(){
             let fila = `<tr>`+
                 `<td class="id_modal invisible">${event.id}</td>`+//Columna 0 > id entradas
                 `<td style="border-left: 7px solid ${CS(event.sucursal_nombre)};">${event.sucursal_nombre}</td>`+//Columna 1 > sucursal
-                `<td class="codigoDevoluciones" style="background: rgb(105, 211, 35);>${event.codigo}</td>`+//Columna 2 >código
+                `<td class="codigoDevoluciones" style="background: rgb(105, 211, 35);">${event.codigo}</td>`+//Columna 2 >código
                 `<td style="text-align: right">${event.existencias}</td>`+//Columna 3 > existencias compradas
                 `<td><input class="cantidadADevolver input-tablas-dos-largo" onkeyup = "operarQDevolucion(this)"></td>`+//Columna 4 > cantidad a devolver
                 `<td>${event.comprobante}</td>`+//Columna 5 > comprobante de compra
@@ -148,10 +151,11 @@ mandarATablaDevoluciones.addEventListener("click",manadarDevoluciones)
 async function manadarDevoluciones(e){
     e.preventDefault();
     if(Number(document.getElementById("buscador_operacion").value) > 0){
+
         document.querySelector(".contenedor-pre-recompra").classList.add("modal-show");
-
+        modal_proceso_abrir("Buscando resultados...", "", "")
         await crearBodyDevoluciones();
-
+        modal_proceso_cerrar()
         document.querySelector("#tabla_modal > tbody > tr:nth-child(1) > td:nth-child(5) > input").focus()
     }else{
         modal_proceso_abrir(`Digite un número de operación`, "")
@@ -324,6 +328,7 @@ async function graficoDevolucionesCompras(){
                                             `year_actual=${anio_principal}`)
     let devolucionesSalidas = await cargarDatos(`salidas_suma_devoluciones_mes?`+
                                             `year_actual=${anio_principal}`)
+    await delay(500)
     let array_entradas = [];
     let array_salidas = [];
     document.querySelectorAll(".f_l_g").forEach((event, i)=>{
@@ -346,6 +351,8 @@ async function graficoDevolucionesCompras(){
         array_salidas.push(d_s)
     };
     graficoBarrasVerticalUnid(document.getElementById("grafico_devoluciones"), array_entradas, array_salidas, ['Dev-Entradas', 'Dev-Salidas']);
+    modal_proceso_abrir(`Datos del año ${anio_principal} cargados.`, "")
+    modal_proceso_salir_botones()
 };
 
 document.getElementById("tipo_devolucion").addEventListener("change",()=>{

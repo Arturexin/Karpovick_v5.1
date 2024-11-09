@@ -261,7 +261,7 @@ async function busquedaSucursal(id_suc, anio){
     let response = await cargarDatos(   `salidas_categorias_sucursal?`+
                                         `sucursal_salidas=${id_suc}&`+
                                         `year_actual=${anio}`)
-
+    await delay(500)
     if(response.status === "success"){
         return crearArrayDatos(response.datos, "categoria")
     }else{
@@ -269,9 +269,10 @@ async function busquedaSucursal(id_suc, anio){
     }
 }
 async function busquedaCategoria(id_suc, id_cat, anio){
+    modal_proceso_abrir("Buscando resultados...", "", "")
+
     document.getElementById("tit_monto").textContent = "";
 
-    document.getElementById("opciones_codigos").value = "1"
     document.querySelector("#tabla_codigos_venta > tbody").remove()
     document.querySelector("#tabla_codigos_venta").createTBody()
 
@@ -282,14 +283,19 @@ async function busquedaCategoria(id_suc, id_cat, anio){
                                         `sucursal_salidas=${id_suc}&`+
                                         `categoria_salidas=${id_cat}&`+
                                         `year_actual=${anio}`)
+    await delay(500)
     if(response.status === "success"){
         array_productos_ = crearArrayDatos(response.datos, "codigo");
         document.getElementById("tit_monto").textContent = array_productos_[0].categoria_nombre;
+        document.getElementById("opciones_codigos").value = "1"
+        
         evetoSelect(document.getElementById("opciones_codigos"),
                     document.getElementById("tabla_codigos_venta"),
                     array_productos_, 
                     "codigo",
                     document.querySelectorAll(".total_mes_categoria"))
+        modal_proceso_abrir("Resultados encontrados", "", "")
+        modal_proceso_salir_botones()
         
         let tot = sumartoriaAbsoluta("suma_ventas", array_productos_)
         document.getElementById("tabla_codigos_venta").children[2].innerHTML = llenarBodyAbsoluto("codigo", array_productos_, "suma_ventas", true, tot[1])
@@ -297,6 +303,8 @@ async function busquedaCategoria(id_suc, id_cat, anio){
                     
     }else{
         array_productos_ = [];
+        modal_proceso_abrir("No se encontraron resultados", "", "")
+        modal_proceso_salir_botones()
     }
 }
 
@@ -326,14 +334,12 @@ document.querySelectorAll(".suc_estad").forEach((event, i)=>{
         let sucursal_ = suc_db.find(x=> x.sucursal_nombre === event.textContent)
         if(sucursal_){
             array_categorias_ = await busquedaSucursal(sucursal_.id_sucursales, anio_principal)
-            await delay(3000);
             document.getElementById("sucu_categoria").textContent = ` ${sucursal_.sucursal_nombre}` 
             modal_proceso_abrir("Resultados encontrados", "", "")
             modal_proceso_salir_botones()
             ticketPromedio(array_categorias_)
             event.classList.add("marcaBotonDos")
         }else{
-            await delay(3000);
             array_categorias_ = [];
             modal_proceso_abrir("No se encontraron resultados", "", "")
             modal_proceso_salir_botones()

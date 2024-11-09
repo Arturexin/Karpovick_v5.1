@@ -93,21 +93,9 @@ function cuerpoFilaTabla(e){
             </tr>`
 };
 function vaciadoInputBusqueda(){
-    document.getElementById("filtro-tabla-caja-fecha-inicio").value = ""
-    document.getElementById("filtro-tabla-caja-fecha-fin").value = ""
+    document.getElementById("_fecha_inicio_").value = ""
+    document.getElementById("_fecha_fin_").value = ""
     document.getElementById("filtro-tabla-caja-sucursal").value = ""
-};
-function manejoDeFechas(){
-    inicio = document.getElementById("filtro-tabla-caja-fecha-inicio").value;
-    fin = document.getElementById("filtro-tabla-caja-fecha-fin").value;
-    if(inicio == "" && fin == ""){
-        inicio = '2000-01-01';
-        fin = fecha_hoy
-    }else if(inicio == "" && fin != ""){
-        inicio = '2000-01-01';
-    }else if(inicio != "" && fin == ""){
-        fin = fecha_hoy;
-    };
 };
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -130,7 +118,7 @@ async function cargarAperturaHoy(){
     let ingresos_ventas_ = document.querySelectorAll(".ingresos_caja_ventas");
     let egresos_efectivo_ = document.querySelectorAll(".egresos_caja_gastos");
     let saldo_cierre_ = document.querySelectorAll(".saldo_cierre_caja");
-
+    await delay(500)
     suc_add.forEach((event, i)=>{
         let suc_ = suc_db.find(x=> x.sucursal_nombre === event)
         consolidado_efectivo.forEach((e)=>{
@@ -251,7 +239,7 @@ async function buttonCerrarCaja(id, estado){
                                                     `fecha_inicio_sucursal=${año}-${mes}-${dia}&`+
                                                     `fecha_fin_sucursal=${año}-${mes}-${dia}`)
         let consolidado_no_cerrado = consolidado_cerrar.find(y => y.id_sucursales === Number(fila_caja.sucursal_caja))
-
+        await delay(500)
         function DataCaja(){
             this.id_caja = fila_caja.id_caja;
             this.sucursal_caja = fila_caja.sucursal_caja;

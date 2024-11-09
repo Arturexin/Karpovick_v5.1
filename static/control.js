@@ -871,3 +871,63 @@ async function creacion_suc(usuario){
         alert(`${data.sucursal_nombre} ha sido creado.`)
     };
 };
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////Extraccion de datos en formato csv///////////////////////////////////////
+let datos_extraccion = [];
+
+let extraccion_ = document.getElementById("extraccion_")
+extraccion_.addEventListener("click", async ()=>{
+    modal_proceso_abrir("Buscando resultados...", "", "")
+    datos_extraccion = await cargarDatos(   `productos_extraccion?`);
+    await delay(500)
+    modal_proceso_cerrar()
+    const csvContent = arrayToCSV(datos_extraccion);
+    console.log(csvContent)
+    downloadCSV(csvContent, 'dataProductos.csv');
+});
+///////Extraccion de datos en formato csv///////////////////////////////////////
+/* let datos_extraccion = [];
+let extraccion_ = document.getElementById("extraccion_")
+extraccion_.addEventListener("click", async ()=>{
+    modal_proceso_abrir("Buscando resultados...", "", "")
+    let f_inicio = document.getElementById("_fecha_inicio_").value;
+    let f_fin = document.getElementById("_fecha_fin_").value;
+    f_inicio === "" ? f_inicio = new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate() : "";
+    f_fin === "" ? f_fin = new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate() : "";
+
+    datos_extraccion = await cargarDatos(   `entradas_extraccion?`+
+                                            `fecha_inicio_entradas=${f_inicio}&`+
+                                            `fecha_fin_entradas=${f_fin}`
+                                        );
+                                        console.log(datos_extraccion)
+    await delay(500)
+    modal_proceso_cerrar()
+    const csvContent = arrayToCSV(datos_extraccion);
+    console.log(csvContent)
+    downloadCSV(csvContent, 'dataEntradas.csv');
+})
+//////////CSV////////////////////////////////////////////////////////////////////////////////////////////
+///////Extraccion de datos en formato csv///////////////////////////////////////
+let datos_extraccion = [];
+
+let extraccion_ = document.getElementById("extraccion_")
+extraccion_.addEventListener("click", async ()=>{
+    modal_proceso_abrir("Buscando resultados...", "", "")
+    let f_inicio = document.getElementById("_fecha_inicio_").value;
+    let f_fin = document.getElementById("_fecha_fin_").value;
+    f_inicio === "" ? f_inicio = new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate() : "";
+    f_fin === "" ? f_fin = new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate() : "";
+
+    datos_extraccion = await cargarDatos(   `salidas_extraccion?`+
+                                            `fecha_inicio_salidas=${f_inicio}&`+
+                                            `fecha_fin_salidas=${f_fin}`
+                                        );
+    await delay(500)
+    modal_proceso_cerrar()
+    const csvContent = arrayToCSV(datos_extraccion);
+    console.log(csvContent)
+    downloadCSV(csvContent, 'dataSalidas.csv');
+}); */

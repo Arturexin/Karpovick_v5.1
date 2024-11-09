@@ -8,6 +8,11 @@ function inicioClientes(){
     graficoClientes();
     array_btn_pages[13] = 1;
 };
+const expregul = {
+    cliente: /^[A-ZÑa-zñáéíóúÁÉÍÓÚ'° ]+$/,
+    telefono: /^[ 0-9]+$/,
+    direccion: /^[A-ZÑa-zñáéíóúÁÉÍÓÚ'°,.:/\d\- ]+$/,
+};
 const barras_compras = [".cg_1_c", ".cg_2_c", ".cg_3_c", ".cg_4_c", ".cg_5_c"]
 /////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
@@ -26,8 +31,7 @@ function cargarDatosAnio(){
 let filas_total_bd = {value: 0};
 let indice_tabla = {value : 1};
 let num_filas_tabla = {value: 0};
-let inicio = 0;
-let fin = 0;
+
 let base_datos = {array: []}
 let reporte_ = [];
 async function inicioTablasClientes(){
@@ -94,7 +98,11 @@ function cuerpoFilaTabla(e){
                         <span class="tooltiptext">Editar cliente</span>
                     </div>
                     <div class="tooltip">
-                        <span onclick="remove(${e.id_cli})" style="font-size:18px;" class="material-symbols-outlined eliminarTablaFila">delete</span>
+                        <span onclick="reporteCliente(${e.id_cli}, '${e.nombre_cli}')" style="font-size:18px;" class="material-symbols-outlined myButtonEditar">insert_chart</span>
+                        <span class="tooltiptext">Reporte de consumos</span>
+                    </div>
+                    <div class="tooltip">
+                        <span onclick="remove(${e.id_cli}, '${e.nombre_cli}')" style="font-size:18px;" class="material-symbols-outlined eliminarTablaFila">delete</span>
                         <span class="tooltiptext">Eliminar cliente</span>
                     </div>
                     
@@ -108,26 +116,16 @@ function vaciadoInputBusqueda(){
     document.getElementById("filtro-tabla-clientes-email").value = ""
     document.getElementById("filtro-tabla-clientes-telefono").value = ""
     document.getElementById("filtro-tabla-clientes-usuario").value = ""
-    document.getElementById("filtro-tabla-clientes-fecha-inicio").value = ""
-    document.getElementById("filtro-tabla-clientes-fecha-fin").value = ""
-};
-function manejoDeFechas(){
-    inicio = document.getElementById("filtro-tabla-clientes-fecha-inicio").value;
-    fin = document.getElementById("filtro-tabla-clientes-fecha-fin").value;
-    if(inicio == "" && fin == ""){
-        inicio = '2000-01-01';
-        fin = new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate()
-    }else if(inicio == "" && fin != ""){
-        inicio = '2000-01-01';
-    }else if(inicio != "" && fin == ""){
-        fin = new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate();
-    };
+    document.getElementById("_fecha_inicio_").value = ""
+    document.getElementById("_fecha_fin_").value = ""
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function edit(id) {
+async function edit(id) {
+    modal_proceso_abrir("Buscando resultados...", "", "")
     let cliente = base_datos.array.find(x => x.id_cli == id)
+    await delay(500)
     document.getElementById('txtId').value = cliente.id_cli
     document.getElementById('nombre').value = cliente.nombre_cli
     document.getElementById('dni').value = cliente.dni_cli
@@ -135,26 +133,34 @@ function edit(id) {
     document.getElementById('telefono').value = cliente.telefono_cli
     document.getElementById('direccion').value = cliente.direccion_cli
     document.getElementById('clase_cli').value = cliente.clase_cli
+    modal_proceso_cerrar()
 };
-async function remove(id) {
-    manejoDeFechas();
-    let url = URL_API_almacen_central + 'clientes_remove'
-    let data = {
-        'id_cli': id,
-    };
-    let response = await funcionFetchDos(url, data);
-    if(response.status === "success"){
-        await conteoFilas(subRutaA(1), filas_total_bd, indice_tabla, 
-                            document.getElementById("numeracionTablaClientes"), 20)
-        await searchDatos(subRutaB(num_filas_tabla.value, 1), base_datos, "#tabla-clientes")
-        if(document.querySelector("#filtro-tabla-clientes-clase").value == 0){
-            localStorage.setItem("clientes_consulta", JSON.stringify(await cargarDatos('clientes_ventas')))                       
-        }else if(document.querySelector("#filtro-tabla-clientes-clase") == 1){
-            localStorage.setItem("proveedores_consulta", JSON.stringify(await cargarDatos('proveedores')))
+async function remove(id, nombre) {
+    modal_proceso_abrir(`¿Desea eliminar el cliente ${nombre}?.`, ``)
+    modal_proceso_abrir_botones()
+    document.getElementById("si_comprobante").addEventListener("click", async ()=>{
+        manejoDeFechas();
+        let url = URL_API_almacen_central + 'clientes_remove'
+        let data = {
+            'id_cli': id,
         };
-        modal_proceso_abrir(`${response.message}`)
-        modal_proceso_salir_botones()
-    };
+        let response = await funcionFetchDos(url, data);
+        if(response.status === "success"){
+            await conteoFilas(subRutaA(1), filas_total_bd, indice_tabla, 
+                                document.getElementById("numeracionTablaClientes"), 20)
+            await searchDatos(subRutaB(num_filas_tabla.value, 1), base_datos, "#tabla-clientes")
+            if(document.querySelector("#filtro-tabla-clientes-clase").value == 0){
+                localStorage.setItem("clientes_consulta", JSON.stringify(await cargarDatos('clientes_ventas')))                       
+            }else if(document.querySelector("#filtro-tabla-clientes-clase") == 1){
+                localStorage.setItem("proveedores_consulta", JSON.stringify(await cargarDatos('proveedores')))
+            };
+            modal_proceso_abrir(`${response.message}`)
+            modal_proceso_salir_botones()
+        };
+    });
+    document.getElementById("no_salir").addEventListener("click", ()=>{
+        modal_proceso_cerrar()
+    });
 };
 
 
@@ -187,6 +193,7 @@ async function saveClientes(e) {
             };
             let url = URL_API_almacen_central + 'clientes'
             let response = await funcionFetchDos(url, dataS)
+            
             if(response.status === "success"){
                 await conteoFilas(subRutaA(1), filas_total_bd, indice_tabla, 
                                 document.getElementById("numeracionTablaClientes"), 20)
@@ -195,11 +202,13 @@ async function saveClientes(e) {
                 if(document.getElementById('clase_cli').value == 0){
                     localStorage.setItem("clientes_consulta", JSON.stringify(await cargarDatos('clientes_ventas')))
                     cli_db = JSON.parse(localStorage.getItem("clientes_consulta"));
+
                     modal_proceso_abrir(`${response.message}`, "")
                     modal_proceso_salir_botones()
                 }else if(document.getElementById('clase_cli').value == 1){
                     localStorage.setItem("proveedores_consulta", JSON.stringify(await cargarDatos('proveedores')))
                     prv_db = JSON.parse(localStorage.getItem("proveedores_consulta"));
+
                     modal_proceso_abrir(`${response.message}`, "")
                     modal_proceso_salir_botones() 
                 }
@@ -435,11 +444,16 @@ document.querySelectorAll("._radio_cp").forEach((event)=>{
 ////////////////////////////////////////////////////////////////////////////////////////
 document.getElementById("reporteClientes").addEventListener("click", async (e)=>{
     e.preventDefault()
+
+    modal_proceso_abrir("Buscando resultados...", "", "")
     reporte_ = await cargarDatos(`clientes_reporte`)
-    console.log(reporte_)
+    await delay(500)
     reporte_clientes()
+    modal_proceso_abrir("Resultados encontrados.", "", "")
+    modal_proceso_salir_botones()
 })
 function reporte_clientes(){
+    manejoDeFechas()
     let suma_efectivo = 0;
     let suma_tarjeta = 0;
     let suma_credito = 0;
@@ -448,11 +462,33 @@ function reporte_clientes(){
     let suma_local = 0;
     let suma_total = 0;
     let total = 0;
-    let html = `<div style="display: grid; justify-items: center;">
-                    <h2 style="text-align: center;">Reporte de ventas por cliente</h2>
-                    <br>
-                    <h3 style="text-align: center;">${new Date()}</h3>
-                    <br>
+    let html = `<style>
+                    body{
+                        display: grid;
+                        align-items: center;
+                        align-content: space-between;
+                        justify-content: center;
+                        gap: 20px;
+                        background: rgba(173, 216, 230, 0.8);
+                        color: #161616;
+                        justify-items: center;
+                    }
+                    td, th{
+                        border: 1px solid #161616;
+                    }
+                    th{
+                        background: rgba(100, 149, 237, 0.8);
+                    }
+                    .titulo_reporte{
+                        display: grid;
+                        justify-items: center;
+                    }
+                </style>
+                <div class="titulo_reporte">
+                    <h2>Reporte de ventas por cliente</h2>
+                    <h3>Fecha de reporte: ${inicio} a ${fin}</h3>
+                </div>
+
                     <table>
                         <thead>
                             <th style="width: 120px; text-align: center;">Cliente</th>
@@ -482,7 +518,7 @@ function reporte_clientes(){
         suma_local += Number(e.local);
         suma_total += (e.pago_efectivo + e.pago_tarjeta + e.pago_credito - e.pago_devoluciones);
         total = e.pago_efectivo + e.pago_tarjeta + e.pago_credito - e.pago_devoluciones;
-                let fila = `<tr>
+            let fila =      `<tr>
                                 <td>${e.nombre_cli}</td>
                                 <td style="text-align: end;">${(e.pago_efectivo).toFixed(2)}</td>
                                 <td style="text-align: end;">${Math.round((e.pago_efectivo/total) * 100)}%</td>
@@ -500,12 +536,11 @@ function reporte_clientes(){
                                 <td style="text-align: center;">${e.ultima_venta}</td>
                                 <td style="text-align: center;">${e.telefono_cli}</td>
                             </tr>`
-                html = html + fila;
+            html = html + fila;
     }
                         
                 html += `</tbody>
-                        <tfooter>
-                            <tr></tr>
+                        <tfoot>
                             <tr>
                                 <th>Total</th>
                                 <th style="text-align: end;">${(suma_efectivo).toFixed(2)}</th>
@@ -524,10 +559,116 @@ function reporte_clientes(){
                                 <th></th>
                                 <th></th>
                             </tr>
-                        </tfooter>
+                        </tfoot>
                     </table>
+                    <h4 style="text-align: center;">${new Date()}</h4>
                     <button onclick="window.print()">Imprimir</button>
-                </div>`
+                `
     let nuevaVentana = window.open('');
     nuevaVentana.document.write(html);
+}
+async function reporteCliente(id_cliente, nombre){
+    modal_proceso_abrir("Buscando resultados...", "", "")
+    manejoDeFechas()
+    let suma_unidades = 0;
+    let suma_devoluciones = 0;
+    let suma_monto = 0;
+    let reporte_cliente = await cargarDatos(    `salidas_reporte_cliente?`+
+                                                `comprobante_salidas=Venta&`+
+                                                `cliente_salidas=${id_cliente}&`+
+                                                `fecha_inicio_salidas=${inicio}&`+
+                                                `fecha_fin_salidas=${fin}`)
+
+    await delay(500)
+    if(reporte_cliente.length > 0){
+
+        let html = `<style>
+                        body{
+                            display: grid;
+                            align-items: center;
+                            align-content: space-between;
+                            justify-content: center;
+                            gap: 20px;
+                            background: rgba(173, 216, 230, 0.8);
+                            color: #161616;
+                        }
+                        td, th{
+                            border: 1px solid #161616;
+                        }
+                        th{
+                            background: rgba(100, 149, 237, 0.8);
+                        }
+                        .titulo_reporte{
+                            display: grid;
+                            justify-items: center;
+                        }
+                    </style>
+                    <div class="titulo_reporte">
+                        <h2>Reporte de consumos del cliente ${nombre}</h2>
+                        <h3>Fecha de reporte: ${inicio} a ${fin}</h3>
+                    </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="row" colspan="16"><h2>Detalle de consumos</h2></th>
+                        </tr>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Sucursal</th>
+                            <th>Código</th>
+                            <th>Descripción</th>
+                            <th>Comprobantes</th>
+                            <th>Usuario</th>
+                            <th>Unidades</th>
+                            <th>Devolución</th>
+                            <th>Monto</th>
+                        </tr>
+                    </thead>
+                    <tbody>`
+        for(a_s of reporte_cliente){
+            let fila =  `<tr>
+                            <td>${a_s.fecha}</td>
+                            <td>${a_s.sucursal_nombre}</td>
+                            <td>${a_s.codigo}</td>
+                            <td>${a_s.descripcion}</td>
+                            <td>${a_s.comprobante}</td>
+                            <td style="text-align: end;">${a_s.nombres}</td>
+                            <td style="text-align: end;">${a_s.existencias_salidas}</td>
+                            <td style="text-align: end;">${a_s.existencias_devueltas}</td>
+                            <td style="text-align: end;">${((a_s.existencias_salidas - a_s.existencias_devueltas) * a_s.precio_venta_salidas).toFixed(2)}</td>
+                        </tr>`
+            html = html + fila; 
+            suma_unidades += a_s.existencias_salidas;
+            suma_devoluciones += a_s.existencias_devueltas;
+            suma_monto += ((a_s.existencias_salidas - a_s.existencias_devueltas) * a_s.precio_venta_salidas);
+        }                        
+                                
+        html += `
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th scope="row" colspan="6">Total</th>
+                            <th>${suma_unidades}</th>
+                            <th>${suma_devoluciones}</th>
+                            <th>${suma_monto.toFixed(2)}</th>
+                        </tr>
+                    </tfoot>
+                </table>`              
+        html += `<h4 style="text-align: center;">${new Date()}</h4>
+                <div>
+                    <button class="imprimir_reporte_usuarios">Imprimir</button>
+                </div>
+                <script>
+                    document.querySelector(".imprimir_reporte_usuarios").addEventListener("click", (event) => {
+                        event.preventDefault()
+                        window.print()
+                    });
+                </script>`
+        modal_proceso_cerrar()
+        let nuevaVentana = window.open('');
+        nuevaVentana.document.write(html);
+    }else{
+        modal_proceso_abrir("No se encontraron resultados.", "", "")
+        modal_proceso_salir_botones()
+    }
 }
