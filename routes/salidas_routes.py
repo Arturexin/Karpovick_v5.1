@@ -611,7 +611,7 @@ def getSalidasComprobante(comprobante):
     try:
         usuarioLlave = session.get('usernameDos')
         with mysql.connection.cursor() as cur:
-            query = ("SELECT idSal AS id, sucursal_nombre, codigo, descripcion, existencias_salidas AS existencias, comprobante, existencias_devueltas, id_sucursales, `salidas`.`idProd` AS id_prod, precio_venta_salidas, cliente "
+            query = ("SELECT idSal AS id, sucursal_nombre, codigo, descripcion, existencias_salidas AS existencias, comprobante, existencias_devueltas, id_sucursales, `salidas`.`idProd` AS id_prod, precio_venta_salidas AS precio, cliente "
                      "FROM salidas "
                      "JOIN almacen_central ON `salidas`.`idProd` = `almacen_central`.`idProd` "
                      "JOIN sucursales ON `salidas`.`sucursal` = `sucursales`.`id_sucursales` "
@@ -632,7 +632,7 @@ def getSalidasComprobante(comprobante):
                 'existencias_devueltas': fila[6],
                 'id_sucursales': fila[7],
                 'id_prod': fila[8],
-                'precio_venta_salidas':fila[9],
+                'precio':fila[9],
                 'cliente':fila[10],
                 }
             resultado.append(contenido)

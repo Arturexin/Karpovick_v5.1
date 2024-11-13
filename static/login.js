@@ -13,6 +13,14 @@ const expresiones = {
     password: /(?=(.*[0-9]))(?=.*[\!@#$%^&*()\\[\]{}\-_+=|:;"'<>,./?])(?=.*[a-z])(?=(.*[A-Z]))(?=(.*)).{8,}/
 };
 formLogin()
+function checkCapsLock(event) { 
+    let capsWarning = document.getElementById("capsWarning"); 
+    if (event.getModifierState("CapsLock")) { 
+        capsWarning.style.display = "block"; 
+    } else { 
+        capsWarning.style.display = "none"; 
+    } 
+}
 function formLogin(){
     let form = `<form id="formulario-loggin" action="/login" method="POST">
                     <div class="contenedor-formulario-uno">
@@ -21,9 +29,9 @@ function formLogin(){
                             <input id="username" type="text" name="username">
                         </label>
                         <label>Constraseña
-                            <input id="password" type="password" name="password">
+                            <input id="password" type="password" name="password" onkeyup="checkCapsLock(event)">
                         </label>
-                        
+                        <p id="capsWarning" style="display:none;color:#cd4b4bc4;font-size: 14px; text-align:center">¡La tecla de mayúsculas está activada!</p>
                         </div>
                     </form>
                     <dir class="centrado_form">

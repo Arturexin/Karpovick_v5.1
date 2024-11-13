@@ -157,7 +157,6 @@ app.register_blueprint(ventas_.ventas_clientes_reporte)
 app.register_blueprint(ventas_.ventas_tabla_reporte)
 app.register_blueprint(ventas_.ventas_grafico)
 app.register_blueprint(ventas_.ventas_comprobante)
-app.register_blueprint(ventas_.ventas_cliente_conteo)
 app.register_blueprint(ventas_.ventas_delete)
 ##########################################################################################################################################################################
 # Datos de la tabla USUARIOS

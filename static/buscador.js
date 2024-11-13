@@ -1,7 +1,8 @@
 const elements = document.querySelectorAll(".stock_sucursal");
 
-function busquedaDetalle(indice, termino){
+async function busquedaDetalle(indice, termino){
     // Obtén la referencia al elemento <ul>
+    modal_proceso_abrir("Buscando resultados...", "", "")
     let miUl_cabecera = document.getElementById("lista_cabecera");
     let miUl_detalle = document.getElementById("lista_detalle");
     let terminoBusqueda = termino;
@@ -27,7 +28,8 @@ function busquedaDetalle(indice, termino){
                             `</li>`;
         };
     };
-    
+    await delay(500)
+    modal_proceso_cerrar()
     if(nuevoLi !== ""){
         miUl_cabecera.innerHTML = cabecera;
         miUl_detalle.innerHTML = nuevoLi;
@@ -38,6 +40,7 @@ function busquedaDetalle(indice, termino){
 };
 
 async function cargarTop(sucursal_id, sucursal_columna){
+    modal_proceso_abrir("Buscando resultados...", "", "")
     let maximo = 0;
     let top_ventas = await cargarDatos(`salidas_top_ventas?`+
                                     `year_actual=${anio_principal}&`+
@@ -47,6 +50,8 @@ async function cargarTop(sucursal_id, sucursal_columna){
                                     `sucursal_get=${sucursal_columna}`)
     let miUl_cabecera = document.getElementById("lista_cabecera");
     let miUl_detalle = document.getElementById("lista_detalle");
+    await delay(500)
+    modal_proceso_cerrar()
     if(top_ventas.length > 0){
         let cabecera =  `<li class="diseno_li">`+
                             `<span style="width: 100px; text-align: center;"><h3>Código</h3></span> `+
@@ -83,41 +88,38 @@ async function cargarTop(sucursal_id, sucursal_columna){
 function marcarDatosCantidad(clase, dato, index){
     if (Number(dato) <= 0) {
         document.querySelectorAll(clase)[index].style.background = mapa_calor[4];
-        document.querySelectorAll(clase)[index].style.color = "black";
     }else if(Number(dato) <= 5){
         document.querySelectorAll(clase)[index].style.background = mapa_calor[3];
-        document.querySelectorAll(clase)[index].style.color = "black";
     }else if(Number(dato) <= 10){
         document.querySelectorAll(clase)[index].style.background = mapa_calor[2];
-        document.querySelectorAll(clase)[index].style.color = "black";
     }else if(Number(dato) <= 20){
         document.querySelectorAll(clase)[index].style.background = mapa_calor[1];
-        document.querySelectorAll(clase)[index].style.color = "black";
     }else{
         document.querySelectorAll(clase)[index].style.background = mapa_calor[0];
-        document.querySelectorAll(clase)[index].style.color = "black";
     };
 };
 function marcarDatosPuesto(clase, dato, index, maximo){
     if (Number(dato) <= maximo * 0.20) {
-        document.querySelectorAll(clase)[index].style.color = mapa_calor[4];
+        document.querySelectorAll(clase)[index].style.background = mapa_calor[4];
     }else if(Number(dato) <= maximo * 0.40){
-        document.querySelectorAll(clase)[index].style.color = mapa_calor[3];
+        document.querySelectorAll(clase)[index].style.background = mapa_calor[3];
     }else if(Number(dato) <= maximo * 0.60){
-        document.querySelectorAll(clase)[index].style.color = mapa_calor[2];
+        document.querySelectorAll(clase)[index].style.background = mapa_calor[2];
     }else if(Number(dato) <= maximo * 0.80){
-        document.querySelectorAll(clase)[index].style.color = mapa_calor[1];
+        document.querySelectorAll(clase)[index].style.background = mapa_calor[1];
     }else if(Number(dato) <= maximo * 1){
-        document.querySelectorAll(clase)[index].style.color = mapa_calor[0];
+        document.querySelectorAll(clase)[index].style.background = mapa_calor[0];
     };
 };
 function busquedaStock(){
     elements.forEach((event, i)=>{
-        event.addEventListener("click", ()=>{
+        event.addEventListener("click", async ()=>{
             removerMarcaBotonDos()
             let sucursal_ = suc_db.find(x=> x.sucursal_nombre === suc_add[i])
             if(sucursal_){
-                cargarTop(sucursal_.id_sucursales, sucursales_activas[i])
+                
+                await cargarTop(sucursal_.id_sucursales, sucursales_activas[i])
+                
                 event.style.background = `${cls[i]}`
             }
         });
@@ -162,12 +164,12 @@ function imprimirContenido() {
 document.getElementById("boton_buscar_codigo").addEventListener("click", ()=>{
     removerMarcaBotonDos()
     busquedaDetalle(0, document.getElementById("buscador_descripcion").value)
-    document.getElementById("buscador_descripcion").focus()
+    document.getElementById("buscador_descripcion").select()
 });
 document.getElementById("boton_buscar_descripcion").addEventListener("click", ()=>{
     removerMarcaBotonDos()
     busquedaDetalle(1, document.getElementById("buscador_descripcion").value)
-    document.getElementById("buscador_descripcion").focus()
+    document.getElementById("buscador_descripcion").select()
 });
 
 
@@ -175,7 +177,7 @@ document.getElementById("boton_borrar_").addEventListener("click", ()=>{
     document.getElementById("categoria_buscador_detalle").value = "0";
     clave_form > 0 ? document.getElementById("periodo_tiempo").value = "0":"";
     document.getElementById("buscador_descripcion").value = ""
-    document.getElementById("buscador_descripcion").focus()
+    document.getElementById("buscador_descripcion").select()
     removerMarcaBotonDos()
 });
 function agregarBusquedaDetalleUno(button){

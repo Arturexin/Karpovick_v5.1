@@ -12,10 +12,15 @@ function init(){
 };
 const URL_API_almacen_central = 'http://127.0.0.1:3000/api/'
 
-let fechaPrincipal = "";
 function generarFecha(){
-    fechaPrincipal = new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate()+" "+new Date().getHours()+":"+new Date().getMinutes()+":"+new Date().getSeconds();
-    return fechaPrincipal;
+    const fecha = new Date(); 
+    const dia = String(fecha.getDate()).padStart(2, '0'); // Asegura que el día tenga dos dígitos 
+    const mes = String(fecha.getMonth() + 1).padStart(2, '0'); // Asegura que el mes tenga dos dígitos 
+    const anio = fecha.getFullYear();
+    const hora = String(fecha.getHours()).padStart(2, '0')
+    const minuto = String(fecha.getMinutes()).padStart(2, '0')
+    const segundo = String(fecha.getSeconds()).padStart(2, '0')
+    return `${anio}-${mes}-${dia} ${hora}:${minuto}:${segundo}`;
 };
 let clave_form = 0;
 let sucursales_activas = ['existencias_ac', 'existencias_su', 'existencias_sd', 'existencias_st', 'existencias_sc'];
@@ -135,6 +140,7 @@ async function cargarIndices(){
 };
 
 let inv_db = JSON.parse(localStorage.getItem("inventarios_consulta"));
+let inv_db_grupo = dividirProductosDinamicamente(inv_db);
 let suc_db = JSON.parse(localStorage.getItem("sucursal_consulta"));
 let cat_db = JSON.parse(localStorage.getItem("categoria_consulta"));
 let prv_db = JSON.parse(localStorage.getItem("proveedores_consulta"));
@@ -312,7 +318,7 @@ function imprimirListaTabla() {
 };
 
 ////////////////////// Función para dividir productos en grupos según el primer carácter del código
-function dividirProductosDinamicamente(productos) {
+/* function dividirProductosDinamicamente(productos) {
     let grupos = {};
     
     productos.forEach(producto => {
@@ -334,7 +340,6 @@ let inv_db_grupo = dividirProductosDinamicamente(inv_db);
 
 // Función para buscar productos en los grupos generados
 function buscarProductosDinamicamente(texto) {
-    /* let productosPorGrupo = JSON.parse(localStorage.getItem('productosPorGrupo')); */
     if(texto !== ""){
 
         let textoBuscado = texto.toLowerCase();
@@ -347,14 +352,83 @@ function buscarProductosDinamicamente(texto) {
         
         // Filtrar los productos en el grupo seleccionado
         return inv_db_grupo[primerCaracter].find(y => y.codigo.toLowerCase().startsWith(texto.toLowerCase()))
-        /* return productosPorGrupo[primerCaracter].filter(producto => producto.codigo.toLowerCase().startsWith(textoBuscado)); */
+        return productosPorGrupo[primerCaracter].filter(producto => producto.codigo.toLowerCase().startsWith(textoBuscado));
     }
-};
+}; */
+function dividirProductosDinamicamente(productos) {
+    let grupos = {};
+
+    if (!Array.isArray(productos)) {
+        console.error("El argumento debe ser un array");
+        return grupos;
+    }
+
+    productos.forEach(producto => {
+        if (producto.codigo && typeof producto.codigo === 'string') {
+            let nivel = grupos;
+            for (let i = 0; i < 3; i++) {// la agrupación se hará hasta un tercer nivel
+                let caracter = producto.codigo[i].toUpperCase();
+                
+                if (caracter === '-') {
+                    // Detener agrupamiento si encuentra un guion
+                    break;
+                }
+
+                if (!nivel[caracter]) {
+                    nivel[caracter] = {};
+                }
+                // Si es el último carácter o el siguiente es un guion, guarda el producto
+                if (i === 2 || producto.codigo[i + 1] === '-') {
+                    if (!Array.isArray(nivel[caracter])) {
+                        nivel[caracter] = [];
+                    }
+                    nivel[caracter].push(producto);
+                } else {
+                    nivel = nivel[caracter];
+                }
+            }
+        } else {
+            console.warn("Producto sin código o con código no válido:", producto);
+        }
+    });
+
+    return grupos;
+}
+
+
+// Función para buscar productos en los grupos generados
+function buscarProductosDinamicamente(texto) {
+    if (texto !== "") {
+        let textoBuscado = texto.toUpperCase();
+        let nivel = inv_db_grupo;
+
+        for (let i = 0; i < 3; i++) {
+            let caracter = textoBuscado[i];
+            
+            if (caracter === '-') {
+                break;
+            }
+
+            if (!nivel[caracter]) {
+                return []; // Si no existe el grupo, no hay resultados
+            }
+            nivel = nivel[caracter];
+        }
+
+        // Filtrar los productos en el grupo seleccionado
+        if (Array.isArray(nivel)) {
+            return nivel.find(producto => producto.codigo.toLowerCase().startsWith(texto.toLowerCase()));
+        } else {
+            return [];
+        }
+    }
+    return [];
+}
 function buscarProducto(textoBusqueda){
     textoBusqueda.addEventListener("keyup", () =>{
-        
+
         let prod_ = buscarProductosDinamicamente(textoBusqueda.value);
-        
+
         if(prod_){
             document.getElementById('id-form').value = prod_.idProd
             document.getElementById('categoria-form').value = prod_.categoria

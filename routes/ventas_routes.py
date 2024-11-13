@@ -11,7 +11,6 @@ ventas_clientes_reporte = Blueprint('ventas_clientes_reporte', __name__)
 ventas_tabla_reporte = Blueprint('ventas_tabla_reporte', __name__)
 ventas_grafico = Blueprint('ventas_grafico', __name__)
 ventas_comprobante = Blueprint('ventas_comprobante', __name__)
-ventas_cliente_conteo = Blueprint('ventas_cliente_conteo', __name__)
 ventas_delete = Blueprint('ventas_delete', __name__)
 
 
@@ -271,33 +270,7 @@ def getVentasComprobante(comprobante):
         return jsonify(resultado)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-###----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@ventas_cliente_conteo.route('/api/ventas_cliente_conteo/<int:dni_cliente>')#VENTAS
-@cross_origin()
-@login_required
-def getVentasCliente(dni_cliente):
-    try:
-        usuarioLlave = session.get('usernameDos')
-        with mysql.connection.cursor() as cur:
-            query = ("SELECT COUNT(dni_cliente) AS conteo_cliente, "
-                     "SUM(modo_efectivo + modo_credito + modo_tarjeta - modo_perdida) AS suma_total "
-                     "FROM ventas "
-                     "WHERE `identificador_ventas` = %s "
-                     "AND ventas.estado > 0 "
-                     "AND dni_cliente LIKE %s")
-            cur.execute(query, (usuarioLlave, dni_cliente))
-            data = cur.fetchall()
 
-        resultado = []
-        for fila in data:
-            contenido = {
-                'conteo_cliente': fila[0],
-                'suma_total': fila[1]
-                }
-            resultado.append(contenido)
-        return jsonify(resultado)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 ###----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @ventas_delete.route('/api/ventas', methods=['POST'])
 @cross_origin()

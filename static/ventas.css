@@ -167,10 +167,6 @@
 .acciones_caja{
     margin: 0px;
 }
-#concurrencia_cliente{
-    border: 1px solid var(--border-principal);
-    padding: 3px 10px;
-}
 .label-checkbox{
     display: flex;
     justify-content: space-around;

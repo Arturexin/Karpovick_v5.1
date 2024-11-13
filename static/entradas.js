@@ -81,7 +81,7 @@ function cuerpoFilaTabla(e){
                     : formatoMoneda((e.existencias_entradas - e.existencias_devueltas) * e.costo_unitario)}</td>
                 <td>${e.comprobante}</td>
                 <td>${e.fecha}</td>
-                <td style="text-align: center;width: 80px">
+                <td style="text-align: center;width: 100px">
                     <div class="tooltip">
                         <span onclick="accionDevoluciones(${e.idEntr})" style="font-size:18px;" class="material-symbols-outlined myButtonEditar">assignment_return</span>
                         <span class="tooltiptext">Devolver</span>
@@ -108,8 +108,7 @@ async function accionRemove(id) {
     modal_proceso_abrir("Buscando resultados...", "", "")
 
     let entradas = base_datos.array.find(y => y.idEntr == id)// obtenemos los datos de la fila
-    let db = JSON.parse(localStorage.getItem("inventarios_consulta"))
-    let producto = db.find(x=> x.codigo === entradas.codigo)
+    let producto = buscarProductosDinamicamente(entradas.codigo)
 
     await delay(500)
     modal_proceso_cerrar()
@@ -144,22 +143,20 @@ async function procesarRemove(idEntr){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 async function accionDevoluciones(id) {
     modal_proceso_abrir("Buscando resultados...", "", "")
-
     let entradas = base_datos.array.find(x => x.idEntr == id)
-    let db = JSON.parse(localStorage.getItem("inventarios_consulta"))
-    let sucursales_comparacion = JSON.parse(localStorage.getItem("sucursal_consulta"))
-
     if(entradas.comprobante.startsWith("Compra") || entradas.comprobante.startsWith("Recompra")){
         await delay(500)
         modal_proceso_cerrar()
-        let producto = db.find(x=> x.codigo === entradas.codigo)
+
+        let producto = buscarProductosDinamicamente(entradas.codigo)
+        
         tabla_proforma_productos(producto, "Devoluciones", entradas.categoria_nombre, entradas.comprobante)
-        sucursales_comparacion.forEach((e, i) =>{
-            if(entradas.sucursal_nombre == e.sucursal_nombre){
-                sucursal_id_entradas = e.id_sucursales
-                tabla_body_productos(entradas, i, sucursal_id_entradas)
-            }
-        });
+        let indice_suc = suc_add.findIndex(x=> x === entradas.sucursal_nombre)
+        let datos_suc = suc_db.find(x=> x.sucursal_nombre === entradas.sucursal_nombre)
+        if(datos_suc && indice_suc){
+            sucursal_id_entradas = datos_suc.id_sucursales
+            tabla_body_productos(entradas, indice_suc, sucursal_id_entradas)
+        }
         contenedorBotonesProducto(`procesarDevolucion()`, "Procesar Devolución")
         document.getElementById("acciones_rapidas_entradas").classList.add("modal-show")
     }else{
@@ -431,9 +428,8 @@ function modificarArrayVolcado(array){
 document.getElementById("carga_archivo").addEventListener("change", leerArchivo);
 
 function agregarId(array){
-    let _productos_ = JSON.parse(localStorage.getItem("inventarios_consulta"));
     array.forEach((event)=>{
-        let prod = _productos_.find(y => y.codigo === event.codigo)
+        let prod = buscarProductosDinamicamente(event.codigo)
         event.idProd = prod.idProd;
     });
 };
@@ -451,10 +447,9 @@ document.getElementById("volcar_datos").addEventListener("click", (e)=>{
 
 let array_producto_repetido = [];
 function comprobarDatosRepetidos(){
-    let _productos_ = JSON.parse(localStorage.getItem("inventarios_consulta"));
 
     array_productos.forEach((event)=>{
-        let codig = _productos_.find(y => y.codigo === event.codigo);
+        let codig = buscarProductosDinamicamente(event.codigo)
         if(codig !== undefined){
             array_producto_repetido.push(codig)
         }

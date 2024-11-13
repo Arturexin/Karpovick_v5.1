@@ -19,7 +19,6 @@ const barras_compras = [".cg_1_c", ".cg_2_c", ".cg_3_c", ".cg_4_c", ".cg_5_c"]
 function cargarDatosAnio(){
     document.getElementById("cargar_datos_anio").addEventListener("click", async ()=>{
         anio_principal = anio_referencia.value;
-
         graficoClientes();
 
         modal_proceso_abrir(`Datos del año ${anio_principal} cargados.`, "")
@@ -569,10 +568,7 @@ function reporte_clientes(){
 }
 async function reporteCliente(id_cliente, nombre){
     modal_proceso_abrir("Buscando resultados...", "", "")
-    manejoDeFechas()
-    let suma_unidades = 0;
-    let suma_devoluciones = 0;
-    let suma_monto = 0;
+    manejoDeFechas();
     let reporte_cliente = await cargarDatos(    `salidas_reporte_cliente?`+
                                                 `comprobante_salidas=Venta&`+
                                                 `cliente_salidas=${id_cliente}&`+
@@ -581,89 +577,13 @@ async function reporteCliente(id_cliente, nombre){
 
     await delay(500)
     if(reporte_cliente.length > 0){
-
-        let html = `<style>
-                        body{
-                            display: grid;
-                            align-items: center;
-                            align-content: space-between;
-                            justify-content: center;
-                            gap: 20px;
-                            background: rgba(173, 216, 230, 0.8);
-                            color: #161616;
-                        }
-                        td, th{
-                            border: 1px solid #161616;
-                        }
-                        th{
-                            background: rgba(100, 149, 237, 0.8);
-                        }
-                        .titulo_reporte{
-                            display: grid;
-                            justify-items: center;
-                        }
-                    </style>
-                    <div class="titulo_reporte">
-                        <h2>Reporte de consumos del cliente ${nombre}</h2>
-                        <h3>Fecha de reporte: ${inicio} a ${fin}</h3>
-                    </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th scope="row" colspan="16"><h2>Detalle de consumos</h2></th>
-                        </tr>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Sucursal</th>
-                            <th>Código</th>
-                            <th>Descripción</th>
-                            <th>Comprobantes</th>
-                            <th>Usuario</th>
-                            <th>Unidades</th>
-                            <th>Devolución</th>
-                            <th>Monto</th>
-                        </tr>
-                    </thead>
-                    <tbody>`
-        for(a_s of reporte_cliente){
-            let fila =  `<tr>
-                            <td>${a_s.fecha}</td>
-                            <td>${a_s.sucursal_nombre}</td>
-                            <td>${a_s.codigo}</td>
-                            <td>${a_s.descripcion}</td>
-                            <td>${a_s.comprobante}</td>
-                            <td style="text-align: end;">${a_s.nombres}</td>
-                            <td style="text-align: end;">${a_s.existencias_salidas}</td>
-                            <td style="text-align: end;">${a_s.existencias_devueltas}</td>
-                            <td style="text-align: end;">${((a_s.existencias_salidas - a_s.existencias_devueltas) * a_s.precio_venta_salidas).toFixed(2)}</td>
-                        </tr>`
-            html = html + fila; 
-            suma_unidades += a_s.existencias_salidas;
-            suma_devoluciones += a_s.existencias_devueltas;
-            suma_monto += ((a_s.existencias_salidas - a_s.existencias_devueltas) * a_s.precio_venta_salidas);
-        }                        
-                                
-        html += `
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <th scope="row" colspan="6">Total</th>
-                            <th>${suma_unidades}</th>
-                            <th>${suma_devoluciones}</th>
-                            <th>${suma_monto.toFixed(2)}</th>
-                        </tr>
-                    </tfoot>
-                </table>`              
-        html += `<h4 style="text-align: center;">${new Date()}</h4>
-                <div>
-                    <button class="imprimir_reporte_usuarios">Imprimir</button>
-                </div>
-                <script>
-                    document.querySelector(".imprimir_reporte_usuarios").addEventListener("click", (event) => {
-                        event.preventDefault()
-                        window.print()
-                    });
-                </script>`
+        let html = estilosRep();
+        html += `<div class="titulo_reporte">
+                    <h2>Reporte de consumos del cliente ${nombre}</h2>
+                    <h3>Fecha de reporte: ${inicio} a ${fin}</h3>
+                </div>` 
+        html += tablaRep(reporte_cliente, nombre)            
+        html += imprimirRep();
         modal_proceso_cerrar()
         let nuevaVentana = window.open('');
         nuevaVentana.document.write(html);

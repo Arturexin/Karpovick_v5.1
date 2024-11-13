@@ -51,21 +51,41 @@ btnSalidas.addEventListener("click", (e) => {
 });
 //////  CLIENTES//////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-async function consumoCliente(){// Busca datos de consumos acumulados de clientes registrados.
-    let cli_consumo = await cargarDatos(`ventas_cliente_conteo/${Number(document.getElementById("txtIdv").value)}`);
-    await delay(500); 
-    if(cli_consumo.length > 0){
-        if(cli_consumo[0].conteo_cliente > 0){
-            document.getElementById("concurrencia_cliente").textContent = `Cliente recurrente con ${cli_consumo[0].conteo_cliente} `+
-                                                                            `operaciones de ${moneda()} ${cli_consumo[0].suma_total.toFixed(2)}, `+
-                                                                            `consumo promedio ${moneda()} ${(cli_consumo[0].suma_total/cli_consumo[0].conteo_cliente).toFixed(2)}`
-        };
-    };
-};
+document.getElementById("reporte_cliente").addEventListener("click", (e)=>{
+    e.preventDefault();
+    let cliente_ = Number(document.getElementById('txtIdv').value);
+    let nombre_ = document.getElementById('clientesv').value;
+    if(cliente_ > 0 && cliente_ !== cli_db[0].id_cli){
+        reporteCliente(cliente_, nombre_)
+    }
+})
+async function reporteCliente(id_cliente, nombre){
+    modal_proceso_abrir("Buscando resultados...", "", "")
+    let reporte_cliente = await cargarDatos(    `salidas_reporte_cliente?`+
+                                                `comprobante_salidas=Venta&`+
+                                                `cliente_salidas=${id_cliente}&`+
+                                                `fecha_inicio_salidas=2000-01-01&`+
+                                                `fecha_fin_salidas=${new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate()}`)
+
+    await delay(500)
+    if(reporte_cliente.length > 0){
+        let html = estilosRep();
+        html += `<div class="titulo_reporte">
+                    <h2>Reporte de consumos del cliente ${nombre}</h2>
+                    <h3>Fecha de reporte: ${reporte_cliente[0].fecha} a ${new Date().getDate()+"-"+(new Date().getMonth()+1)+"-"+new Date().getFullYear()}</h3>
+                </div>` 
+        html += tablaRep(reporte_cliente, nombre)            
+        html += imprimirRep();
+        modal_proceso_cerrar()
+        let nuevaVentana = window.open('');
+        nuevaVentana.document.write(html);
+    }else{
+        modal_proceso_abrir("No se encontraron resultados.", "", "")
+        modal_proceso_salir_botones()
+    }
+}
 async function buscarClienteVentas(cliente){// Función que busca clientes registrados
     document.getElementById('txtIdv').value = cliente.id_cli
-    await consumoCliente()
-    
     document.getElementById('clientesv').value = cliente.nombre_cli
     document.getElementById('dniv').value = cliente.dni_cli
     document.getElementById('emailv').value = cliente.email_cli
@@ -79,12 +99,10 @@ function funcionBusquedaCliente(opcion){
     let array_dato_cliente = ["nombre_cli", "dni_cli", "email_cli", "telefono_cli"];
     let dato_cliente = cli_db.find(y => y[array_dato_cliente[opcion - 1]].toLowerCase().includes(document.getElementById('buscar-cliente-ventas').value.toLowerCase()))
     if(dato_cliente !== undefined){
-        document.getElementById("concurrencia_cliente").textContent = "";
         buscarClienteVentas(dato_cliente)
     }else{
         modal_proceso_abrir("Cliente no encontrado", "")
         modal_proceso_salir_botones_focus("buscar-cliente-ventas")
-        document.getElementById("concurrencia_cliente").textContent = "";
         document.getElementById("formularioClientesVentas").reset();
     };
 };
@@ -158,7 +176,6 @@ function buscarIdNuevo(){// Busca datos de un cliente recien registrado
 
 document.getElementById("boton_restablecer_form_clientes_ventas").addEventListener("click", ()=>{
     resetClientes();
-    document.getElementById("concurrencia_cliente").textContent = "";
 });
 //////////////////////////////////////////////////////////////////////////////////////
 ///////////////////BUSCADOR DE PRODUCTOS EN FORMULARIO VENTAS/////////////////////////
@@ -633,9 +650,8 @@ removerTablaVentas.addEventListener("click", () =>{
 //////////////////////////////////GENERAR TICKET/////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
 function NuevaVentanaComprobanteDePago(nro_venta, ticket_venta) {
+    let sucursal_ = select_sucursal.children[select_sucursal.selectedIndex].textContent;
     let nombre_cliente = document.getElementById("clientesv").value;
-    let bodyTicket = document.querySelector("#tabla-ventas > tbody");
-    let importe_venta = 0;
     let nuevaVentana;
     let comprobantes = ["Nota de venta", "Boleta de venta", "Factura"]
     let tipo_comprobante = ""
@@ -645,139 +661,33 @@ function NuevaVentanaComprobanteDePago(nro_venta, ticket_venta) {
         }
     });
     // Generar el contenido HTML con los datos de la tabla
-    let contenidoHTML = `<style>
-                            *{
-                                margin: 0;
-                                padding: 0;
-                            }
-                            .contenedor_ticket {
-                                display: flex;
-                                justify-content: center;
-                            }
-                            .ticket{
-                                width: 260px;
-                                margin: 20px;
-                                font-size: 10px;
-                                display: flex;
-                                flex-direction: column;
-                                align-items: center;
-                            }
-                            table{
-                                font-size: 10px;
-                            }
-                            .tabla_head th{
-                                color: black;
-                                border-top: 1px solid black;
-                                border-bottom: 1px solid black;
-                                margin: auto;
-                            }
-                            .codBarTicket {
-                                width: 150px;
-                            }
-                            .invisible {
-                                display: none;
-                            }
-                        </style>
-                        <div class="contenedor_ticket">
-                        <div class="ticket">
-                            <p>${neg_db[0].nombre_empresa}</p>
-                            <p>${neg_db[0].direccion}</p>
-                            <p>RUC: ${neg_db[0].ruc}</p>
-                            <p>Sede: ${select_sucursal.children[select_sucursal.selectedIndex].textContent}</p>
-                            <h2 class="tipo_comprobante">${tipo_comprobante}</h2>
-                            <br>
-                            <h2>${ticket_venta}</h2>
-                            <br>
-                            <p>FECHA   : ${generarFecha()}</p>
-                            <p>CLIENTE : ${nombre_cliente}</p>
-                            <table>
-                                <thead class="tabla_head">
-                                    <tr>
-                                        <th>PRODUCTO</th>
-                                        <th>CANTIDAD</th>
-                                        <th>PRECIO</th>
-                                        <th>IMPORTE</th>
-                                    </tr>
-                                </thead>
-                                <tbody>`;
-    for (let i = 0; i < bodyTicket.rows.length; i++) {
-        let producto = bodyTicket.children[i].children[3].textContent;
-        let catidad = bodyTicket.children[i].children[6].children[1].value;
-        let precio = Number(bodyTicket.children[i].children[7].textContent).toFixed(2);
-        let importe = bodyTicket.children[i].children[8].textContent;
-        contenidoHTML += `<tr>
-                                <td>${producto}</td>
-                                <td>${catidad}</td>
-                                <td>${precio}</td>
-                                <td>${importe}</td>
-                            </tr>`;
-        importe_venta += Number(bodyTicket.children[i].children[8].textContent);
-    };
-            contenidoHTML +=    `</tbody>
-                                <tfoot>
-                                    <tr class="clave">
-                                        <th>OP. GRAVADAS</th>
-                                        <th></th>
-                                        <th></th>
-                                        <th> ${moneda()} ${((1/1.18)*(importe_venta)).toFixed(2)}</th>
-                                    </tr>
-                                    <tr class="clave">
-                                        <th>I.G.V.</th>
-                                        <th>18%</th>
-                                        <th></th>
-                                        <th> ${moneda()} ${((importe_venta)-((1/1.18)*(importe_venta))).toFixed(2)}</th>
-                                    </tr>
-                                    <tr>
-                                        <th>IMPORTE TOTAL</th>
-                                        <th></th>
-                                        <th></th>
-                                        <th> ${moneda()} ${importe_venta.toFixed(2)}</th>
-                                    </tr>
-                                </tfoot>   
-                            </table>
-                            <p>USUARIO: ${usu_db.puesto_usuario}</p>
-                            <p>LADO: ORIGINAL   </p>
-                                        <img class="codBarTicket" src="">
-                            <br>
-                            <p>ACUMULA Y CANJEA PUNTOS EN NUESTROS<p>
-                            <p>CENTROS DE VENTA!!!<p>
-                            <p>GRACIAS POR SU PREFERENCIA<p>
-                            
-                        </div>
+    let contenidoHTML = estilosComp();
+    contenidoHTML +=    `<div class="contenedor_ticket">
+                            <div class="ticket">
+                                <p>${neg_db[0].nombre_empresa}</p>
+                                <p>${neg_db[0].direccion}</p>
+                                <p>RUC: ${neg_db[0].ruc}</p>
+                                <p>Sede: ${sucursal_}</p>
+                                <h2 class="tipo_comprobante">${tipo_comprobante}</h2>
+                                <br>
+                                <h2>${ticket_venta}</h2>
+                                <br>
+                                <p>FECHA   : ${generarFecha()}</p>
+                                <p>CLIENTE : ${nombre_cliente}</p>`
+    contenidoHTML += tablaComp(array_saldos);                        
+    contenidoHTML +=            `<p style="font-size: 9px">USUARIO: ${usu_db.nombre_usuario}</p>
+                                <p style="font-size: 9px">LADO: ORIGINAL   </p>
+                                <img style="height: 40px" class="codBarTicket" src="">
+                                
+                                <p>GRACIAS POR SU PREFERENCIA<p>
+                                
+                            </div>
                         </div>
                         <br>
                         <br>
                         <br>
-                        <br>
-                        <button id="imprimir_ticket">Imprimir</button>
-                        <button id="guardar_pdf_dos">PDF</button>
-                        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
-                        <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-                        <script>
-                            if(document.querySelector(".tipo_comprobante").textContent === "Nota de venta"){
-                                document.querySelectorAll(".clave").forEach((event)=>{
-                                    event.classList.add("invisible")
-                                });   
-                            }
-                            JsBarcode(".codBarTicket", "${nro_venta}", {
-                                format: "CODE128",
-                                displayValue: true
-                            });
-                            var options = {
-                                filename: '${ticket_venta}.pdf',
-                                image: { type: 'jpeg', quality: 0.98 },
-                                html2canvas: { scale: 2 },
-                                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                            };
-                            document.getElementById("guardar_pdf_dos").addEventListener("click",(e)=>{
-                                e.preventDefault()
-                                html2pdf().set(options).from(document.querySelector(".ticket")).save();
-                            })
-                            document.getElementById("imprimir_ticket").addEventListener("click",(e)=>{
-                                e.preventDefault()
-                                window.print();
-                            })
-                        </script>`;
+                        <br>`;
+    contenidoHTML += accionesComp(nro_venta, ticket_venta);
 
     // Abrir una nueva ventana o pestaña con el contenido HTML generado
     nuevaVentana = window.open('');
@@ -816,97 +726,24 @@ function cambioSucursal(){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 document.getElementById("reporte_ventas_hoy").addEventListener("click", async ()=>{
     modal_proceso_abrir("Buscando resultados...", "", "")
-    let suma_unidades = 0;
-    let suma_monto = 0;
-    let reporte_ventas = await cargarDatos(`salidas_tabla_reporte?`+
-                                        `comprobante_salidas=Venta&`+
-                                        `fecha_inicio_salidas=${new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate()}&`+
-                                        `fecha_fin_salidas=${new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate()}`)
+    let reporte_ventas = await cargarDatos( `salidas_tabla_reporte?`+
+                                            `comprobante_salidas=Venta&`+
+                                            `fecha_inicio_salidas=${new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate()}&`+
+                                            `fecha_fin_salidas=${new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate()}`)
+    let sucursal_operacion = select_sucursal.children[select_sucursal.selectedIndex].textContent;
     await delay(500); 
+    
+    let array_reporte = reporte_ventas.filter(x=> x.sucursal_nombre === sucursal_operacion)
+    
     modal_proceso_cerrar()
-    let reporteHTML = `
-                    <style>
-                        body{
-                            display: grid;
-                            align-items: center;
-                            align-content: space-between;
-                            justify-content: center;
-                            gap: 20px;
-                            background: rgba(173, 216, 230, 0.8);
-                            color: #161616;
-                        }
-                        td, th{
-                            border: 1px solid #161616;
-                        }
-                        th{
-                            background: rgba(100, 149, 237, 0.8);
-                        }
-                        .titulo_reporte{
-                            display: grid;
-                            justify-items: center;
-                        }
-                    </style>
-                    <div class="titulo_resporte">
-                        <h2>Reporte de Ventas</h2>
-                        <h2>${select_sucursal.children[select_sucursal.selectedIndex].textContent}</h2>
-                        <h3>Fecha de reporte: ${new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate()}</h3>
-                    </div>
-                    <table>
-                            <thead>
-                                <tr>
-                                    <th scope="row" colspan="16"><h2>Detalle de operaciones</h2></th>
-                                </tr>
-                                <tr>
-                                    <th>Fecha</th>
-                                    <th>Sucursal</th>
-                                    <th>Código</th>
-                                    <th>Descripción</th>
-                                    <th>Comprobantes</th>
-                                    <th>Unidades</th>
-                                    <th>Monto</th>
-                                </tr>
-                            </thead>
-                            <tbody>`
-    for(sal of reporte_ventas){
-        if(sal.sucursal_nombre == 
-            select_sucursal.children[select_sucursal.selectedIndex].textContent){
-            let fila = `
-                        <tr>
-                            <td>${sal.fecha}</td>
-                            <td>${sal.sucursal_nombre}</td>
-                            <td>${sal.codigo}</td>
-                            <td>${sal.descripcion}</td>
-                            <td>${sal.comprobante}</td>
-                            <td style="text-align: end;">${sal.existencias_salidas}</td>
-                            <td style="text-align: end;">${(sal.existencias_salidas * sal.precio_venta_salidas).toFixed(2)}</td>
-                        </tr>`
-            reporteHTML = reporteHTML + fila;
-            suma_unidades += sal.existencias_salidas;
-            suma_monto += (sal.existencias_salidas * sal.precio_venta_salidas);
-        };
-    };                  
-    reporteHTML += `
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <th scope="row" colspan="5">Total</th>
-                                    <th>${suma_unidades}</th>
-                                    <th>${suma_monto.toFixed(2)}</th>
-                                </tr>
-                            </tfoot>
-                        </table>
-                        <div>
-                            <button class="imprimir_reporte_ventas">Imprimir</button>
-                        </div>
-                        <script>
-                                document.querySelector(".imprimir_reporte_ventas").addEventListener("click", (event) => {
-                                event.preventDefault()
-                                window.print()
-                            });
-                        </script>
-                    `
+    let html = estilosRep();
+    html +=  `<div class="titulo_reporte">
+                <h2>Reporte de Ventas ${sucursal_operacion}</h2>
+            </div>`
+    html += tablaRep(array_reporte, sucursal_operacion);               
+    html += imprimirRep();
     let nuevaVentana = window.open('');
-    nuevaVentana.document.write(reporteHTML);
+    nuevaVentana.document.write(html);
 });
 
 //////////////////////////////////////////////////////////////
@@ -1117,8 +954,9 @@ function agregarBusquedaDetalleUno(button){
     buscador_codigo.focus()
 };
 ////////////////////////////////////////////////////////////////////////////////////////
-function busquedaDetalle(indice, termino){
+async function busquedaDetalle(indice, termino){
     // Obtén la referencia al elemento <ul>
+    modal_proceso_abrir("Buscando resultados...", "", "")
     let miUl_cabecera = document.getElementById("lista_cabecera");
     let miUl_detalle = document.getElementById("lista_detalle");
     let terminoBusqueda = termino;
@@ -1144,7 +982,8 @@ function busquedaDetalle(indice, termino){
                             `</li>`;
         };
     };
-    
+    await delay(500)
+    modal_proceso_cerrar()
     if(nuevoLi !== ""){
         miUl_cabecera.innerHTML = cabecera;
         miUl_detalle.innerHTML = nuevoLi;

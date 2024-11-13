@@ -1,11 +1,12 @@
 document.addEventListener("DOMContentLoaded", inicioDetalleVentas)
 let anio_principal = ""
-
+let det_ve_gr = [];
 function inicioDetalleVentas(){
     anio_principal = new Date().getFullYear()
     inicioTablasDetalleVentas()
     cargarDatosAnio()
-    graficosInicio()
+    graficoModoVenta()
+    graficoVentas()
     array_btn_pages[7] = 1;
     
 };
@@ -16,11 +17,11 @@ const barras_detalle = [".cg_1_c", ".cg_2_c", ".cg_3_c", ".cg_4_c", ".cg_5_c"]
 let credito_ = []
 let reporte_ = []
 let reporte_dos_ = []
+
 async function graficosInicio(){
     anio_principal = anio_referencia.value;
-
-    det_ve_gr = await cargarDatos(`ventas_grafico?`+
-                                `year_actual=${anio_principal}`)
+    det_ve_gr = await cargarDatos(  `ventas_grafico?`+
+                                    `year_actual=${anio_principal}`)
     await delay(500)
     graficoModoVenta()
     graficoVentas()
@@ -44,7 +45,7 @@ let num_filas_tabla = {value: 0};
 
 let base_datos = {array: []}
 let detVentasComprobante = [];
-let det_ve_gr = [];
+
 async function inicioTablasDetalleVentas(){
     await conteoFilas(subRutaA(0), filas_total_bd, indice_tabla, 
                     document.getElementById("numeracionTablaVentas"), 20)
@@ -139,13 +140,12 @@ async function buscarTicketVenta(id_ventas) {
     modal_proceso_abrir("Buscando resultados...", "", "")
     let datos_cliente = JSON.parse(localStorage.getItem("clientes_consulta"))
     let numeracion_comprobante_venta = "";
-    let importe_venta = 0;
     let nombre_cliente = "";
     let filaDetalleVenta = base_datos.array.find(y => y.id_det_ventas == id_ventas)
     if(filaDetalleVenta.tipo_comprobante[0] === "N"){
-        numeracion_comprobante_venta = "Nota de Venta"
+        numeracion_comprobante_venta = "Nota de venta"
     }else if(filaDetalleVenta.tipo_comprobante[0] === "B"){
-        numeracion_comprobante_venta = "Boleta de Venta"
+        numeracion_comprobante_venta = "Boleta de venta"
     }else if(filaDetalleVenta.tipo_comprobante[0] === "F"){
         numeracion_comprobante_venta = "Factura"
     };
@@ -161,145 +161,32 @@ async function buscarTicketVenta(id_ventas) {
     };
 
     // Generar el contenido HTML con los datos de la tabla
-    let contenidoHTML = `<style>
-                            *{
-                                margin: 0;
-                                padding: 0;
-                            }
-                            .contenedor_ticket {
-                                display: flex;
-                                justify-content: center;
-                            }
-                            .ticket{
-                                width: 260px;
-                                margin: 20px;
-                                font-size: 10px;
-                                display: flex;
-                                flex-direction: column;
-                                align-items: center;
-                            }
-                            table{
-                                font-size: 10px;
-                            }
-                            .tabla_head th{
-                                color: black;
-                                border-top: 1px solid black;
-                                border-bottom: 1px solid black;
-                                margin: auto;
-                            }
-                            .codBarTicket {
-                                width: 150px;
-                            }
-                            .invisible {
-                                display: none;
-                            }
-                        </style>
-                        <div class="contenedor_ticket">
-                        <div class="ticket">
-                            <p>${neg_db[0].nombre_empresa}</p>
-                            <p>${neg_db[0].direccion}</p>
-                            <p>RUC: ${neg_db[0].ruc}</p>
-                            <p>Sede: ${filaDetalleVenta.sucursal_nombre}</p>
-                            <h2 class="tipo_comprobante">${numeracion_comprobante_venta}</h2>
-                            <br>
-                            <h2>${filaDetalleVenta.tipo_comprobante}</h2>
-                            <br>
-                            <p>FECHA   : ${filaDetalleVenta.fecha_det_ventas}</p>
-                            <p>CLIENTE : ${nombre_cliente}</p>
-                            <table>
-                                <thead class="tabla_head">
-                                    <tr>
-                                        <th>PRODUCTO</th>
-                                        <th>CANTIDAD</th>
-                                        <th>PRECIO</th>
-                                        <th>IMPORTE</th>
-                                    </tr>
-                                </thead>
-                                <tbody>`;
-        detVentasComprobante.forEach((event) =>{
-        if(event.comprobante === filaDetalleVenta.comprobante){
-            let producto = event.descripcion;
-            let catidad = event.existencias;
-            let precio = Number(event.precio_venta_salidas).toFixed(2);
-            let importe = (event.precio_venta_salidas * event.existencias).toFixed(2);
-            contenidoHTML += `<tr>
-                        <td>${producto}</td>
-                        <td>${catidad}</td>
-                        <td>${precio}</td>
-                        <td>${importe}</td>
-                    </tr>`;
-            importe_venta += Number(event.precio_venta_salidas * event.existencias);
+    let contenidoHTML = estilosComp();
+    contenidoHTML +=    `<div class="contenedor_ticket">
+                            <div class="ticket">
+                                <p>${neg_db[0].nombre_empresa}</p>
+                                <p>${neg_db[0].direccion}</p>
+                                <p>RUC: ${neg_db[0].ruc}</p>
+                                <p>Sede: ${filaDetalleVenta.sucursal_nombre}</p>
+                                <h2 class="tipo_comprobante">${numeracion_comprobante_venta}</h2>
+                                <br>
+                                <h2>${filaDetalleVenta.tipo_comprobante}</h2>
+                                <br>
+                                <p>FECHA   : ${filaDetalleVenta.fecha_det_ventas}</p>
+                                <p>CLIENTE : ${nombre_cliente}</p>`
+    contenidoHTML += tablaComp(detVentasComprobante);                        
+    contenidoHTML +=            `<p style="font-size: 9px>USUARIO: ${usu_db.nombre_usuario}</p>
+                                <p style="font-size: 9px>LADO: COPIA</p>
+                                <img style="height: 40px" class="codBarTicket" src="">
 
-        }
-    });
-            contenidoHTML +=    `</tbody>
-                                <tfoot>
-                                    <tr class="clave">
-                                        <th>oper. GRAVADAS</th>
-                                        <th></th>
-                                        <th></th>
-                                        <th> ${moneda()} ${((1/1.18)*(importe_venta)).toFixed(2)}</th>
-                                    </tr>
-                                    <tr class="clave">
-                                        <th>I.G.V.</th>
-                                        <th>18%</th>
-                                        <th></th>
-                                        <th> ${moneda()} ${((importe_venta)-((1/1.18)*(importe_venta))).toFixed(2)}</th>
-                                    </tr>
-                                    <tr>
-                                        <th>IMPORTE TOTAL</th>
-                                        <th></th>
-                                        <th></th>
-                                        <th> ${moneda()} ${importe_venta.toFixed(2)}</th>
-                                    </tr>
-                                </tfoot>   
-                            </table>
-                            <p>USUARIO: ${usu_db.puesto_usuario}</p>
-                            <p>LADO: COPIA</p>
-                                        <img class="codBarTicket" src="">
-                            <p>PRESENTACIÓN IMPRESA DE LA<p>
-                            <p>${numeracion_comprobante_venta}<p>
-                            <br>
-                            <p>ACUMULA Y CANJEA PUNTOS EN NUESTROS<p>
-                            <p>DESCUENTOS Y PROMOCIONES!!!<p>
-                            <p>GRACIAS POR SU PREFERENCIA<p>
-                            <p>Sistema ventas: http://karpovick.com<p>
-                            
-                        </div>
+                                <p>GRACIAS POR SU PREFERENCIA<p>                            
+                            </div>
                         </div>
                         <br>
                         <br>
                         <br>
-                        <br>
-                        <button id="imprimir_ticket">Imprimir</button>
-                        <button id="guardar_pdf_dos">PDF</button>
-                        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
-                        <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-                        <script>
-                        if(document.querySelector(".tipo_comprobante").textContent === "Nota de Venta"){
-                            document.querySelectorAll(".clave").forEach((event)=>{
-                                event.classList.add("invisible")
-                            });   
-                        }
-                        JsBarcode(".codBarTicket", "${filaDetalleVenta.comprobante}", {
-                            format: "CODE128",
-                            displayValue: true
-                        });
-                        var options = {
-                            filename: '${filaDetalleVenta.tipo_comprobante}.pdf',
-                            image: { type: 'jpeg', quality: 0.98 },
-                            html2canvas: { scale: 2 },
-                            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                            };
-                            document.getElementById("guardar_pdf_dos").addEventListener("click",(e)=>{
-                                e.preventDefault()
-                                html2pdf().set(options).from(document.querySelector(".ticket")).save();
-                            })
-                            document.getElementById("imprimir_ticket").addEventListener("click",(e)=>{
-                                e.preventDefault()
-                                window.print();
-                            })
-                        </script>`;
+                        <br>`;
+    contenidoHTML += accionesComp(filaDetalleVenta.comprobante, filaDetalleVenta.tipo_comprobante);
 
     // Abrir una nueva ventana o pestaña con el contenido HTML generado
     let nuevaVentana = window.open('');

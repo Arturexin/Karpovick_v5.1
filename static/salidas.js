@@ -109,8 +109,7 @@ async function accionRemove(id) {
     modal_proceso_abrir("Buscando resultados...", "", "")
 
     let salidas = base_datos.array.find(y => y.idSal == id)// obtenemos los datos de la fila
-    let db = JSON.parse(localStorage.getItem("inventarios_consulta"))
-    let producto = db.find(x=> x.codigo === salidas.codigo)
+    let producto = buscarProductosDinamicamente(salidas.codigo)
 
     await delay(500)
     modal_proceso_cerrar()
@@ -152,19 +151,19 @@ async function accionDevoluciones(id) {
     modal_proceso_abrir("Buscando resultados...", "", "")
 
     let salidas = base_datos.array.find(x => x.idSal == id)
-    let db = JSON.parse(localStorage.getItem("inventarios_consulta"))
-    let sucursales_comparacion = JSON.parse(localStorage.getItem("sucursal_consulta"))
     if(salidas.comprobante.startsWith("Venta")){
+
         await delay(500)
+        
         modal_proceso_cerrar()
-        let producto = db.find(x=> x.codigo === salidas.codigo)
+        let producto = buscarProductosDinamicamente(salidas.codigo)
         tabla_proforma_productos(producto, "Devoluciones", salidas.categoria_nombre, salidas.comprobante)
-        sucursales_comparacion.forEach((e, i) =>{
-            if(salidas.sucursal_nombre == e.sucursal_nombre){
-                sucursal_id_salidas = e.id_sucursales
-                tabla_body_productos(salidas, i, sucursal_id_salidas)
-            }
-        });
+        let indice_suc = suc_add.findIndex(x=> x === salidas.sucursal_nombre)
+        let datos_suc = suc_db.find(x=> x.sucursal_nombre === salidas.sucursal_nombre)
+        if(datos_suc && indice_suc){
+            sucursal_id_salidas = datos_suc.id_sucursales
+            tabla_body_productos(salidas, indice_suc, sucursal_id_salidas)
+        }
         contenedorBotonesProducto(`procesarDevolucion()`, "Procesar Devolución")
         document.getElementById("acciones_rapidas_salidas").classList.add("modal-show")
     }else{
@@ -344,52 +343,6 @@ async function realizarDevolucion(){
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////REPORTES////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
-function tablaRep(array_suc, sucursal, item, concepto){
-    let suma_unidades = 0;
-    let suma_monto = 0;
-    let tabla_ = `<table id="tabla_salidas">
-                    <thead>
-                        <tr>
-                            <th scope="row" colspan="16"><h2>Detalle de operaciones ${sucursal}</h2></th>
-                        </tr>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>${item}</th>
-                            <th>Código</th>
-                            <th>Descripción</th>
-                            <th>Comprobantes</th>
-                            <th>Unidades</th>
-                            <th>Monto</th>
-                        </tr>
-                    </thead>
-                    <tbody>`
-        for(a_s of array_suc){
-            let fila =  `<tr>
-                            <td>${a_s.fecha}</td>
-                            <td>${a_s[concepto]}</td>
-                            <td>${a_s.codigo}</td>
-                            <td>${a_s.descripcion}</td>
-                            <td>${a_s.comprobante}</td>
-                            <td style="text-align: end;">${a_s.existencias_salidas}</td>
-                            <td style="text-align: end;">${(a_s.existencias_salidas * a_s.precio_venta_salidas).toFixed(2)}</td>
-                        </tr>`
-            tabla_ = tabla_ + fila; 
-            suma_unidades += a_s.existencias_salidas;
-            suma_monto += (a_s.existencias_salidas * a_s.precio_venta_salidas);
-        }                        
-                                
-        tabla_ += `
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <th scope="row" colspan="5">Total</th>
-                            <th>${suma_unidades}</th>
-                            <th>${suma_monto.toFixed(2)}</th>
-                        </tr>
-                    </tfoot>
-                </table>`
-    return tabla_;
-}
 document.getElementById("reporte_ventas").addEventListener("click", async ()=>{
     modal_proceso_abrir("Buscando resultados...", "", "")
     manejoDeFechas()
@@ -409,29 +362,8 @@ document.getElementById("reporte_ventas").addEventListener("click", async ()=>{
                                             `fecha_fin_salidas=${fin}`)
 
     await delay(500)
-    
-    let reporteHTML = `<style>
-                            body{
-                                display: grid;
-                                align-items: center;
-                                align-content: space-between;
-                                justify-content: center;
-                                gap: 20px;
-                                background: rgba(173, 216, 230, 0.8);
-                                color: #161616;
-                            }
-                            td, th{
-                                border: 1px solid #161616;
-                            }
-                            th{
-                                background: rgba(100, 149, 237, 0.8);
-                            }
-                            .titulo_reporte{
-                                display: grid;
-                                justify-items: center;
-                            }
-                        </style>
-                        <div class="titulo_reporte">
+    let reporteHTML = estilosRep();
+    reporteHTML += `<div class="titulo_reporte">
                             <h2>Reporte de Ventas</h2>
                             <h3>Fecha de reporte: ${inicio} a ${fin}</h3>
                         </div>
@@ -452,36 +384,33 @@ document.getElementById("reporte_ventas").addEventListener("click", async ()=>{
                             <tbody>`
 
     for(repor of reporte_detalle_ventas){
-        let row = `
-                <tr>
-                    <td>${repor.sucursal_nombre}</td>
-                    <td style="text-align: end;">${repor.suma_efectivo.toFixed(2)}</td>
-                    <td style="text-align: end;">${repor.suma_tarjeta.toFixed(2)}</td>
-                    <td style="text-align: end;">${repor.suma_credito.toFixed(2)}</td>
-                    <td style="text-align: end;">${repor.suma_perdida.toFixed(2)}</td>
-                    <td style="text-align: end;">${(repor.suma_credito+
-                                                    repor.suma_efectivo-
-                                                    repor.suma_perdida+
-                                                    repor.suma_tarjeta).toFixed(2)}</td>
-                </tr>`
+        let row =               `<tr>
+                                    <td>${repor.sucursal_nombre}</td>
+                                    <td style="text-align: end;">${repor.suma_efectivo.toFixed(2)}</td>
+                                    <td style="text-align: end;">${repor.suma_tarjeta.toFixed(2)}</td>
+                                    <td style="text-align: end;">${repor.suma_credito.toFixed(2)}</td>
+                                    <td style="text-align: end;">${repor.suma_perdida.toFixed(2)}</td>
+                                    <td style="text-align: end;">${(repor.suma_credito+
+                                                                    repor.suma_efectivo-
+                                                                    repor.suma_perdida+
+                                                                    repor.suma_tarjeta).toFixed(2)}</td>
+                                </tr>`
         reporteHTML = reporteHTML + row;
-        sum_ef += repor.suma_efectivo
-        sum_ta += repor.suma_credito
-        sum_cr += repor.suma_tarjeta
-        sum_de += repor.suma_perdida
+        sum_ef += repor.suma_efectivo;
+        sum_ta += repor.suma_credito;
+        sum_cr += repor.suma_tarjeta;
+        sum_de += repor.suma_perdida;
     };                    
     sum_to = sum_ef + sum_ta + sum_cr - sum_de         
-    reporteHTML += `
-                            
-                            </tbody>
+    reporteHTML +=          `</tbody>
                             <tfoot>
                                 <tr>
-                                    <th style="text-align: end;"></th>
-                                    <th style="text-align: end;"></th>
-                                    <th style="text-align: end;"></th>
-                                    <th style="text-align: end;"></th>
-                                    <th style="text-align: end;"></th>
-                                    <th style="text-align: end;"></th>
+                                    <th style="text-align: end;">Total</th>
+                                    <th style="text-align: end;">${sum_ef.toFixed(2)}</th>
+                                    <th style="text-align: end;">${sum_ta.toFixed(2)}</th>
+                                    <th style="text-align: end;">${sum_cr.toFixed(2)}</th>
+                                    <th style="text-align: end;">${sum_de.toFixed(2)}</th>
+                                    <th style="text-align: end;">${sum_to.toFixed(2)}</th>
                                 </tr>
                             </tfoot>
                         </table>`
@@ -489,78 +418,7 @@ document.getElementById("reporte_ventas").addEventListener("click", async ()=>{
         let filtro_sucursal = reporte_salidas.filter(elemento => elemento.sucursal_nombre === sucursal)
         reporteHTML += tablaRep(filtro_sucursal, sucursal, "Sucursal", "sucursal_nombre")
     })
-    reporteHTML +=      `<h4 style="text-align: center;">${new Date()}</h4>
-                        <div>
-                            <button class="imprimir_reporte_salidas">Imprimir</button>
-                        </div>
-                        <script>
-                            document.querySelector("#tabla_reportes > tfoot").children[0].children[0].textContent = "Total";
-                            document.querySelector("#tabla_reportes > tfoot").children[0].children[1].textContent = ${sum_ef.toFixed(2)};
-                            document.querySelector("#tabla_reportes > tfoot").children[0].children[2].textContent = ${sum_ta.toFixed(2)};
-                            document.querySelector("#tabla_reportes > tfoot").children[0].children[3].textContent = ${sum_cr.toFixed(2)};
-                            document.querySelector("#tabla_reportes > tfoot").children[0].children[4].textContent = ${sum_de.toFixed(2)};
-                            document.querySelector("#tabla_reportes > tfoot").children[0].children[5].textContent = ${sum_to.toFixed(2)};
-
-                            document.querySelector(".imprimir_reporte_salidas").addEventListener("click", (event) => {
-                                event.preventDefault()
-                                window.print()
-                            });
-                        </script>`
-    modal_proceso_abrir("Resultados encontrados.", "", "")
-    modal_proceso_salir_botones()
-    let nuevaVentana = window.open('');
-    nuevaVentana.document.write(reporteHTML);
-});
-document.getElementById("reporte_usuarios").addEventListener("click", async ()=>{
-    modal_proceso_abrir("Buscando resultados...", "", "")
-    manejoDeFechas()
-    let usuarios = await cargarDatos('usuarios_tabla_local')
-    let resporte_usuarios = await cargarDatos(`salidas_tabla_reporte?`+
-                                            `comprobante_salidas=Venta&`+
-                                            `fecha_inicio_salidas=${inicio}&`+
-                                            `fecha_fin_salidas=${fin}`)
-    await delay(500)
-    let reporteHTML = `<style>
-                            body{
-                                display: grid;
-                                align-items: center;
-                                align-content: space-between;
-                                justify-content: center;
-                                gap: 20px;
-                                background: rgba(173, 216, 230, 0.8);
-                                color: #161616;
-                            }
-                            td, th{
-                                border: 1px solid #161616;
-                            }
-                            th{
-                                background: rgba(100, 149, 237, 0.8);
-                            }
-                            .titulo_reporte{
-                                display: grid;
-                                justify-items: center;
-                            }
-                        </style>
-                        <div class="titulo_reporte">
-                            <h2>Reporte de ventas por usuario</h2>
-                            <h3>Fecha de reporte: ${inicio} a ${fin}</h3>
-                        </div>`
-    usuarios.forEach((usuario)=>{
-        let filtro_usuario = resporte_usuarios.filter(elemento => elemento.nombres === usuario.nombres)
-        reporteHTML += tablaRep(filtro_usuario, usuario.nombres, "Usuario", "nombres")
-    })        
-                            
-    reporteHTML += `    <h4 style="text-align: center;">${new Date()}</h4>
-                        <div>
-                            <button class="imprimir_reporte_usuarios">Imprimir</button>
-                        </div>
-                        <script>
-                            document.querySelector(".imprimir_reporte_usuarios").addEventListener("click", (event) => {
-                                event.preventDefault()
-                                window.print()
-                            });
-                        </script>`
-    
+    reporteHTML +=  imprimirRep();
     modal_proceso_abrir("Resultados encontrados.", "", "")
     modal_proceso_salir_botones()
     let nuevaVentana = window.open('');

@@ -75,7 +75,7 @@ function cuerpoFilaTabla(e){
                 <td style="text-align: end;">${e.precio_venta.toFixed(2)}</td>
                 <td style="text-align: end;">${e.lote}</td>
                 <td style="width: 100px;">${e.nombre_cli}</td>
-                <td style="width: 160px;">
+                <td style="width: 160px;text-align: center;">
                     <div class="tooltip">
                         <span onclick="editAlmacenCentral(${e.idProd})" style="font-size:18px;" class="material-symbols-outlined myButtonEditar">print</span>
                         <span class="tooltiptext">Imprimir código</span>

@@ -23,6 +23,7 @@
                         <span class="material-symbols-outlined">help</span>
                         <span class="tooltiptext_ayuda">Seleccione el tipo de dato de búsqueda.</span>
                     </div>
+                    
                 </div>
                 <div class="tres_form">
                     <input id="txtIdv" type="hidden" placeholder="ID"/>
@@ -33,6 +34,10 @@
                                 <span class="material-symbols-outlined">person_search</span>
                                 <span class="tooltiptext_ayuda">Digite palabras clave según el tipo de dato de búsqueda.</span>
                             </div>
+                            <div class="tooltip_ayuda">
+                                <button id="reporte_cliente" class="material-symbols-outlined myButtonEditar">find_in_page</button>
+                                <span class="tooltiptext_ayuda">Buscar consumos.</span>
+                            </div>
                         </label>
                         <label class="label-general">
                             <div style="display: flex">Nombres*
@@ -41,7 +46,8 @@
                                     <span class="tooltiptext_ayuda">El nombre de la persona solo puede contener como caracteres letras.</span>
                                 </div>
                             </div>
-                            <input class="input-general fondo" type="text" id="clientesv" name="clientesv"></label>
+                            <input class="input-general fondo" type="text" id="clientesv" name="clientesv">
+                        </label>
                         <label class="label-general">
                             <div style="display: flex">DNI/RUC
                                 <div class="tooltip_ayuda">
@@ -49,7 +55,8 @@
                                     <span class="tooltiptext_ayuda">El DNI/RUC solo puede contener caracteres numéricos.</span>
                                 </div>
                             </div>
-                            <input class="input-general fondo" type="text" id="dniv" name="dniv"></label>
+                            <input class="input-general fondo" type="text" id="dniv" name="dniv">
+                        </label>
                         <label class="label-general">
                             <div style="display: flex">Email
                                 <div class="tooltip_ayuda">
@@ -57,7 +64,8 @@
                                     <span class="tooltiptext_ayuda">Ingresar datos en formato adecuado. Ej.: "email@karpovick.com".</span>
                                 </div>
                             </div>
-                            <input class="input-general fondo" type="text" id="emailv" name="emailv"></label>
+                            <input class="input-general fondo" type="text" id="emailv" name="emailv">
+                        </label>
                         <label class="label-general">
                             <div style="display: flex">Teléfono*
                                 <div class="tooltip_ayuda">
@@ -65,7 +73,8 @@
                                     <span class="tooltiptext_ayuda">Ingresar datos en formato adecuado. EJ: "999 999 999".</span>
                                 </div>
                             </div>
-                            <input class="input-general fondo" type="text" id="telefonov" name="telefonov"></label>
+                            <input class="input-general fondo" type="text" id="telefonov" name="telefonov">
+                        </label>
                         <label class="label-general">
                             <div style="display: flex">Dirección
                                 <div class="tooltip_ayuda">
@@ -73,8 +82,9 @@
                                     <span class="tooltiptext_ayuda">Ingresar la dirección de residencia.</span>
                                 </div>
                             </div>
-                            <input class="input-general fondo" type="text" id="direccionv" name="direccionv"></label>
-                        <p id="concurrencia_cliente"></p>
+                            <input class="input-general fondo" type="text" id="direccionv" name="direccionv">
+                        </label>
+                        
                     </div>
                 </div>
                 <div class="cuatro_form">
@@ -313,7 +323,8 @@
         {% endwith %}
     </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 <script src="../static/ventas.js"></script>
 <script src="../static/form.js"></script>
+<script src="../static/tab_reportes.js"></script>
+<script src="../static/comp_venta.js"></script>
 {% endblock %}

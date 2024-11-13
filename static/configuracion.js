@@ -209,8 +209,7 @@ async function buscarCategoria(objeto, categoria_id){
                             categoria_tabla.siete, categoria_tabla.ocho, categoria_tabla.nueve, categoria_tabla.diez, categoria_tabla.once, categoria_tabla.doce] 
         let filtro_medidas_tabla = _medidas_tabla.filter(elemento => elemento.trim() !== "")
 
-        let base_datos_busqueda = JSON.parse(localStorage.getItem("inventarios_consulta"))
-        let base_filtro = base_datos_busqueda.filter(id => id.categoria === categoria_id)
+        let base_filtro = inv_db.filter(id => id.categoria === categoria_id)
 
         let iteracion = 0;
         for(const event of base_filtro){
