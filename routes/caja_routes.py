@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from flask import Blueprint, jsonify, request, session
 from flask_cors import cross_origin
 from flask_login import login_required
+
 from db_connection import mysql
 
 # Definimos el blueprint para las rutas de caja

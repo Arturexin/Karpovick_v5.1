@@ -217,6 +217,9 @@ async function busquedaProductoPorId(){//Busca productos por id condicionado por
                                         `ids=${ids.join(",")}`);
     await delay(500); 
     let fila_res = array_saldos.find(x => response[0].idProd === x.idProd)
+    console.log(response)
+    console.log(response[0][sucursales_activas[idx_suc]])
+    console.log(fila_res)
     if(fila_res === undefined){
         if(response[0][sucursales_activas[idx_suc]] > 0){
             array_saldos.push(new ObjGeneral(response[0].categoria,
@@ -236,7 +239,8 @@ async function busquedaProductoPorId(){//Busca productos por id condicionado por
                                             response[0].existencias_sc,
             ));
         }else{
-            modal_proceso_abrir("Existencias insuficientes. Este producto no se podrá agregar a la lista.", "")
+            modal_proceso_abrir("Existencias insuficientes. Este producto no se podrá agregar a la lista.", "", "")
+            await delay(500)
             modal_proceso_salir_botones_focus("buscador-productos-ventas")
         }
     }else{
@@ -248,7 +252,8 @@ async function busquedaProductoPorId(){//Busca productos por id condicionado por
                 fila_res.precio = response[0].precio_venta;
             });
         }else{
-            modal_proceso_abrir("Existencias insuficientes.", "")
+            modal_proceso_abrir("Existencias insuficientes.", "", "")
+            await delay(500)
             modal_proceso_salir_botones_focus("buscador-productos-ventas")
         }
     };
@@ -464,6 +469,7 @@ async function procesamientoVentas(e){
         };
     }catch(error){
         modal_proceso_abrir("Ocurrió un error. " + error, "");
+
         console.error("Ocurrió un error. ", error)
     };
 };

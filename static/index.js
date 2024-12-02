@@ -283,16 +283,16 @@ const cerrarSesion = document.getElementById("cerrar-sesion");
 cerrarSesion.addEventListener("click", async () => {
     localStorage.clear();
     modal_proceso_abrir("Cerrando sesión...", "", "")
-    await delay(1000)
+    
     let response  = await fetch('/logout', {
         "method": 'GET',
         "headers": {
             "Content-Type": 'application/json'  
         }
     });
+    await delay(1000)
     if(response.ok){
         location.href = response.url
-        location.reload();
     };
 });
 
@@ -318,7 +318,7 @@ function imprimirListaTabla() {
 };
 
 ////////////////////// Función para dividir productos en grupos según el primer carácter del código
-/* function dividirProductosDinamicamente(productos) {
+function dividirProductosDinamicamente(productos) {
     let grupos = {};
     
     productos.forEach(producto => {
@@ -336,8 +336,6 @@ function imprimirListaTabla() {
     return grupos;
 }
 
-let inv_db_grupo = dividirProductosDinamicamente(inv_db);
-
 // Función para buscar productos en los grupos generados
 function buscarProductosDinamicamente(texto) {
     if(texto !== ""){
@@ -354,8 +352,8 @@ function buscarProductosDinamicamente(texto) {
         return inv_db_grupo[primerCaracter].find(y => y.codigo.toLowerCase().startsWith(texto.toLowerCase()))
         return productosPorGrupo[primerCaracter].filter(producto => producto.codigo.toLowerCase().startsWith(textoBuscado));
     }
-}; */
-function dividirProductosDinamicamente(productos) {
+};
+/* function dividirProductosDinamicamente(productos) {
     let grupos = {};
 
     if (!Array.isArray(productos)) {
@@ -423,7 +421,7 @@ function buscarProductosDinamicamente(texto) {
         }
     }
     return [];
-}
+} */
 function buscarProducto(textoBusqueda){
     textoBusqueda.addEventListener("keyup", () =>{
 

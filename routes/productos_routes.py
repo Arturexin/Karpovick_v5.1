@@ -639,7 +639,7 @@ def actualizar_almacen_central_suma(cur, recompra_data, usuarioLlave, nombre_arr
                      "WHERE `almacen_central`.`idProd` = %s "
                      "AND identificadorProd = %s "
                      "AND almacen_central.estado > 0 "
-                     f"AND {sucursal_post} >= %s")
+                     f"AND %s >= 0")
             cur.executemany(query, data_productos)
 
     if cur.rowcount != data_len:
