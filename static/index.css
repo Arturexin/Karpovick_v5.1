@@ -285,3 +285,9 @@ select:focus{ outline: none;}
     justify-items: center;
     gap: 20px;
 }
+.usuarios-form{
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 20px;
+}

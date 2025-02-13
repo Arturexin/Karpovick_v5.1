@@ -345,7 +345,7 @@ function buscarProductosDinamicamente(texto) {
         
         // Buscar en el grupo correspondiente si existe
         if (!inv_db_grupo[primerCaracter]) {
-            return []; // Si no existe el grupo, no hay resultados
+            return undefined; // Si no existe el grupo, no hay resultados
         }
         
         // Filtrar los productos en el grupo seleccionado
@@ -435,11 +435,12 @@ function buscarProducto(textoBusqueda){
             if(document.getElementById('buscador-productos-form').value == ""){
                 reseteoFormulario()
             }
-        }else{
-            reseteoFormulario()
+        }else if(prod_ === undefined){
+            reseteoFormulario();
+            document.getElementById("buscador-productos-form").value = "";
         };
     });
-}
+};
 ////////////////////////////////////////////////////////////////////////////////////////
 let cls = [ "rgb(230, 202, 123)",
     "rgb(145, 230, 156)",

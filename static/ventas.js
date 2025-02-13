@@ -184,6 +184,7 @@ let sucursal_ventas = 0;
 let idx_suc = 0;
 buscador_codigo.addEventListener("keyup", async () =>{
     let almacenCentral = buscarProductosDinamicamente(buscador_codigo.value.toLowerCase());
+    console.log(almacenCentral)
     if(almacenCentral){
         
         id_ventas.value = almacenCentral.idProd;
@@ -204,7 +205,7 @@ buscador_codigo.addEventListener("keyup", async () =>{
             resetDetalleVentas();
         };
         resetDetalleVentas();
-    }else{
+    }else if(almacenCentral === undefined){
         resetFormularioVentas();
         resetDetalleVentas();
     };
@@ -469,8 +470,7 @@ async function procesamientoVentas(e){
         };
     }catch(error){
         modal_proceso_abrir("Ocurrió un error. " + error, "");
-
-        console.error("Ocurrió un error. ", error)
+        modal_proceso_salir_botones_focus("buscador-productos-ventas")
     };
 };
 async function realizarCredito(sucursal_ventas, numeracion_comprobante_venta){

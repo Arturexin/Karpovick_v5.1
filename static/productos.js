@@ -226,7 +226,7 @@ async function accion_recompras(id){
     tabla_head_productos("Sucursal", "Existencias", "Recompra", "Saldo", "");
     suc_add.forEach((e, i)=>{
         let coincidencia = suc_db.find(x=> x.sucursal_nombre === e)
-        coincidencia ? tabla_body_productos(prod_, i, coincidencia.id_sucursales) : ";"
+        coincidencia ? tabla_body_productos(prod_, i, coincidencia.id_sucursales) : "";
     });
     contenedorBotonesProducto(`procesarRecompra()`, "Procesar recompra")
     document.getElementById("acciones_rapidas").classList.add("modal-show")

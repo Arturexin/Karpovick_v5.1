@@ -171,6 +171,16 @@ app.register_blueprint(usuarios_.usuarios_acciones_post)
 app.register_blueprint(usuarios_.usuarios_registro_post)
 app.register_blueprint(usuarios_.usuarios_registro_interno_post)
 app.register_blueprint(usuarios_.usuarios_delete)
+app.register_blueprint(usuarios_.usuarios_estado_post)
+
+
+app.register_blueprint(usuarios_.usuarios_registro_asistencias)
+app.register_blueprint(usuarios_.usuarios_asistencia_busqueda)
+app.register_blueprint(usuarios_.asistencias_conteo)
+app.register_blueprint(usuarios_.asistencias_tabla)
+app.register_blueprint(usuarios_.edit_asistencias)
+app.register_blueprint(usuarios_.asistencias_remove)
+app.register_blueprint(usuarios_.usuarios_asistencia_remuneracion)
 ##########################################################################################################################################################################
 # Datos de la tabla gastos_varios
 ##########################################################################################################################################################################
@@ -388,6 +398,14 @@ def configuracion():
     if puesto not in (201, 202):
         return render_template('index.html')
     return render_template('configuracion.html')
+@app.route('/usuarios')
+@cross_origin()
+@login_required
+def usuarios():
+    puesto = session.get('puesto')
+    if puesto not in (201, 202):
+        return render_template('index.html')
+    return render_template('usuarios.html')
 @app.route('/home')
 @cross_origin()
 @login_required

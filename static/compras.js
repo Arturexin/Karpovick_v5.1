@@ -296,10 +296,12 @@ async function procesamientoCompras(e){
             document.querySelector("#tabla_principal").createTBody();
             array_saldos = [];
             sumaSaldosProforma();
-        };
+        }else if(document.querySelector("#tabla_principal > tbody").rows.length === 0){
+            modal_proceso_abrir("Imposible procesar, la lista está vacía.", "")
+            modal_proceso_salir_botones();
+        }
     }catch(error){
         modal_proceso_abrir("Ocurrió un error. " + error, "")
-        console.error("Ocurrió un error. ", error)
         modal_proceso_salir_botones()
     };
 };
@@ -644,10 +646,12 @@ async function procesamientoRecompras(e){
             document.querySelector("#tabla_principal").createTBody();
             array_saldos = [];
             sumaSaldosProforma();
+        }else if(document.querySelector("#tabla_principal > tbody").rows.length === 0){
+            modal_proceso_abrir("Imposible procesar, la lista está vacía.", "")
+            modal_proceso_salir_botones();
         };
     }catch(error){
         modal_proceso_abrir("Ocurrió un error. " + error, "")
-        console.error("Ocurrió un error. ", error)
         modal_proceso_salir_botones()
     };
 };

@@ -132,10 +132,9 @@ def getAllCategoriasLlenar():
 @login_required
 def saveCategorias():
     if 'id' in request.json:
-        editCategorias()
+        return editCategorias()  # Retorna la respuesta JSON correcta
     else:
-        createCategorias()
-    return "ok"
+        return createCategorias()  # Retorna la respuesta JSON correcta
 
 def createCategorias():
     try:

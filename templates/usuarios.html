@@ -1,0 +1,164 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="usuarios-form baja_opacidad">
+    <div class="contenedor_compras_principal">
+        <form id="formulario-create-usuarios" action="/registro" method="POST">
+            <h2>Crear Nuevo Usuario
+                <div class="tooltip_ayuda">
+                    <span class="material-symbols-outlined">help</span>
+                    <span class="tooltiptext_ayuda">Este apartado registra y edita los datos de los usuarios con acceso al sistema.</span>
+                </div>
+            </h2>
+            <div class="contenedor-label-input-compras">
+                <div>
+                    <input type="hidden" id="id_usuarios">
+                    <label class="label-general">Nombres
+                        <input  class="input-general fondo" id="nombres-create-usuario" name="nombres-create-usuario" type="text">
+                    </label>
+                    <label class="label-general">Apellidos
+                        <input  class="input-general fondo" id="apellidos-create-usuario" name="apellidos-create-usuario" type="text">
+                    </label>
+                    <label class="label-general">DNI
+                        <input  class="input-general fondo" id="dni-create-usuario" name="dni-create-usuario" type="text">
+                    </label>
+                    <label class="label-general">Email
+                        <input  class="input-general fondo" id="email-create-usuario" name="email-create-usuario" type="text">
+                    </label>
+                    <label class="label-general">Teléfono
+                        <input  class="input-general fondo" id="telefono-create-usuario" name="telefono-create-usuario" type="text">
+                    </label>
+                    <label class="label-general">Cargo
+                        <select class="input-general fondo" name="cargo-create-usuario" id="cargo-create-usuario" style="cursor: pointer;">
+                            <option value="" selected disabled>Selecciona un cargo</option>
+                            <option value=201>Administrador</option>
+                            <option value=202>Supervisor</option>
+                            <option value=0>Cajero Almacén Central</option>
+                            <option value=1>Cajero Sucursal Uno</option>
+                            <option value=2>Cajero Sucursal Dos</option>
+                            <option value=3>Cajero Sucursal Tres</option>
+                            <option value=4>Cajero Sucursal Cuatro</option>
+                            <option value=5>Colaborador Almacén Central</option>
+                            <option value=6>Colaborador Sucursal Uno</option>
+                            <option value=7>Colaborador Sucursal Dos</option>
+                            <option value=8>Colaborador Sucursal Tres</option>
+                            <option value=9>Colaborador Sucursal Cuatro</option>
+                        </select>
+                    </label>
+                    <label class="label-general">Salario
+                        <input class="input-general fondo" id="salario-create-usuario" name="salario-create-create-usuario" type="text">
+                    </label>
+                    <div style="display: flex;justify-content: space-between;">
+                        <div>
+                            Asignacion familiar
+                            <input id="asigFam-create-usuario" name="asigFam-create-create-usuario" type="checkbox">
+                        </div>
+                        <div>
+                            AFP/ONP
+                            <input id="pension-create-usuario" name="pension-create-create-usuario" type="checkbox">
+                        </div>
+                        <div>
+                            Essalud
+                            <input id="salud-create-usuario" name="salud-create-create-usuario" type="checkbox">
+                        </div>
+
+                    </div>
+                    
+                    <label class="label-general">Password
+                        <input class="input-general fondo" id="password-create-usuario" name="password-create-usuario" type="text">
+                    </label>
+                    <label class="label-general">Confirmar Password
+                        <input class="input-general fondo" id="password-confirmar-create-usuario" name="password-confirmar-create-usuario" type="text">
+                    </label>
+                </div>
+            </div>
+            <div class="boton-cli">
+                <button type="submit" id="crear-nueva-cuenta-usuario" class="myButtonAgregar">Registrar</button>
+                <input id="reset_usuarios" type="reset" class="myButtonEliminar">
+            </div>
+        </form>
+        <div style="padding: 20px 0;">
+        </div>
+    
+    </div>
+    <table id="tabla-usuarios-local"  class="tabla-proforma">
+        <thead>
+            <tr>
+                <th scope="row" colspan="8"><h2>Tabla Usuarios</h2></th>
+            </tr>
+            <tr>
+                <th>Colaborador</th>
+                <th>DNI</th>
+                <th>Email</th>
+                <th>Teléfono</th>
+                <th>Cargo</th>
+                <th>Fecha</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <table id="tabla-asistencias"  class="tabla-proforma">
+        <thead>
+            <tr>
+                <th scope="row" colspan="15"><h2>Tabla de asistencias</h2></th>
+            </tr>
+            <tr>
+                <th scope="row" colspan="15">
+                    <div>
+                        <button id="buscarFiltrosAsistencias" class="myButtonEditar">Buscar</button>
+                        <button id="restablecerAsistencias" class="eliminarTablaFila">Restablecer</button>
+                    </div>
+                    <div>Fecha Inicio
+                        <input id="_fecha_inicio_" type="datetime-local" class="input-filtro" placeholder="Fecha Inicio">
+                        Fecha Fin
+                        <input id="_fecha_fin_" type="datetime-local" class="input-filtro" placeholder="Fecha Fin">
+                    </div>
+                </th>
+            </tr>
+            <tr>
+                <th style="width: 120px;">Sucursal
+                    <input list="sucursales_opciones" id="filtro-tabla-asistencias-sucursal" type="text" class="input-filtro" placeholder="Sucursal" autocomplete="off">
+                    <datalist id="sucursales_opciones">
+                        <option value="Almacén Central"></option>
+                        <option value="Sucursal Uno"></option>
+                        <option value="Sucursal Dos"></option>
+                        <option value="Sucursal Tres"></option>
+                        <option value="Sucursal Cuatro"></option>
+                    </datalist> 
+                </th>
+                <th style="width: 180px;">Colaborador
+                    <input id="filtro-tabla-asistencias-nombre" type="text" class="input-filtro" placeholder="Nombres">
+                    <input id="filtro-tabla-asistencias-apellidos" type="text" class="input-filtro" placeholder="Apellidos">
+                </th>
+                <th style="width: 140px;">Hora de entrada</th>
+                <th style="width: 140px;">Hora de salida</th>
+                <th style="width: 70px;">Salario / hora</th>
+                <th style="width: 70px;">Horas laboradas</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+        <tfoot>
+            <tr>
+                <th scope="row" colspan="16">
+                    <button id="_inicio_" class="eliminarTablaFila"><<<</button>
+                    <button id="retrocederAsistencia" class="eliminarTablaFila"><<  </button>
+                    <select id="numeracionTablaAsistencia" style="width: 50px; text-align: center;">
+                    </select>
+                    <button id="avanzarAsistencia" class="eliminarTablaFila">  >></button>
+                    <button id="_final_" class="eliminarTablaFila">>>></button>
+                </th>
+            </tr>
+        </tfoot>
+    </table>
+    <div id="acciones_rapidas" class="contenedor-pre-recompra">
+    </div>
+</div>
+
+<script src="../static/usuarios.js"></script>
+<script src="../static/tablas.js"></script>
+<script src="../static/form.js"></script>
+{% endblock %}

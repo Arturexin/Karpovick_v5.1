@@ -876,7 +876,7 @@ async function creacion_suc(usuario){
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////Extraccion de datos en formato csv///////////////////////////////////////
-let datos_extraccion = [];
+/* let datos_extraccion = [];
 
 let extraccion_ = document.getElementById("extraccion_")
 extraccion_.addEventListener("click", async ()=>{
@@ -887,7 +887,7 @@ extraccion_.addEventListener("click", async ()=>{
     const csvContent = arrayToCSV(datos_extraccion);
     console.log(csvContent)
     downloadCSV(csvContent, 'dataProductos.csv');
-});
+}); */
 ///////Extraccion de datos en formato csv///////////////////////////////////////
 /* let datos_extraccion = [];
 let extraccion_ = document.getElementById("extraccion_")

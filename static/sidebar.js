@@ -8,7 +8,7 @@ const colores_sidebar = [
     "rgb(211, 211, 211)",
 ]
 
-let array_btn_pages = Array(15).fill(0);
+let array_btn_pages = Array(16).fill(0);
 
 function sidebarMarcadito(){
     array_btn_pages.forEach((event, i)=>{
@@ -22,10 +22,9 @@ function sidebarMarcadito(){
                 color_fondo = `var(--side_dos)`
             }else if(i === 10 || i === 11 || i === 12 || i === 13){
                 color_fondo = `var(--side_tres)`
-            }else if(i === 14){
+            }else if(i === 14 || i === 15){
                 color_fondo = `var(--side_cuatro)`
             }
-
             document.querySelectorAll(".sub-lista")[i].style.background = `linear-gradient(135deg, var(--fondo-primero) 20%, ${color_fondo} 80%)`
             document.getElementById("sidebar").style.boxShadow = `0px 0px 5px 0px ${color_fondo}`
             document.querySelector(".baja_opacidad").classList.add("alta_opacidad")

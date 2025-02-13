@@ -57,8 +57,7 @@ let codigoComprobacionRegistro = "";
 function crearHeadRegistro(){
     let tablaCompras= document.querySelector("#tabla_modal > thead");
     let nuevaFilaTablaCompras = tablaCompras.insertRow(-1);
-    let fila = `
-                <tr class="tbody_preproforma">
+    let fila =  `<tr class="tbody_preproforma">
                     <th style="width: 120px;">Categoría</th>
                     <th style="width: 120px;">Código</th>
                     <th style="width: 200px;">Descripción</th>
@@ -68,14 +67,13 @@ function crearHeadRegistro(){
                     <th style="width: 70px;">Lote</th>
                     <th style="width: 70px;">Proveedor</th>
                     <th style="width: 40px;"><span style="font-size:18px;" class="material-symbols-outlined">delete</span></th>
-                </tr>
-                `
+                </tr>`
     nuevaFilaTablaCompras.innerHTML = fila;
 };
 function crearBodyRegistro(tallaRegistro, loteRegistro){
     let tablaRegistro = document.querySelector("#tabla_modal > tbody");
     let nuevaFilaTablaRegistro = tablaRegistro.insertRow(-1);
-    let fila = `<tr>`+
+    let fila =  `<tr>`+
                     `<td>${document.getElementById("categoria-form").children[document.getElementById("categoria-form").selectedIndex].textContent}</td>`+// Columna 1 > categoría
                     `<td class="codigo_modal" style="background: rgb(105, 211, 35)">${document.getElementById("codigo-form").value}-${tallaRegistro}-${loteRegistro}</td>`+// Columna 2 > código
                     `<td><input onKeyup="op_descri(this)" class="input-tablas-texto-largo" value="${document.getElementById("descripcion-form").value}" placeholder="Rellene esta celda"></td>`+// Columna 3 > descripción
@@ -239,10 +237,12 @@ async function procesamientoRegistros(e){
             document.querySelector("#tabla_principal > tbody").remove();
             document.querySelector("#tabla_principal").createTBody();
             array_saldos = [];
+        }else if(document.querySelector("#tabla_principal > tbody").rows.length === 0){
+            modal_proceso_abrir("Imposible procesar, la lista está vacía.", "")
+            modal_proceso_salir_botones();
         };
     }catch(error){
         modal_proceso_abrir("Ocurrió un error. " + error, "")
-        console.error("Ocurrió un error. ", error)
         modal_proceso_salir_botones()
     };
 };
