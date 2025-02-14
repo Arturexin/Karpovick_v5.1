@@ -360,7 +360,7 @@ def editAccionesAsistencia():
     #"""Edita la información de un usuario y registra la asistencia."""
     try:
         usuarioLlave = session.get('usernameDos')
-        dato_cero = 0
+        
         dato_uno = 1
         with mysql.connection.cursor() as cur:
             query = ("UPDATE `usuarios` SET `clave` = %s "
@@ -371,7 +371,7 @@ def editAccionesAsistencia():
             if 'id_asistencia' in request.json:
                 response = horaSalida(cur, dato_uno, usuarioLlave)
             else:
-                response = horaEntrada(cur, dato_cero, dato_uno, usuarioLlave)
+                response = horaEntrada(cur, dato_uno, usuarioLlave)
 
             mysql.connection.commit()
         return response
@@ -600,11 +600,11 @@ def getRemuneracionMultiple():
         return jsonify({'error': str(e)}), 500
     
 
-def horaEntrada(cur, dato_cero, dato_uno, usuarioLlave):
+def horaEntrada(cur, dato_uno, usuarioLlave):
     consulta = ("INSERT INTO `control_asistencia` (`id_asistencia`, `colaborador`, `hora_entrada`, `hora_salida`, "
                 "`sucursal`, `identificador_asistencia`, `estado`, `salario`) "
                 "VALUES (NULL, %s, %s, %s, %s, %s, %s, %s)")
-    valores = ( request.json['colaborador'], request.json['hora_entrada'], dato_cero, 
+    valores = ( request.json['colaborador'], request.json['hora_entrada'], request.json['hora_entrada'], 
                 request.json['sucursal'], usuarioLlave, dato_uno, request.json['salario'])
     cur.execute(consulta,valores)
     return jsonify({"status": "success", "message": "Hora de entrada registrada correctamente."})

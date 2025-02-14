@@ -334,18 +334,10 @@ async function pausarUsuario(id){
             usuario.clave = 4;
             await searchUsuarios(false)
 
-            let asistenci_ = base_datos.array.find(x=> x.id_asistencia == colaborador.id_asistencia)
-            if(asistenci_){// actualizamos los datos de la base de datos
-                asistenci_.hora_salida = generarFecha();
-                asistenci_.formato_salida = new Date();
-                asistenci_.salario = tratamientoSalario(usuario.id);
-                let html = ''
-                for(e of base_datos.array){//volvemos a pintar los datos en la tabla de asistencias
-                    let fila =  cuerpoFilaTabla(e)
-                    html = html + fila;
-                };
-                document.querySelector("#tabla-asistencias > tbody").innerHTML = html;
-            };
+            manejoDeFechas();
+            await conteoFilas(subRutaA(1), filas_total_bd, indice_tabla, 
+                            document.getElementById("numeracionTablaAsistencia"), 20)
+            await searchDatos(subRutaB(num_filas_tabla.value, 1), base_datos, "#tabla-asistencias")
             modal_proceso_abrir(`Hora de salida de ${usuario.nombres} ${usuario.apellidos} se registró a: ${generarFecha()}`, "")
             modal_proceso_salir_botones()
         };
@@ -446,19 +438,10 @@ async function procesarEdicion(id){
     let url = URL_API_almacen_central + 'edit_asistencias'
     let response_edit = await funcionFetchDos(url, data)
     if(response_edit.status = 'success'){
-        let asistenci_ = base_datos.array.find(x=> x.id_asistencia == id)
-        if(asistenci_){// actualizamos los datos de la base de datos
-            asistenci_.hora_entrada = document.getElementById('edit_hora_entrada').value;
-            asistenci_.hora_salida = document.getElementById('edit_hora_salida').value;
-            asistenci_.formato_entrada = new Date(document.getElementById("edit_hora_entrada").value);
-            asistenci_.formato_salida = new Date(document.getElementById("edit_hora_salida").value);
-            let html = ''
-            for(e of base_datos.array){//volvemos a pintar los datos en la tabla de asistencias
-                let fila =  cuerpoFilaTabla(e)
-                html = html + fila;
-            };
-            document.querySelector("#tabla-asistencias > tbody").innerHTML = html;
-        };
+        manejoDeFechas();
+        await conteoFilas(subRutaA(1), filas_total_bd, indice_tabla, 
+                        document.getElementById("numeracionTablaAsistencia"), 20)
+        await searchDatos(subRutaB(num_filas_tabla.value, 1), base_datos, "#tabla-asistencias")
     
         modal_proceso_abrir(`${response_edit.message}.`, "")
         modal_proceso_salir_botones()
@@ -475,7 +458,6 @@ function generarFechaDos(dato, correccion_zona){
     const segundo = String(fecha.getSeconds()).padStart(2, '0')
     return `${anio}-${mes}-${dia} ${hora}:${minuto}:${segundo}`;
 };
-
 //ELIMINAR Asistencia
 
 async function accionRemove(id) {
@@ -616,7 +598,7 @@ async function graficoClientes(){
     let response = await cargarDatos(   `asistencia_remuneracion_multiple?`+
                                         `year_actual=${anio_referencia.value}&`+
                                         `month_actual=${new Date().getMonth() + 1}`)
-    console.log(response)
+
     document.getElementById("contenedor_grafico_usuarios").innerHTML = `<canvas id="grafico_usuarios" class="gradico_anual"></canvas>`
 
     const labels = response.map(item => `${item.nombres} ${item.apellidos}`);
