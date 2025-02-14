@@ -534,8 +534,6 @@ def getRemuneracion(colaborador):
                         WHERE identificador_asistencia = %s 
                         AND estado > 0 
                         AND colaborador = %s 
-                        AND hora_entrada <> '0000-00-00 00:00:00'
-                        AND hora_salida <> '0000-00-00 00:00:00'
                         AND YEAR(hora_entrada) = %s 
                         GROUP BY mes
                     """)
@@ -567,6 +565,7 @@ def getRemuneracionMultiple():
             query = ("""
                         SELECT 
                             MONTH(hora_entrada) AS mes, 
+                            colaborador,
                             nombres,
                             apellidos,
                             salario,
@@ -575,8 +574,6 @@ def getRemuneracionMultiple():
                         JOIN usuarios ON `control_asistencia`.`colaborador` = `usuarios`.`id` 
                         WHERE identificador_asistencia = %s 
                         AND estado > 0 
-                        AND hora_entrada <> '0000-00-00 00:00:00'
-                        AND hora_salida <> '0000-00-00 00:00:00'
                         AND MONTH(hora_entrada) = %s 
                         AND YEAR(hora_entrada) = %s 
                         GROUP BY colaborador, mes
@@ -589,10 +586,11 @@ def getRemuneracionMultiple():
         for fila in data:
             contenido = { 
                 'mes': fila[0],
-                'nombres': fila[1],
-                'apellidos': fila[2],
-                'salario': fila[3],
-                'horas_laboradas': fila[4],
+                'colaborador': fila[1],
+                'nombres': fila[2],
+                'apellidos': fila[3],
+                'salario': fila[4],
+                'horas_laboradas': fila[5],
                 }
             resultado.append(contenido)
         return jsonify(resultado)
