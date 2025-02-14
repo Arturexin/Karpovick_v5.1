@@ -123,7 +123,7 @@ function colorFondo(mayor_absoluto, num) {
     return '';  // Por si acaso ninguno de los casos se cumple
 }
 
-function llenarBodyAbsoluto(nombre, array_, dato, moneda, mayor_absoluto) {
+function llenarBodyAbsoluto(nombre, array_, dato, moneda, mayor_absoluto, valor) {
     let html = '';
     for (let categoria of array_) {
         let sum_cat = 0;
@@ -139,7 +139,7 @@ function llenarBodyAbsoluto(nombre, array_, dato, moneda, mayor_absoluto) {
         fila += `<td class="total_categoria" style="text-align: center; width: 80px;font-size: 13px;"><h4>${moneda ? sum_cat.toFixed(2): sum_cat}</h4></td>
                  <td style="text-align: center;width: 40px;">
                     <div class="tooltip">
-                        <span onclick="busquedaCategoria(${categoria.sucursal}, ${categoria.categoria}, ${document.getElementById('anio_referencia').value})" 
+                        <span onclick="parametroFuncion(${categoria.sucursal}, ${categoria.categoria}, ${document.getElementById('anio_referencia').value}, ${valor}, '${categoria.codigo}')" 
                             style="font-size:18px;" class="material-symbols-outlined myButtonEditar">play_arrow
                         </span>
                         <span class="tooltiptext">Detalle por producto</span>
@@ -150,7 +150,7 @@ function llenarBodyAbsoluto(nombre, array_, dato, moneda, mayor_absoluto) {
     }
     return html
 }
-function llenarBodyRelativo(nombre, array_, dato, array_total, mayor_relativo){
+function llenarBodyRelativo(nombre, array_, dato, array_total, mayor_relativo, valor){
     let html = ''
     for(categoria of array_){
         let sum_cat = 0;
@@ -168,7 +168,7 @@ function llenarBodyRelativo(nombre, array_, dato, array_total, mayor_relativo){
         fila +=     `<td class="total_categoria" style="text-align: center;width: 80px;font-size: 13px;"><h4>${Math.round(sum_cat/sum_tot * 100)}%</h4></td>
                     <td style="text-align: center;width: 40px;">
                         <div class="tooltip">
-                            <span onclick="busquedaCategoria(${categoria.sucursal}, ${categoria.categoria}, ${document.getElementById("anio_referencia").value})" 
+                            <span onclick="parametroFuncion(${categoria.sucursal}, ${categoria.categoria}, ${document.getElementById("anio_referencia").value}, ${valor}, '${categoria.codigo}')" 
                                 style="font-size:18px;" class="material-symbols-outlined myButtonEditar">play_arrow
                             </span>
                             <span class="tooltiptext">Detalle por producto</span>
@@ -197,7 +197,7 @@ function llenarFooterRelativo(elemento, array){
     })
     elemento[12].textContent = `100%`;
 }
-function evetoSelect(elemento, tabla_body, array_, nombre, nodeList){
+function evetoSelect(elemento, tabla_body, array_, nombre, nodeList, valor){
     let options =   [ 
                         "", 
                         "suma_ventas", "suma_ventas", 
@@ -217,11 +217,11 @@ function evetoSelect(elemento, tabla_body, array_, nombre, nodeList){
                 }else if(i % 2 !== 0){
                     let tipo = i > 4 ? false: true;
                     let tot = sumartoriaAbsoluta(options[i], array_)
-                    tabla_body.children[2].innerHTML = llenarBodyAbsoluto(nombre, array_, options[i], tipo, tot[1])
+                    tabla_body.children[2].innerHTML = llenarBodyAbsoluto(nombre, array_, options[i], tipo, tot[1], valor)
                     llenarFooter(nodeList, tot[0], tipo)
                 }else if(i % 2 === 0){
                     let tot = sumartoriaAbsoluta(options[i], array_)
-                    tabla_body.children[2].innerHTML = llenarBodyRelativo(nombre, array_, options[i], tot[0], tot[2])
+                    tabla_body.children[2].innerHTML = llenarBodyRelativo(nombre, array_, options[i], tot[0], tot[2], valor)
                     llenarFooterRelativo(nodeList, tot)
                 }
             }
@@ -279,7 +279,7 @@ async function busquedaCategoria(id_suc, id_cat, anio){
     let tot = Array(12).fill("");
     llenarFooter(document.querySelectorAll(".total_mes_categoria"), tot, false)
 
-    let response = await cargarDatos(   `salidas_productos_sucursal?`+
+    let response = await cargarDatos(   `salidas_productos_sucursal_grupo?`+
                                         `sucursal_salidas=${id_suc}&`+
                                         `categoria_salidas=${id_cat}&`+
                                         `year_actual=${anio}`)
@@ -293,18 +293,65 @@ async function busquedaCategoria(id_suc, id_cat, anio){
                     document.getElementById("tabla_codigos_venta"),
                     array_productos_, 
                     "codigo",
-                    document.querySelectorAll(".total_mes_categoria"))
+                    document.querySelectorAll(".total_mes_categoria"), 1)
         modal_proceso_abrir("Resultados encontrados", "", "")
         modal_proceso_salir_botones()
         
         let tot = sumartoriaAbsoluta("suma_ventas", array_productos_)
-        document.getElementById("tabla_codigos_venta").children[2].innerHTML = llenarBodyAbsoluto("codigo", array_productos_, "suma_ventas", true, tot[1])
+        document.getElementById("tabla_codigos_venta").children[2].innerHTML = llenarBodyAbsoluto("codigo", array_productos_, "suma_ventas", true, tot[1], 1)
         llenarFooter(document.querySelectorAll(".total_mes_categoria"), tot[0], true)
                     
     }else{
         array_productos_ = [];
         modal_proceso_abrir("No se encontraron resultados", "", "")
         modal_proceso_salir_botones()
+    }
+}
+
+async function busquedaProducto(id_suc, anio, codigo_busqueda){
+    modal_proceso_abrir("Buscando resultados...", "", "")
+
+    document.getElementById("tit_monto_medida").textContent = "";
+
+    document.querySelector("#tabla_codigo_medidas > tbody").remove()
+    document.querySelector("#tabla_codigo_medidas").createTBody()
+
+    let tot = Array(12).fill("");
+    llenarFooter(document.querySelectorAll(".total_mes_categoria_medida"), tot, false)
+
+    let response = await cargarDatos(   `salidas_productos_sucursal/${codigo_busqueda}?`+
+                                        `sucursal_salidas=${id_suc}&`+
+                                        `year_actual=${anio}`)
+
+    await delay(500)
+    if(response.status === "success"){
+        array_productos_ = crearArrayDatos(response.datos, "codigo");
+        document.getElementById("tit_monto_medida").textContent = codigo_busqueda;
+        document.getElementById("opciones_codigo_medidas").value = "1"
+        
+        evetoSelect(document.getElementById("opciones_codigo_medidas"),
+                    document.getElementById("tabla_codigo_medidas"),
+                    array_productos_, 
+                    "codigo",
+                    document.querySelectorAll(".total_mes_categoria_medida"), null)
+        modal_proceso_abrir("Resultados encontrados", "", "")
+        modal_proceso_salir_botones()
+        
+        let tot = sumartoriaAbsoluta("suma_ventas", array_productos_)
+        document.getElementById("tabla_codigo_medidas").children[2].innerHTML = llenarBodyAbsoluto("codigo", array_productos_, "suma_ventas", true, tot[1], null)
+        llenarFooter(document.querySelectorAll(".total_mes_categoria_medida"), tot[0], true)
+                    
+    }else{
+        array_productos_ = [];
+        modal_proceso_abrir("No se encontraron resultados", "", "")
+        modal_proceso_salir_botones()
+    }
+}
+async function parametroFuncion(id_suc, id_cat, anio, valor, codigo_busqueda){
+    if(valor === 0){
+        await busquedaCategoria(id_suc, id_cat, anio)
+    }else if(valor === 1){
+        await busquedaProducto(id_suc, anio, codigo_busqueda)
     }
 }
 
@@ -325,6 +372,10 @@ document.querySelectorAll(".suc_estad").forEach((event, i)=>{
         document.getElementById("opciones_codigos").value = "0"
         document.querySelector("#tabla_codigos_venta > tbody").remove()
         document.querySelector("#tabla_codigos_venta").createTBody()
+
+        document.getElementById("opciones_codigo_medidas").value = "0"
+        document.querySelector("#tabla_codigo_medidas > tbody").remove()
+        document.querySelector("#tabla_codigo_medidas").createTBody()
 
         let tot = Array(12).fill("");
         llenarFooter(document.querySelectorAll(".total_mes_sucursal"), tot, false)
@@ -349,7 +400,12 @@ document.querySelectorAll(".suc_estad").forEach((event, i)=>{
                     document.getElementById("tabla_categorias_venta"),
                     array_categorias_,
                     "categoria_nombre",
-                    document.querySelectorAll(".total_mes_sucursal"))
+                    document.querySelectorAll(".total_mes_sucursal"), 0)
+        
+        document.getElementById("opciones_categorias").value = "1"
+        tot = sumartoriaAbsoluta("suma_ventas", array_categorias_)
+        document.getElementById("tabla_categorias_venta").children[2].innerHTML = llenarBodyAbsoluto("categoria_nombre", array_categorias_, "suma_ventas", true, tot[1], 0)
+        llenarFooter(document.querySelectorAll(".total_mes_sucursal"), tot[0], true)
     })
 });
 function quitarMarcaBoton(){
@@ -365,6 +421,9 @@ document.getElementById("imprimir_cat").addEventListener("click", ()=>{
 })
 document.getElementById("imprimir_prod").addEventListener("click", ()=>{
     imprimirContenido_home(document.querySelector("#tabla_codigos_venta"), document.getElementById("opciones_codigos"), "producto")
+})
+document.getElementById("imprimir_prod_medida").addEventListener("click", ()=>{
+    imprimirContenido_home(document.querySelector("#tabla_codigo_medidas"), document.getElementById("opciones_codigo_medidas"), "medida de producto")
 })
 function imprimirContenido_home(elemento, elemento_titulo, texto) {
     let anio = document.getElementById("anio_referencia").value
@@ -391,7 +450,7 @@ function imprimirContenido_home(elemento, elemento_titulo, texto) {
 //Buscador de desempeño
 let input_busqueda = document.querySelectorAll(".input-filtro")
 function buscadorDesempeno(i, event){
-    let id = ["#tabla_categorias_venta", "#tabla_codigos_venta"]
+    let id = ["#tabla_categorias_venta", "#tabla_codigos_venta", "#tabla_codigo_medidas"]
     document.querySelectorAll(`${id[i]} > tbody > tr`).forEach((elemento)=>{
         if(elemento.children[0].textContent.toLowerCase().includes(event.value.toLowerCase())){
             elemento.children[0].parentNode.classList.remove("invisible")

@@ -184,7 +184,6 @@ let sucursal_ventas = 0;
 let idx_suc = 0;
 buscador_codigo.addEventListener("keyup", async () =>{
     let almacenCentral = buscarProductosDinamicamente(buscador_codigo.value.toLowerCase());
-    console.log(almacenCentral)
     if(almacenCentral){
         
         id_ventas.value = almacenCentral.idProd;
@@ -218,9 +217,6 @@ async function busquedaProductoPorId(){//Busca productos por id condicionado por
                                         `ids=${ids.join(",")}`);
     await delay(500); 
     let fila_res = array_saldos.find(x => response[0].idProd === x.idProd)
-    console.log(response)
-    console.log(response[0][sucursales_activas[idx_suc]])
-    console.log(fila_res)
     if(fila_res === undefined){
         if(response[0][sucursales_activas[idx_suc]] > 0){
             array_saldos.push(new ObjGeneral(response[0].categoria,
@@ -686,6 +682,7 @@ function NuevaVentanaComprobanteDePago(nro_venta, ticket_venta) {
                                 <img style="height: 40px" class="codBarTicket" src="">
                                 
                                 <p>GRACIAS POR SU PREFERENCIA<p>
+                                <p>Whatsapp: ${neg_db[0].web}<p>
                                 
                             </div>
                         </div>

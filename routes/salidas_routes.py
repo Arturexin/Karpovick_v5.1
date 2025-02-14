@@ -25,6 +25,7 @@ salidas_comprobante = Blueprint('salidas_comprobante', __name__)
 salidas_delete = Blueprint('salidas_delete', __name__)
 procesar_devolucion_salidas_post = Blueprint('procesar_devolucion_salidas_post', __name__)
 salidas_gestion_ventas_post = Blueprint('salidas_gestion_ventas_post', __name__)
+salidas_productos_sucursal_grupo = Blueprint('salidas_productos_sucursal_grupo', __name__)
 
 @salidas_conteo.route('/api/salidas_conteo')
 @cross_origin()
@@ -473,14 +474,68 @@ def getCategoriasSucursalSalidas():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@salidas_productos_suc.route('/api/salidas_productos_sucursal')#SALIDAS_estadisticas
+@salidas_productos_sucursal_grupo.route('/api/salidas_productos_sucursal_grupo')  # SALIDAS_estadisticas
 @cross_origin()
 @login_required
-def getCodigoSucursalSalidas():
+def getCodigoSucursalSalidasGrupo():
     try:
         usuarioLlave = session.get('usernameDos')
         sucursal_salidas = request.args.get('sucursal_salidas')
         categoria_salidas = request.args.get('categoria_salidas')
+        year_actual = request.args.get('year_actual')
+
+        with mysql.connection.cursor() as cur:
+            query = """
+                SELECT 
+                    MONTH(fecha) AS mes, 
+                    sucursal, 
+                    categoria_nombre, 
+                    SUBSTRING_INDEX(codigo, '-', 1) AS codigo_base,  -- Extraer el código base
+                    SUM((existencias_salidas - existencias_devueltas) * precio_venta_salidas) AS suma_ventas, 
+                    SUM((existencias_salidas - existencias_devueltas) * costo_unitario) AS suma_costos, 
+                    SUM(existencias_salidas - existencias_devueltas) AS suma_unidades, 
+                    SUM(existencias_devueltas) AS suma_unidades_dev, 
+                    COUNT(DISTINCT comprobante) AS suma_veces 
+                FROM `salidas` 
+                JOIN `almacen_central` ON `salidas`.`idProd` = `almacen_central`.`idProd` 
+                JOIN categorias ON `almacen_central`.`categoria` = `categorias`.`id` 
+                WHERE `identificadorSal` = %s 
+                AND sucursal = %s 
+                AND comprobante LIKE %s 
+                AND categoria LIKE %s 
+                AND salidas.estado > 0 
+                AND YEAR(fecha) = %s 
+                GROUP BY mes, sucursal, categoria, codigo_base  -- Agrupar por el código base
+                ORDER BY mes ASC
+            """
+            data_params = (usuarioLlave, f"{sucursal_salidas}", "Venta%", f"{categoria_salidas}", year_actual)
+            cur.execute(query, data_params)
+            data = cur.fetchall()
+            resultado = []
+            for fila in data:
+                contenido = {
+                    'mes': fila[0],
+                    'sucursal': fila[1],
+                    'categoria_nombre': fila[2],
+                    'codigo': fila[3],  # Usar el código base
+                    'suma_ventas': fila[4],
+                    'suma_costos': fila[5],
+                    'suma_unidades': int(fila[6]),
+                    'suma_unidades_dev': int(fila[7]),
+                    'suma_veces': int(fila[8])
+                }
+                resultado.append(contenido)
+            return jsonify({"status": "success", "datos": resultado})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+@salidas_productos_suc.route('/api/salidas_productos_sucursal/<string:codigo>')#SALIDAS_estadisticas
+@cross_origin()
+@login_required
+def getCodigoSucursalSalidas(codigo):
+    try:
+        usuarioLlave = session.get('usernameDos')
+        sucursal_salidas = request.args.get('sucursal_salidas')
         #year_actual = datetime.now().year
         year_actual = request.args.get('year_actual')
 
@@ -497,12 +552,12 @@ def getCodigoSucursalSalidas():
                      "WHERE `identificadorSal` = %s "
                      "AND sucursal = %s "
                      "AND comprobante LIKE %s "
-                     "AND categoria LIKE %s "
+                     "AND codigo LIKE %s "
                      "AND salidas.estado > 0 "
                      "AND YEAR(fecha) = %s "
                      "GROUP BY mes, sucursal, categoria, codigo "
                      "ORDER BY mes ASC")
-            data_params = (usuarioLlave, f"{sucursal_salidas}", "Venta%", f"{categoria_salidas}", year_actual)
+            data_params = (usuarioLlave, f"{sucursal_salidas}", "Venta%", f"{codigo}%", year_actual)
             cur.execute(query, data_params)
             data = cur.fetchall()
         resultado = []

@@ -1,16 +1,18 @@
 document.addEventListener("DOMContentLoaded", inicioUsuarios)
-function inicioUsuarios(){
+async function inicioUsuarios(){
     searchUsuarios(true) 
 
     array_btn_pages[14] = 1;
-    cargarDatosAnio()
-    inicioTablasAsistencias()
+    await cargarDatosAnio()
+    await inicioTablasAsistencias()
+    await graficoClientes()
 };
 
 function cargarDatosAnio(){
     document.getElementById("cargar_datos_anio").addEventListener("click", async ()=>{
         anio_principal = anio_referencia.value;
 
+        graficoClientes()
         modal_proceso_abrir(`Datos del año ${anio_principal} cargados.`, "")
         modal_proceso_salir_botones()
     })
@@ -610,3 +612,64 @@ async function modalRemuneracion(remuneracion, id, anio){
                 </div>`;
     document.getElementById("acciones_rapidas").innerHTML = html;
 }
+async function graficoClientes(){
+    let response = await cargarDatos(   `asistencia_remuneracion_multiple?`+
+                                        `year_actual=${anio_referencia.value}&`+
+                                        `month_actual=${new Date().getMonth() + 1}`)
+    console.log(response)
+    document.getElementById("contenedor_grafico_usuarios").innerHTML = `<canvas id="grafico_usuarios" class="gradico_anual"></canvas>`
+
+    const labels = response.map(item => `${item.nombres} ${item.apellidos}`);
+    const horasLaboradas = response.map(item => Number(item.horas_laboradas));
+
+    const ctx = document.getElementById('grafico_usuarios').getContext('2d');
+    const myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: `Horas Laboradas`,
+                data: horasLaboradas,
+                backgroundColor: "rgb(230, 110, 141)",
+                borderColor: "rgb(230, 110, 141, 0.2)",
+                borderWidth: 1,
+                barThickness: 10
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    grid: {
+                        display: false
+                    },ticks: {
+                        color: '#eee'
+                    }
+                },
+                y: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        color: '#eee', // Cambiar el color de las etiquetas
+                        font: {
+                            size: 12, // Cambiar el tamaño de la fuente
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    labels: {
+                        color: '#eee', // Establece el color de los labels en la leyenda
+                        font: {
+                            size: 18, // Cambiar el tamaño de la fuente
+                        }
+                    }
+                },
+            }
+        }
+    });
+};

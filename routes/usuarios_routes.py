@@ -26,6 +26,7 @@ usuarios_asistencia_busqueda = Blueprint('usuarios_asistencia_busqueda', __name_
 edit_asistencias = Blueprint('edit_asistencias', __name__)
 asistencias_remove = Blueprint('asistencias_remove', __name__)
 usuarios_asistencia_remuneracion = Blueprint('usuarios_asistencia_remuneracion', __name__)
+usuarios_asistencia_remuneracion_multiple = Blueprint('usuarios_asistencia_remuneracion_multiple', __name__)
 
 
 @usuarios_conteo.route('/api/usuarios_conteo')#Control
@@ -328,7 +329,6 @@ def registroInternoCreate():
                         request.json['salario_usu'], request.json['afp_onp'], request.json['asig_fam'], request.json['salud'])
             cur.execute(consulta,valores)
 
-            cur.execute(consulta,valores)
             mysql.connection.commit()
         return jsonify({"status": "success", "message": "Usuario creado correctamente."})
     except Exception as e:
@@ -530,7 +530,7 @@ def getRemuneracion(colaborador):
                             MONTH(hora_entrada) AS mes, 
                             salario,
                             SUM(TIME_TO_SEC(TIMEDIFF(COALESCE(hora_salida, '00:00:00'), COALESCE(hora_entrada, '00:00:00')))) / 3600 AS horas_laboradas
-                        FROM control_asistencia 
+                        FROM control_asistencia
                         WHERE identificador_asistencia = %s 
                         AND estado > 0 
                         AND colaborador = %s 
@@ -549,6 +549,50 @@ def getRemuneracion(colaborador):
                 'mes': fila[0],
                 'salario': fila[1],
                 'horas_laboradas': fila[2],
+                }
+            resultado.append(contenido)
+        return jsonify(resultado)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+@usuarios_asistencia_remuneracion_multiple.route('/api/asistencia_remuneracion_multiple')#Usuarios
+@cross_origin()
+@login_required
+def getRemuneracionMultiple():
+    try:
+        usuarioLlave = session.get('usernameDos')
+        year_actual = request.args.get('year_actual')
+        month_actual = request.args.get('month_actual')
+        with mysql.connection.cursor() as cur:
+            query = ("""
+                        SELECT 
+                            MONTH(hora_entrada) AS mes, 
+                            nombres,
+                            apellidos,
+                            salario,
+                            SUM(TIME_TO_SEC(TIMEDIFF(COALESCE(hora_salida, '00:00:00'), COALESCE(hora_entrada, '00:00:00')))) / 3600 AS horas_laboradas
+                        FROM control_asistencia  
+                        JOIN usuarios ON `control_asistencia`.`colaborador` = `usuarios`.`id` 
+                        WHERE identificador_asistencia = %s 
+                        AND estado > 0 
+                        AND hora_entrada <> '0000-00-00 00:00:00'
+                        AND hora_salida <> '0000-00-00 00:00:00'
+                        AND MONTH(hora_entrada) = %s 
+                        AND YEAR(hora_entrada) = %s 
+                        GROUP BY colaborador, mes
+                    """)
+            data_params = (usuarioLlave, month_actual, year_actual)
+            cur.execute(query, data_params)
+            data = cur.fetchall()
+
+        resultado = []
+        for fila in data:
+            contenido = { 
+                'mes': fila[0],
+                'nombres': fila[1],
+                'apellidos': fila[2],
+                'salario': fila[3],
+                'horas_laboradas': fila[4],
                 }
             resultado.append(contenido)
         return jsonify(resultado)

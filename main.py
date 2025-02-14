@@ -106,6 +106,7 @@ app.register_blueprint(salidas_.salidas_comprobante)
 app.register_blueprint(salidas_.salidas_delete)
 app.register_blueprint(salidas_.procesar_devolucion_salidas_post)
 app.register_blueprint(salidas_.salidas_gestion_ventas_post)
+app.register_blueprint(salidas_.salidas_productos_sucursal_grupo)
 ##########################################################################################################################################################################
 # Datos de la tabla TRANSFERENCIAS
 ##########################################################################################################################################################################
@@ -181,6 +182,7 @@ app.register_blueprint(usuarios_.asistencias_tabla)
 app.register_blueprint(usuarios_.edit_asistencias)
 app.register_blueprint(usuarios_.asistencias_remove)
 app.register_blueprint(usuarios_.usuarios_asistencia_remuneracion)
+app.register_blueprint(usuarios_.usuarios_asistencia_remuneracion_multiple)
 ##########################################################################################################################################################################
 # Datos de la tabla gastos_varios
 ##########################################################################################################################################################################

@@ -179,7 +179,8 @@ async function buscarTicketVenta(id_ventas) {
                                 <p style="font-size: 9px>LADO: COPIA</p>
                                 <img style="height: 40px" class="codBarTicket" src="">
 
-                                <p>GRACIAS POR SU PREFERENCIA<p>                            
+                                <p>GRACIAS POR SU PREFERENCIA<p> 
+                                <p>Whatsapp: ${neg_db[0].web}<p>                           
                             </div>
                         </div>
                         <br>

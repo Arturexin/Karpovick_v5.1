@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", inicioConfiguracion)
 function inicioConfiguracion(){
-    searchNumeracion();
+    /* searchNumeracion(); */
     searchDatosUsuario();
     searchSucursales();
     array_btn_pages[15] = 1;
@@ -263,7 +263,7 @@ function incrementarCantidad(p){
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////NUMERACION//////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-async function searchNumeracion(){
+/* async function searchNumeracion(){
     numeracion = await cargarDatos('numeracion_comprobante')
     await delay(500)
     let html = ''
@@ -326,7 +326,7 @@ async function saveNumeracion(e) {
         modal_proceso_salir_botones();
 
     }
-}
+} */
 async function searchDatosUsuario(){
     datos = await cargarDatos('numeracion_comprobante_datos')
     await delay(500)
@@ -375,9 +375,9 @@ async function saveNumeracionDatos(e) {
         "web": document.getElementById('web-datos').value    
     }
     let url = URL_API_almacen_central + 'numeracion_comprobante_datos'
-    let response = await funcionFetch(url, data)
+    let response = await funcionFetchDos(url, data)
     if(response.status === 'success'){
-        searchDatosUsuario();
+        await searchDatosUsuario();
         localStorage.setItem("datos_negocio", JSON.stringify(await cargarDatos('numeracion_comprobante_datos')))
         neg_db = JSON.parse(localStorage.getItem("datos_negocio"));
         agregarMoneda(document.querySelectorAll(".moneda_cabecera"))

@@ -38,7 +38,7 @@
         <table id="tabla_categorias_venta" class="tabla_mapa_calor">
             <thead>
                 <tr>
-                    <th scope="row" colspan="16"><h2>Desempeño por categoría<span id="sucu_categoria"></span></h2></th>
+                    <th scope="row" colspan="16"><h2>Desempeño por sucursal por categoría<span id="sucu_categoria"></span></h2></th>
                 </tr>
                 <tr>
                     <th scope="row" colspan="16">
@@ -96,7 +96,7 @@
         <table id="tabla_codigos_venta" class="tabla_mapa_calor">
             <thead>
                 <tr>
-                    <th scope="row" colspan="16"><h2>Desempeño por producto por categoria <span id="tit_monto"></span></h2></th>
+                    <th scope="row" colspan="16"><h2>Desempeño por categoria por producto <span id="tit_monto"></span></h2></th>
                 </tr>
                 <tr>
                     <th scope="row" colspan="16">
@@ -151,6 +151,67 @@
                 <th class="total_mes_categoria" style="text-align: center;font-size: 14px;"></th>
                 <th class="total_mes_categoria" style="text-align: center;font-size: 14px;"></th>
                 <th><button id="imprimir_prod">Imprimir</button></th>
+            </tfoot>
+        </table>
+        <br>
+        <table id="tabla_codigo_medidas" class="tabla_mapa_calor">
+            <thead>
+                <tr>
+                    <th scope="row" colspan="16"><h2>Desempeño por producto por medida <span id="tit_monto_medida"></span></h2></th>
+                </tr>
+                <tr>
+                    <th scope="row" colspan="16">
+                        <select name="" id="opciones_codigo_medidas" class="input-select-ventas">
+                            <option value=0>--Selección--</option>
+                            <option value=1>Ventas absolutas</option>
+                            <option value=2>Ventas relativas</option>
+                            <option value=3>Ganancias absolutas</option>
+                            <option value=4>Ganancias relativas</option>
+                            <option value=5>Unidades absolutas</option>
+                            <option value=6>Unidades relativas</option>
+                            <option value=7>Recurrencias absolutas</option>
+                            <option value=8>Recurrencias relativas</option>
+                            <option value=9>Devoluciones absolutas</option>
+                            <option value=10>Devoluciones relativas</option>
+                        </select>
+                    </th>
+                </tr>
+                <tr>
+                    <th display="grid" justify-items="center" width="45px">Producto <input id="buscador_producto_medida" type="text" class="input-filtro" placeholder="Buscar ..."></th>
+                    <th>Ene</th>
+                    <th>Feb</th>
+                    <th>Mar</th>
+                    <th>Abr</th>
+                    <th>May</th>
+                    <th>Jun</th>
+                    <th>Jul</th>
+                    <th>Ago</th>
+                    <th>Set</th>
+                    <th>Oct</th>
+                    <th>Nov</th>
+                    <th>Dic</th>
+                    <th>Total</th>
+                    <th>Acciones</th>
+                </tr>
+                
+            </thead>
+            <tbody style="font-size: 15px;"></tbody>
+            <tfoot>
+                <th>Total</th>
+                <th class="total_mes_categoria_medida" style="text-align: center;font-size: 14px;"></th>
+                <th class="total_mes_categoria_medida" style="text-align: center;font-size: 14px;"></th>
+                <th class="total_mes_categoria_medida" style="text-align: center;font-size: 14px;"></th>
+                <th class="total_mes_categoria_medida" style="text-align: center;font-size: 14px;"></th>
+                <th class="total_mes_categoria_medida" style="text-align: center;font-size: 14px;"></th>
+                <th class="total_mes_categoria_medida" style="text-align: center;font-size: 14px;"></th>
+                <th class="total_mes_categoria_medida" style="text-align: center;font-size: 14px;"></th>
+                <th class="total_mes_categoria_medida" style="text-align: center;font-size: 14px;"></th>
+                <th class="total_mes_categoria_medida" style="text-align: center;font-size: 14px;"></th>
+                <th class="total_mes_categoria_medida" style="text-align: center;font-size: 14px;"></th>
+                <th class="total_mes_categoria_medida" style="text-align: center;font-size: 14px;"></th>
+                <th class="total_mes_categoria_medida" style="text-align: center;font-size: 14px;"></th>
+                <th class="total_mes_categoria_medida" style="text-align: center;font-size: 14px;"></th>
+                <th><button id="imprimir_prod_medida">Imprimir</button></th>
             </tfoot>
         </table>
         <br>

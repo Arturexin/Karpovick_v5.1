@@ -8,8 +8,6 @@ let fecha_hoy = new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new D
 let filas_total_bd = {value: 0};
 let indice_tabla = {value : 1};
 let num_filas_tabla = {value: 0};
-let inicio = 0;
-let fin = 0;
 let base_datos = {array: []}
 let consolidado_efectivo = [];
 async function inicioTablasCaja(){
