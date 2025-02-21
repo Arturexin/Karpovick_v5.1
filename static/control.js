@@ -510,10 +510,11 @@ async function activacion(id_usuario){
                 this.id = usuario.id;
                 if(usuario.cargo === 201 || usuario.cargo === 200){
                     this.vinculacion = usuario.id;
+                    this.clave = 1;//inicia como activado
                 }else{
                     this.vinculacion = usuario.vinculacion;
+                    this.clave = 4;//inicia como pausado
                 }
-                this.clave = 1;
                 this.num_sucursales = usuario.num_sucursales;
                 this.num_usuarios = usuario.num_usuarios;
             };

@@ -548,10 +548,15 @@ async function modalRemuneracion(remuneracion, id, anio){
                             </tr>
                         </thead>`
     remuneracion.forEach(element => {
-        let valor_hora_ordinario = Number(element.salario)/192;
-        let remuneracion_ordinaria = Number(element.horas_laboradas) <= 192 ? Number(element.horas_laboradas) * valor_hora_ordinario : element.salario;
+        let asignacion_familiar = usuario.asig_fam === 1 ? usuario.salario_usu * 0.1 : 0;
+        let afp_onp = usuario.afp_onp === 1 ? (usuario.salario_usu + asignacion_familiar) * 0.13 : 0;
+        let essalud = usuario.salud === 1 ? (usuario.salario_usu + asignacion_familiar) * 0.09 : 0;
 
-        let valor_hora_sobretiempo = element.salario/30/8;
+        let remuneracion_neto = usuario.salario_usu + asignacion_familiar - afp_onp - essalud;
+        let valor_hora_ordinario = Number(remuneracion_neto)/192;
+        let remuneracion_ordinaria = Number(element.horas_laboradas) <= 192 ? Number(element.horas_laboradas) * valor_hora_ordinario : remuneracion_neto;
+
+        let valor_hora_sobretiempo = remuneracion_neto/30/8;
         let numero_horas_sobretiempo = Number(element.horas_laboradas) > 192 ? Number(element.horas_laboradas) - 192 : 0;
         let h_dos = 0;
         let sobretiempo_dos_horas = 0
@@ -567,9 +572,7 @@ async function modalRemuneracion(remuneracion, id, anio){
             sobretiempo_dos_horas = h_dos * valor_hora_sobretiempo * 1.25
             sobretiempo_mas_tres_horas = h_tres * valor_hora_sobretiempo * 1.35
         }
-        let asignacion_familiar = usuario.asig_fam === 1 ? usuario.salario_usu * 0.1 : 0;
-        let afp_onp = usuario.afp_onp === 1 ? (usuario.salario_usu + asignacion_familiar) * 0.13 : 0;
-        let essalud = usuario.salud === 1 ? (usuario.salario_usu + asignacion_familiar) * 0.09 : 0;
+        
             html +=     `<tbody>
                             <tr>
                                 <td style="width: 80px; text-align: center;">${meses_letras[element.mes-1]}-${anio}</td>
@@ -577,7 +580,7 @@ async function modalRemuneracion(remuneracion, id, anio){
                                 <td style="width: 80px; text-align: center;">${asignacion_familiar}</td>
                                 <td style="width: 80px; text-align: center;">${afp_onp}</td>
                                 <td style="width: 80px; text-align: center;">${essalud}</td>
-                                <td style="width: 80px; text-align: center;">${element.salario}</td>
+                                <td style="width: 80px; text-align: center;">${remuneracion_neto}</td>
                                 <td style="width: 80px; text-align: center;">${Number(element.horas_laboradas).toFixed(2)}</td>
                                 <td style="width: 80px; text-align: center;">${numero_horas_sobretiempo}</td>
                                 <td style="width: 80px; text-align: center;">${sobretiempo_dos_horas + sobretiempo_mas_tres_horas}</td>

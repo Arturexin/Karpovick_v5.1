@@ -527,8 +527,7 @@ def getRemuneracion(colaborador):
         with mysql.connection.cursor() as cur:
             query = ("""
                         SELECT 
-                            MONTH(hora_entrada) AS mes, 
-                            salario,
+                            MONTH(hora_entrada) AS mes,
                             SUM(TIME_TO_SEC(TIMEDIFF(COALESCE(hora_salida, '00:00:00'), COALESCE(hora_entrada, '00:00:00')))) / 3600 AS horas_laboradas
                         FROM control_asistencia
                         WHERE identificador_asistencia = %s 
@@ -545,8 +544,7 @@ def getRemuneracion(colaborador):
         for fila in data:
             contenido = { 
                 'mes': fila[0],
-                'salario': fila[1],
-                'horas_laboradas': fila[2],
+                'horas_laboradas': fila[1],
                 }
             resultado.append(contenido)
         return jsonify(resultado)
@@ -568,7 +566,6 @@ def getRemuneracionMultiple():
                             colaborador,
                             nombres,
                             apellidos,
-                            salario,
                             SUM(TIME_TO_SEC(TIMEDIFF(COALESCE(hora_salida, '00:00:00'), COALESCE(hora_entrada, '00:00:00')))) / 3600 AS horas_laboradas
                         FROM control_asistencia  
                         JOIN usuarios ON `control_asistencia`.`colaborador` = `usuarios`.`id` 
@@ -589,8 +586,7 @@ def getRemuneracionMultiple():
                 'colaborador': fila[1],
                 'nombres': fila[2],
                 'apellidos': fila[3],
-                'salario': fila[4],
-                'horas_laboradas': fila[5],
+                'horas_laboradas': fila[4],
                 }
             resultado.append(contenido)
         return jsonify(resultado)
