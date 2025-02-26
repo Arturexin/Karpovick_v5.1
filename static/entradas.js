@@ -152,8 +152,9 @@ async function accionDevoluciones(id) {
         
         tabla_proforma_productos(producto, "Devoluciones", entradas.categoria_nombre, entradas.comprobante)
         let indice_suc = suc_add.findIndex(x=> x === entradas.sucursal_nombre)
+        console.log(indice_suc)
         let datos_suc = suc_db.find(x=> x.sucursal_nombre === entradas.sucursal_nombre)
-        if(datos_suc && indice_suc){
+        if(datos_suc && indice_suc !== undefined){
             sucursal_id_entradas = datos_suc.id_sucursales
             tabla_body_productos(entradas, indice_suc, sucursal_id_entradas)
         }
